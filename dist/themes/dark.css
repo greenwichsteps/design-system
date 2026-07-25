@@ -1,0 +1,11 @@
+/* Dark theme — the one non-brand override axis. Applied via [data-theme="dark"]. */
+[data-theme="dark"] {
+  --ds-bg: var(--ds-ink);
+  --ds-surface: var(--ds-ink-raised);
+  --ds-surface-raised: #24252C;
+  --ds-text: var(--ds-on-ink);
+  --ds-text-muted: var(--ds-ink-muted);
+  --ds-border: var(--ds-ink-hairline);
+  --ds-hover: rgba(255,255,255,0.06);
+  --ds-code-bg: var(--ds-surface-raised);
+}

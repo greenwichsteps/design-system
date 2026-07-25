@@ -1,0 +1,15 @@
+/* Burnside Steps — self-hosted brand fonts (committed in ./fonts/ and deployed).
+   Surfaces that don't load this file fall back to the stacks in tokens.css
+   (Georgia / system-ui). */
+@font-face { font-family: 'Canela'; font-weight: 300; font-style: normal; font-display: swap; src: url('./fonts/Canela-Light.woff2') format('woff2'); }
+@font-face { font-family: 'Canela'; font-weight: 400; font-style: normal; font-display: swap; src: url('./fonts/Canela-Regular.woff2') format('woff2'); }
+@font-face { font-family: 'Canela'; font-weight: 500; font-style: normal; font-display: swap; src: url('./fonts/Canela-Medium.woff2') format('woff2'); }
+@font-face { font-family: 'Canela'; font-weight: 400; font-style: italic; font-display: swap; src: url('./fonts/Canela-RegularItalic.woff2') format('woff2'); }
+@font-face { font-family: 'Canela Text'; font-weight: 400; font-style: normal; font-display: swap; src: url('./fonts/CanelaText-Regular.woff2') format('woff2'); }
+@font-face { font-family: 'Canela Text'; font-weight: 400; font-style: italic; font-display: swap; src: url('./fonts/CanelaText-RegularItalic.woff2') format('woff2'); }
+@font-face { font-family: 'GT America'; font-weight: 400; font-style: normal; font-display: swap; src: url('./fonts/GT-America-Standard-Regular.woff2') format('woff2'); }
+@font-face { font-family: 'GT America'; font-weight: 500; font-style: normal; font-display: swap; src: url('./fonts/GT-America-Standard-Medium.woff2') format('woff2'); }
+@font-face { font-family: 'GT America'; font-weight: 700; font-style: normal; font-display: swap; src: url('./fonts/GT-America-Standard-Bold.woff2') format('woff2'); }
+@font-face { font-family: 'GT America Mono'; font-weight: 400; font-style: normal; font-display: swap; src: url('./fonts/GT-America-Mono-Regular.woff2') format('woff2'); }
+@font-face { font-family: 'GT America Mono'; font-weight: 500; font-style: normal; font-display: swap; src: url('./fonts/GT-America-Mono-Medium.woff2') format('woff2'); }
+@font-face { font-family: 'GT America Compressed'; font-weight: 700; font-style: normal; font-display: swap; src: url('./fonts/GT-America-Compressed-Bold.woff2') format('woff2'); }
