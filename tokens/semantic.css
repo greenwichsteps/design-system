@@ -17,6 +17,11 @@
   --ds-accent-press: #000000;
   --ds-accent-tint: rgba(0,0,0,0.12);
   --ds-on-accent: #FFFFFF;
+  /* accent-solid: used only by solid fills (e.g. primary buttons); falls back to --ds-accent
+     so un-themed usage and themes that don't override it still work. */
+  --ds-accent-solid: var(--ds-accent);
+  --ds-accent-solid-press: var(--ds-accent-press);
+  --ds-on-accent-solid: var(--ds-on-accent);
   --ds-focus-ring: 0 0 0 3px var(--ds-accent-tint);
   --ds-logo: none;
 }

@@ -6,8 +6,8 @@
   text-decoration: none; white-space: nowrap;
 }
 .ds-btn--sm { padding: var(--ds-space-2) var(--ds-space-4); font-size: var(--ds-text-sm); }
-.ds-btn--accent { background: var(--ds-accent); color: var(--ds-on-accent); }
-.ds-btn--accent:hover { background: var(--ds-accent-press); }
+.ds-btn--accent { background: var(--ds-accent-solid); color: var(--ds-on-accent-solid); }
+.ds-btn--accent:hover { background: var(--ds-accent-solid-press); }
 .ds-btn--secondary { background: var(--ds-surface); color: var(--ds-text); border-color: var(--ds-border); }
 .ds-btn--secondary:hover { background: var(--ds-hover); }
 .ds-btn--ghost { background: transparent; color: var(--ds-text); }
@@ -18,7 +18,7 @@
 .ds-btn[data-loading]::after {
   content: ""; position: absolute; width: 1em; height: 1em; border-radius: 50%;
   border: 2px solid currentColor; border-top-color: transparent; animation: ds-spin .6s linear infinite;
-  color: var(--ds-on-accent);
+  color: var(--ds-on-accent-solid);
 }
 @keyframes ds-spin { to { transform: rotate(360deg); } }
 .ds-iconbtn { display: inline-grid; place-items: center; width: 40px; height: 40px; border: 0;

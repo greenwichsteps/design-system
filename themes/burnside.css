@@ -4,5 +4,10 @@
   --ds-accent-press: #E23B86;
   --ds-accent-tint: rgba(255,77,157,0.14);
   --ds-on-accent: #121317;
+  /* accent-solid: deeper, accessible magenta for solid fills (e.g. primary buttons);
+     the bright --ds-accent above keeps serving links, borders, focus rings, tinted badges. */
+  --ds-accent-solid: #D81E7A;
+  --ds-accent-solid-press: #B81866;
+  --ds-on-accent-solid: #ffffff;
   --ds-logo: url("../identity/wordmark.svg");
 }
