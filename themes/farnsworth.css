@@ -4,5 +4,8 @@
   --ds-accent-press: #1E52D6;
   --ds-accent-tint: rgba(47,107,255,0.14);
   --ds-on-accent: #FFFFFF;
+  --ds-accent-solid: var(--ds-accent);
+  --ds-accent-solid-press: var(--ds-accent-press);
+  --ds-on-accent-solid: var(--ds-on-accent);
   --ds-logo: url("../identity/farnsworth-placeholder.svg");
 }

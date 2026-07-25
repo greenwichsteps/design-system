@@ -1,4 +1,4 @@
-.ds-code { position: relative; background: var(--ds-ink); color: var(--ds-on-ink);
+.ds-code { position: relative; background: var(--ds-code-bg); color: var(--ds-code-fg);
   border-radius: var(--ds-radius-md); padding: var(--ds-space-4); overflow-x: auto; }
 .ds-code pre, .ds-code code { font-family: var(--ds-font-mono); font-size: var(--ds-text-sm); }
 .ds-code__copy { position: absolute; top: var(--ds-space-2); right: var(--ds-space-2); }
