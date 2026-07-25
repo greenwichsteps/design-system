@@ -1,0 +1,5 @@
+.ds-stat { display: grid; gap: var(--ds-space-1); }
+.ds-stat__value { font-family: var(--ds-font-display); font-size: var(--ds-text-2xl); line-height: 1; }
+.ds-stat__label { font-size: var(--ds-text-sm); color: var(--ds-text-muted); }
+.ds-empty { display: grid; gap: var(--ds-space-3); place-items: center; text-align: center; padding: var(--ds-space-10) var(--ds-space-5); color: var(--ds-text-muted); }
+.ds-empty__title { font-size: var(--ds-text-lg); color: var(--ds-text); }
