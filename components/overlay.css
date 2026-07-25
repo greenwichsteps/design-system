@@ -1,5 +1,6 @@
 dialog.ds-modal { border: 0; border-radius: var(--ds-radius-lg); padding: var(--ds-space-6); max-width: 480px; width: calc(100% - var(--ds-space-8)); background: var(--ds-surface); color: var(--ds-text); box-shadow: var(--ds-shadow-pop); }
 dialog.ds-modal::backdrop { background: var(--ds-scrim); }
+.ds-modal > * + * { margin-top: var(--ds-space-4); }
 .ds-menu { position: relative; display: inline-block; }
 .ds-menu__list { position: absolute; top: calc(100% + var(--ds-space-1)); left: 0; min-width: 180px; background: var(--ds-surface); border: 1px solid var(--ds-border); border-radius: var(--ds-radius-lg); box-shadow: var(--ds-shadow-pop); padding: var(--ds-space-2); display: none; z-index: 20; }
 .ds-menu.is-open .ds-menu__list { display: block; }
