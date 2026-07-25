@@ -1,0 +1,8 @@
+/* Farnsworth Steps — throwaway demo theme proving the accent+logo swap. */
+[data-theme-brand="farnsworth"] {
+  --ds-accent: #2F6BFF;
+  --ds-accent-press: #1E52D6;
+  --ds-accent-tint: rgba(47,107,255,0.14);
+  --ds-on-accent: #FFFFFF;
+  --ds-logo: url("../identity/farnsworth-placeholder.svg");
+}

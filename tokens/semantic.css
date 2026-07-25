@@ -1,0 +1,22 @@
+/* Semantic tokens — what components reference. Neutrals map to primitives here;
+   accent + logo are set by the active theme file. */
+:root {
+  --ds-bg: var(--ds-paper);
+  --ds-surface: var(--ds-white);
+  --ds-surface-raised: var(--ds-white);
+  --ds-text: var(--ds-ink);
+  --ds-text-muted: var(--ds-muted-ink);
+  --ds-border: var(--ds-hairline);
+  --ds-hover: var(--ds-hover-ink);
+  --ds-danger: var(--ds-error);
+  --ds-on-danger: var(--ds-white);
+  --ds-success-fg: var(--ds-success);
+  --ds-scrim: rgba(18,19,23,0.4);
+  /* accent + focus + logo are theme-provided; fallbacks keep the base usable un-themed */
+  --ds-accent: #000000;
+  --ds-accent-press: #000000;
+  --ds-accent-tint: rgba(0,0,0,0.12);
+  --ds-on-accent: #FFFFFF;
+  --ds-focus-ring: 0 0 0 3px var(--ds-accent-tint);
+  --ds-logo: none;
+}

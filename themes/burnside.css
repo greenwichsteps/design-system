@@ -1,0 +1,8 @@
+/* Burnside Steps theme — accent + logo only. */
+:root, [data-theme-brand="burnside"] {
+  --ds-accent: #FF4D9D;
+  --ds-accent-press: #E23B86;
+  --ds-accent-tint: rgba(255,77,157,0.14);
+  --ds-on-accent: #121317;
+  --ds-logo: url("../identity/wordmark.svg");
+}
