@@ -1,0 +1,20 @@
+.ds-field { display: grid; gap: var(--ds-space-2); }
+.ds-label { font-size: var(--ds-text-sm); font-weight: 500; }
+.ds-help { font-size: var(--ds-text-sm); color: var(--ds-text-muted); }
+.ds-field[data-invalid] .ds-help { color: var(--ds-danger); }
+.ds-input, .ds-textarea, .ds-select {
+  width: 100%; padding: var(--ds-space-3) var(--ds-space-4); background: var(--ds-surface);
+  color: var(--ds-text); border: 1px solid var(--ds-border); border-radius: var(--ds-radius-md);
+  transition: border-color var(--ds-dur) var(--ds-ease);
+}
+.ds-input:focus-visible, .ds-textarea:focus-visible, .ds-select:focus-visible { border-color: var(--ds-accent); }
+.ds-field[data-invalid] :is(.ds-input, .ds-textarea, .ds-select) { border-color: var(--ds-danger); }
+.ds-textarea { min-height: 6rem; resize: vertical; }
+.ds-check { display: inline-flex; align-items: center; gap: var(--ds-space-2); cursor: pointer; }
+.ds-check input { accent-color: var(--ds-accent); width: 1.1em; height: 1.1em; }
+.ds-toggle { position: relative; width: 42px; height: 24px; }
+.ds-toggle input { position: absolute; opacity: 0; }
+.ds-toggle span { position: absolute; inset: 0; background: var(--ds-border); border-radius: var(--ds-radius-pill); transition: background var(--ds-dur) var(--ds-ease); }
+.ds-toggle span::after { content: ""; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: var(--ds-surface); border-radius: 50%; transition: transform var(--ds-dur) var(--ds-ease); }
+.ds-toggle input:checked + span { background: var(--ds-accent); }
+.ds-toggle input:checked + span::after { transform: translateX(18px); }

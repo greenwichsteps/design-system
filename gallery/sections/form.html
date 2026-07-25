@@ -1,0 +1,64 @@
+<section>
+  <h2>Form Controls</h2>
+
+  <h3>Text Input</h3>
+  <div class="ds-field">
+    <label class="ds-label" for="name">Name</label>
+    <input id="name" class="ds-input" type="text" placeholder="Enter your name">
+    <div class="ds-help">This is a help text</div>
+  </div>
+
+  <h3>Textarea</h3>
+  <div class="ds-field">
+    <label class="ds-label" for="message">Message</label>
+    <textarea id="message" class="ds-textarea" placeholder="Enter your message"></textarea>
+  </div>
+
+  <h3>Select</h3>
+  <div class="ds-field">
+    <label class="ds-label" for="option">Option</label>
+    <select id="option" class="ds-select">
+      <option>Choose an option</option>
+      <option>Option 1</option>
+      <option>Option 2</option>
+      <option>Option 3</option>
+    </select>
+  </div>
+
+  <h3>Checkbox</h3>
+  <label class="ds-check">
+    <input type="checkbox">
+    <span>Agree to terms and conditions</span>
+  </label>
+
+  <h3>Radio</h3>
+  <div style="display: grid; gap: var(--ds-space-3);">
+    <label class="ds-check">
+      <input type="radio" name="choice">
+      <span>Option A</span>
+    </label>
+    <label class="ds-check">
+      <input type="radio" name="choice">
+      <span>Option B</span>
+    </label>
+  </div>
+
+  <h3>Toggle Switch (Off)</h3>
+  <label class="ds-toggle">
+    <input type="checkbox">
+    <span></span>
+  </label>
+
+  <h3>Toggle Switch (On)</h3>
+  <label class="ds-toggle">
+    <input type="checkbox" checked>
+    <span></span>
+  </label>
+
+  <h3>Invalid Field</h3>
+  <div class="ds-field" data-invalid>
+    <label class="ds-label" for="email">Email</label>
+    <input id="email" class="ds-input" type="email" value="invalid-email" placeholder="Enter email">
+    <div class="ds-help">Please enter a valid email address</div>
+  </div>
+</section>
