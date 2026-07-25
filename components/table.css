@@ -1,0 +1,4 @@
+.ds-table { width: 100%; border-collapse: collapse; }
+.ds-table th, .ds-table td { text-align: left; padding: var(--ds-space-3) var(--ds-space-4); border-bottom: 1px solid var(--ds-border); }
+.ds-table th { font-size: var(--ds-text-sm); color: var(--ds-text-muted); font-weight: 500; }
+.ds-table tbody tr:hover { background: var(--ds-hover); }
