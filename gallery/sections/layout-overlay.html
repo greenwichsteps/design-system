@@ -1,0 +1,71 @@
+<section>
+  <h2>Layout & Overlays</h2>
+
+  <h3>Nav</h3>
+  <nav class="ds-nav">
+    <span class="ds-nav__brand">Brand</span>
+    <div class="ds-nav__spacer"></div>
+    <div class="ds-nav__links" data-ds-nav="main">
+      <a href="#">Product</a>
+      <a href="#">Pricing</a>
+      <a href="#">Docs</a>
+    </div>
+    <button class="ds-btn ds-btn--ghost ds-btn--sm" data-ds-nav-toggle="main">Menu</button>
+  </nav>
+
+  <h3>Container & Grid</h3>
+  <div class="ds-container">
+    <div class="ds-grid ds-grid--2">
+      <div class="ds-card">
+        <div class="ds-card__title">Card One</div>
+        <p>A plain card sitting inside a 2-column grid.</p>
+      </div>
+      <div class="ds-card">
+        <div class="ds-card__title">Card Two</div>
+        <p>The grid collapses to a single column below 720px.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Modal</h3>
+  <button class="ds-btn ds-btn--accent" data-ds-modal-open="demo">Open modal</button>
+  <dialog class="ds-modal" data-ds-modal="demo">
+    <div class="ds-card__title">Demo modal</div>
+    <p>This dialog is opened with <code>data-ds-modal-open</code> and closed with <code>data-ds-modal-close</code> or by clicking the backdrop.</p>
+    <button class="ds-btn ds-btn--secondary" data-ds-modal-close>Close</button>
+  </dialog>
+
+  <h3>Menu</h3>
+  <div class="ds-menu" data-ds-menu>
+    <button class="ds-btn ds-btn--secondary" data-ds-menu-trigger>Menu</button>
+    <div class="ds-menu__list" data-ds-menu-list>
+      <button class="ds-menu__item">Edit</button>
+      <button class="ds-menu__item">Duplicate</button>
+      <button class="ds-menu__item">Delete</button>
+    </div>
+  </div>
+
+  <h3>Tabs</h3>
+  <div class="ds-tabs" data-ds-tabs>
+    <div class="ds-tabs__list">
+      <button class="ds-tab" role="tab" data-ds-tab="a" aria-selected="true">Overview</button>
+      <button class="ds-tab" role="tab" data-ds-tab="b" aria-selected="false">Details</button>
+    </div>
+    <div data-ds-panel="a">
+      <p>Overview panel content.</p>
+    </div>
+    <div data-ds-panel="b" hidden>
+      <p>Details panel content.</p>
+    </div>
+  </div>
+
+  <h3>Toast</h3>
+  <button class="ds-btn" data-ds-toast="Saved.">Show toast</button>
+
+  <h3>Footer</h3>
+  <footer class="ds-footer">
+    <div class="ds-container">
+      <p>&copy; 2026 Design System. All rights reserved.</p>
+    </div>
+  </footer>
+</section>
