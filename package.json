@@ -1,0 +1,25 @@
+{
+  "name": "@greenwichsteps/design-system",
+  "version": "0.1.0",
+  "description": "Shared, themeable, CSS-first design system.",
+  "type": "module",
+  "files": ["dist", "tokens", "themes", "components", "behaviors", "fonts", "identity"],
+  "exports": {
+    "./ui.css": "./dist/ui.css",
+    "./ui.js": "./dist/ui.js",
+    "./tokens.css": "./dist/tokens.css",
+    "./themes/*": "./dist/themes/*",
+    "./fonts.css": "./dist/fonts.css"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "prepare": "npm run build",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.0",
+    "jsdom": "^25.0.0",
+    "typescript": "^5.6.0",
+    "vitest": "^4.1.0"
+  }
+}
