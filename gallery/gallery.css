@@ -1,0 +1,87 @@
+/* Gallery-only presentation styles.
+   Not part of the shipped design system — this file styles the styleguide
+   page itself (header, section rhythm, demo groupings), always referencing
+   design tokens (var(--ds-*)) rather than introducing new raw values. */
+
+.ds-gallery-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--ds-surface);
+  border-bottom: 1px solid var(--ds-border);
+}
+.ds-gallery-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-4);
+  padding-block: var(--ds-space-4);
+}
+.ds-gallery-header__title {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-lg);
+  font-weight: 600;
+  margin: 0;
+}
+.ds-gallery-header__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+}
+.ds-gallery-header__label {
+  font-size: var(--ds-text-sm);
+  color: var(--ds-text-muted);
+}
+
+main.ds-container {
+  padding-block: var(--ds-space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-10);
+}
+
+/* Separate each demo section with a hairline + top padding, so sections
+   read as distinct cards in the reference page instead of running together. */
+main > section {
+  padding-top: var(--ds-space-8);
+  border-top: 1px solid var(--ds-border);
+}
+main > section:first-child {
+  padding-top: 0;
+  border-top: none;
+}
+
+/* Give every direct child of a section room to breathe — the shared reset
+   zeroes all margins, so without this demos stack flush against each other. */
+main > section > * + * {
+  margin-top: var(--ds-space-4);
+}
+
+main > section > h2 {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-2xl);
+  line-height: 1.1;
+}
+main > section > h3 {
+  font-family: var(--ds-font-display);
+  font-size: var(--ds-text-lg);
+  margin-top: var(--ds-space-6);
+}
+main > section > h4 {
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-text-sm);
+  font-weight: 600;
+  color: var(--ds-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Groups a cluster of small inline demos (buttons, badges, toggles) into a
+   spaced, wrapping row instead of letting them sit jammed against each other
+   or their label. */
+.ds-demo-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-3);
+}

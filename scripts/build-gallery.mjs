@@ -33,12 +33,15 @@ await build({
   entryPoints: [R("gallery/gallery.ts")],
   outfile: R("gallery/dist/gallery.js"),
   bundle: true,
-  format: "esm",
+  format: "iife",
   minify: true,
   target: ["es2022"],
 });
 
 // 5. Copy the design-system dist/ alongside the gallery so it's self-contained.
 cpSync(R("dist"), R("gallery/dist/dist"), { recursive: true });
+
+// 6. Copy the gallery-only stylesheet alongside the gallery.
+cpSync(R("gallery/gallery.css"), R("gallery/dist/gallery.css"));
 
 console.log("Built gallery → gallery/dist/");

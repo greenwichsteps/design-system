@@ -26,7 +26,7 @@ cpSync(R("identity"), R("dist/identity"), { recursive: true });
 
 // ui.js — bundle behaviors (Task 7+). Entry is optional until behaviors exist.
 if (existsSync(R("behaviors/index.ts"))) {
-  await build({ entryPoints: [R("behaviors/index.ts")], outfile: R("dist/ui.js"), bundle: true, format: "esm", minify: true, target: ["es2022"] });
+  await build({ entryPoints: [R("behaviors/index.ts")], outfile: R("dist/ui.js"), bundle: true, format: "iife", globalName: "DS", minify: true, target: ["es2022"] });
 } else {
   writeFileSync(R("dist/ui.js"), "export {};\n");
 }
