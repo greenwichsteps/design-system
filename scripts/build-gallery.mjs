@@ -20,7 +20,15 @@ const indexHtml = read("gallery/index.html");
 if (!indexHtml.includes("<!--SECTIONS-->")) {
   throw new Error("gallery/index.html is missing the <!--SECTIONS--> placeholder");
 }
-const injectedHtml = indexHtml.replace("<!--SECTIONS-->", sectionsHtml);
+let injectedHtml = indexHtml.replace("<!--SECTIONS-->", sectionsHtml);
+
+// 2b. Cache-bust local CSS/JS assets so browsers don't serve stale copies
+// from disk cache when viewing gallery/dist/index.html over file://.
+const v = Date.now();
+injectedHtml = injectedHtml.replace(
+  /(href|src)="(\.\/[^"?]+\.(?:css|js))"/g,
+  `$1="$2?v=${v}"`
+);
 
 // 3. Prepare gallery/dist/ output directory.
 rmSync(R("gallery/dist"), { recursive: true, force: true });
