@@ -1,0 +1,27 @@
+.ds-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--ds-space-2);
+  padding: var(--ds-space-3) var(--ds-space-5); border: 1px solid transparent;
+  border-radius: var(--ds-radius-md); font-weight: 500; line-height: 1; cursor: pointer;
+  transition: background var(--ds-dur) var(--ds-ease), border-color var(--ds-dur) var(--ds-ease);
+  text-decoration: none; white-space: nowrap;
+}
+.ds-btn--sm { padding: var(--ds-space-2) var(--ds-space-4); font-size: var(--ds-text-sm); }
+.ds-btn--accent { background: var(--ds-accent); color: var(--ds-on-accent); }
+.ds-btn--accent:hover { background: var(--ds-accent-press); }
+.ds-btn--secondary { background: var(--ds-surface); color: var(--ds-text); border-color: var(--ds-border); }
+.ds-btn--secondary:hover { background: var(--ds-hover); }
+.ds-btn--ghost { background: transparent; color: var(--ds-text); }
+.ds-btn--ghost:hover { background: var(--ds-hover); }
+.ds-btn--danger { background: var(--ds-danger); color: var(--ds-on-danger); }
+.ds-btn:disabled, .ds-btn[aria-disabled="true"] { opacity: .5; pointer-events: none; }
+.ds-btn[data-loading] { color: transparent; position: relative; }
+.ds-btn[data-loading]::after {
+  content: ""; position: absolute; width: 1em; height: 1em; border-radius: 50%;
+  border: 2px solid currentColor; border-top-color: transparent; animation: ds-spin .6s linear infinite;
+  color: var(--ds-on-accent);
+}
+@keyframes ds-spin { to { transform: rotate(360deg); } }
+.ds-iconbtn { display: inline-grid; place-items: center; width: 40px; height: 40px; border: 0;
+  background: transparent; border-radius: var(--ds-radius-md); color: var(--ds-text); cursor: pointer; }
+.ds-iconbtn:hover { background: var(--ds-hover); }
+.ds-link { color: var(--ds-accent); text-decoration: underline; text-underline-offset: 2px; }
