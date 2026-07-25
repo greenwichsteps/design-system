@@ -1,0 +1,6 @@
+.ds-display { font-family: var(--ds-font-display); font-size: var(--ds-text-display); line-height: 1.02; letter-spacing: -0.02em; }
+.ds-h1 { font-family: var(--ds-font-display); font-size: var(--ds-text-3xl); line-height: 1.05; }
+.ds-h2 { font-family: var(--ds-font-display); font-size: var(--ds-text-2xl); line-height: 1.1; }
+.ds-prose { max-width: 68ch; }
+.ds-prose p { margin-bottom: var(--ds-space-4); }
+.ds-quote { font-family: var(--ds-font-serif-text); font-size: var(--ds-text-xl); font-style: italic; border-left: 2px solid var(--ds-accent); padding-left: var(--ds-space-4); }
