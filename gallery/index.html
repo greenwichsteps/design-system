@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" data-theme-brand="burnside">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Design System Gallery</title>
+    <link rel="stylesheet" href="./dist/tokens.css" />
+    <link rel="stylesheet" href="./dist/fonts.css" />
+    <link rel="stylesheet" href="./dist/themes/burnside.css" />
+    <link rel="stylesheet" href="./dist/themes/farnsworth.css" />
+    <link rel="stylesheet" href="./dist/themes/dark.css" />
+    <link rel="stylesheet" href="./dist/ui.css" />
+    <style>
+      .ds-gallery-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: var(--ds-surface);
+        border-bottom: 1px solid var(--ds-border);
+      }
+      .ds-gallery-header__inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--ds-space-4);
+        padding-block: var(--ds-space-4);
+      }
+      .ds-gallery-header__title {
+        font-family: var(--ds-font-sans);
+        font-size: var(--ds-text-lg);
+        font-weight: 600;
+        margin: 0;
+      }
+      .ds-gallery-header__controls {
+        display: flex;
+        align-items: center;
+        gap: var(--ds-space-3);
+      }
+      .ds-gallery-header__label {
+        font-size: var(--ds-text-sm);
+        color: var(--ds-text-muted);
+      }
+      main.ds-container {
+        padding-block: var(--ds-space-8);
+        display: flex;
+        flex-direction: column;
+        gap: var(--ds-space-10);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="ds-gallery-header">
+      <div class="ds-container ds-gallery-header__inner">
+        <h1 class="ds-gallery-header__title">Design System Gallery</h1>
+        <div class="ds-gallery-header__controls">
+          <label class="ds-gallery-header__label" for="gallery-brand">Brand</label>
+          <select id="gallery-brand" class="ds-select" data-gallery-brand>
+            <option value="burnside">Burnside</option>
+            <option value="farnsworth">Farnsworth</option>
+          </select>
+          <button type="button" class="ds-btn ds-btn--secondary ds-btn--sm" data-ds-theme-toggle>Dark</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="ds-container">
+      <!--SECTIONS-->
+    </main>
+
+    <script type="module" src="./dist/ui.js"></script>
+    <script type="module" src="./gallery.js"></script>
+  </body>
+</html>
