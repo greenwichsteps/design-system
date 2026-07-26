@@ -24,10 +24,23 @@ cpSync(R("fonts.css"), R("dist/fonts.css"));
 cpSync(R("fonts"), R("dist/fonts"), { recursive: true });
 cpSync(R("identity"), R("dist/identity"), { recursive: true });
 
-// ui.js — bundle behaviors (Task 7+). Entry is optional until behaviors exist.
+// Two JS builds from two entry points, because the two consumption models want
+// opposite things.
+//
+//   dist/ui.js   IIFE + `DS` global, built from behaviors/auto.ts, which initializes
+//                on load. For <script src> users such as the gallery.
+//   dist/ui.mjs  ESM named exports, built from behaviors/index.ts, which is
+//                side-effect-free. For bundler users, who must be able to import one
+//                behavior without silently running the rest (see GRE-128).
+//
+// Keep them pointed at different entries. Building ui.js from index.ts drops the
+// auto-init and silently breaks every script-tag consumer.
 if (existsSync(R("behaviors/index.ts"))) {
-  await build({ entryPoints: [R("behaviors/index.ts")], outfile: R("dist/ui.js"), bundle: true, format: "iife", globalName: "DS", minify: true, target: ["es2022"] });
+  const common = { bundle: true, minify: true, target: ["es2022"] };
+  await build({ ...common, entryPoints: [R("behaviors/auto.ts")], outfile: R("dist/ui.js"), format: "iife", globalName: "DS" });
+  await build({ ...common, entryPoints: [R("behaviors/index.ts")], outfile: R("dist/ui.mjs"), format: "esm" });
 } else {
   writeFileSync(R("dist/ui.js"), "export {};\n");
+  writeFileSync(R("dist/ui.mjs"), "export {};\n");
 }
 console.log("Built design-system → dist/");

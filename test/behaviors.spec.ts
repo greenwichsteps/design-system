@@ -1,9 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { initClipboard } from "../behaviors/clipboard";
 import { initTheme } from "../behaviors/theme";
 import { initNav } from "../behaviors/nav";
 
 beforeEach(() => { document.body.innerHTML = ""; document.documentElement.removeAttribute("data-theme"); localStorage.clear(); });
+afterEach(() => vi.unstubAllGlobals());
 
 describe("clipboard", () => {
   it("copies the data-ds-copy value on click", async () => {
@@ -22,6 +23,63 @@ describe("theme toggle", () => {
     document.querySelector("button")!.click();
     expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
     expect(localStorage.getItem("ds-theme")).toBe("dark");
+  });
+});
+
+// jsdom's matchMedia always reports matches:false and ignores listeners, so the OS
+// preference has to be stubbed to be testable at all.
+function stubPrefersDark(matches: boolean) {
+  const listeners: Array<() => void> = [];
+  const mql = {
+    matches,
+    addEventListener: (_type: string, fn: () => void) => { listeners.push(fn); },
+    removeEventListener: () => {},
+  };
+  vi.stubGlobal("matchMedia", () => mql);
+  return { setOS(next: boolean) { mql.matches = next; listeners.forEach((fn) => fn()); } };
+}
+
+describe("theme, following the OS", () => {
+  it("uses the OS preference when nothing is stored", () => {
+    stubPrefersDark(true);
+    initTheme();
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+  });
+
+  it("sets light explicitly when the OS is light, so dark.css cannot linger", () => {
+    stubPrefersDark(false);
+    initTheme();
+    expect(document.documentElement.getAttribute("data-theme")).toBe("light");
+  });
+
+  it("does not persist the OS preference, which would freeze the page against later changes", () => {
+    stubPrefersDark(true);
+    initTheme();
+    expect(localStorage.getItem("ds-theme")).toBeNull();
+  });
+
+  it("follows the OS live when the visitor has not chosen", () => {
+    const os = stubPrefersDark(false);
+    initTheme();
+    os.setOS(true);
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+  });
+
+  it("lets an explicit stored choice win over the OS", () => {
+    localStorage.setItem("ds-theme", "light");
+    stubPrefersDark(true);
+    initTheme();
+    expect(document.documentElement.getAttribute("data-theme")).toBe("light");
+  });
+
+  it("keeps an explicit choice when the OS later changes", () => {
+    const os = stubPrefersDark(false);
+    document.body.innerHTML = `<button data-ds-theme-toggle>T</button>`;
+    initTheme();
+    document.querySelector("button")!.click();
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+    os.setOS(false);
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
   });
 });
 describe("nav toggle", () => {
