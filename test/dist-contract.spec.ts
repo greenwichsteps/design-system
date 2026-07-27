@@ -77,4 +77,22 @@ describe("published artifacts", () => {
         .toMatch(new RegExp(`\\b${name}\\b`));
     }
   });
+
+  // The blind spot in the guard above, closed. That test compares export NAMES
+  // against index.d.ts, and every name also appears there in an import line, so
+  // dropping a whole sibling declaration slips straight past it: the suite stays
+  // green at 29 while a consumer fails with TS2307 Cannot find module './theme.js'.
+  // Checking that each specifier actually resolves is what catches a missing file
+  // rather than a missing name. Found by review of the change that added the guard.
+  it("resolves every declaration its entry point imports", () => {
+    const index = readFileSync(join(root, "dist/types/index.d.ts"), "utf8");
+    const specifiers = [...index.matchAll(/from "\.\/([^"]+)\.js"/g)].map((m) => m[1]);
+    expect(specifiers.length, "no relative specifiers found in index.d.ts to check").toBeGreaterThan(0);
+    for (const s of specifiers) {
+      expect(
+        existsSync(join(root, `dist/types/${s}.d.ts`)),
+        `dist/types/${s}.d.ts is imported by index.d.ts but was not emitted`,
+      ).toBe(true);
+    }
+  });
 });
