@@ -99,6 +99,12 @@ a { color: inherit; }
 .ds-toggle input:checked + span::after { transform: translateX(18px); }
 
 
+/* hero.css */
+.ds-hero { padding: var(--ds-space-8) 0; text-align: center; }
+.ds-hero__lede { color: var(--ds-text-muted); max-width: 46ch; margin: var(--ds-space-4) auto 0; }
+.ds-hero__actions { display: flex; gap: var(--ds-space-3); justify-content: center; flex-wrap: wrap; margin-top: var(--ds-space-5); }
+
+
 /* layout.css */
 .ds-container { width: 100%; max-width: 1120px; margin-inline: auto; padding-inline: var(--ds-space-5); }
 .ds-grid { display: grid; gap: var(--ds-space-5); }

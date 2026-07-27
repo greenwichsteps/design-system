@@ -95,4 +95,14 @@ describe("published artifacts", () => {
       ).toBe(true);
     }
   });
+
+  // The build concatenates components/*.css automatically, so the realistic
+  // failure is the file being deleted or renamed rather than the build breaking.
+  // Two consumers now depend on these class names arriving in dist/ui.css.
+  it("ships the hero composition in the stylesheet", () => {
+    const css = readFileSync(join(root, "dist/ui.css"), "utf8");
+    for (const cls of [".ds-hero", ".ds-hero__lede", ".ds-hero__actions"]) {
+      expect(css, `${cls} missing from dist/ui.css`).toContain(cls);
+    }
+  });
 });
