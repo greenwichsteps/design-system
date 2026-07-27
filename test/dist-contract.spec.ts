@@ -55,4 +55,26 @@ describe("published artifacts", () => {
     await import("../dist/ui.js");
     expect(document.documentElement.getAttribute("data-theme"), "ui.js did not auto-initialize").not.toBeNull();
   });
+
+  it("ships a type declaration next to the module build", () => {
+    expect(existsSync(join(root, "dist/ui.d.mts")), "dist/ui.d.mts missing").toBe(true);
+    expect(existsSync(join(root, "dist/types/index.d.ts")), "dist/types/index.d.ts missing").toBe(true);
+  });
+
+  // The drift guard, and the reason it compares against the RUNTIME exports.
+  // Generation makes the declarations impossible to desync from the source, so the
+  // realistic failure is different: the emit step silently stops running and a stale
+  // dist/ stays committed. Only a comparison against what ui.mjs actually exports
+  // catches that. Word boundaries matter here: "toast" is a substring of "initToast",
+  // so a plain substring check would pass while toast itself was missing.
+  it("declares every name the module build actually exports", async () => {
+    const mod = await import("../dist/ui.mjs");
+    const dts = readFileSync(join(root, "dist/types/index.d.ts"), "utf8");
+    const exported = Object.keys(mod as Record<string, unknown>).filter((k) => k !== "default");
+    expect(exported.length, "no runtime exports found to compare against").toBeGreaterThan(0);
+    for (const name of exported) {
+      expect(dts, `${name} is exported by dist/ui.mjs but absent from the declarations`)
+        .toMatch(new RegExp(`\\b${name}\\b`));
+    }
+  });
 });

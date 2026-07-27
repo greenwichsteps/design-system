@@ -1,10 +1,10 @@
-import { initClipboard } from "./clipboard";
-import { initTheme } from "./theme";
-import { initNav } from "./nav";
-import { initMenu } from "./menu";
-import { initTabs } from "./tabs";
-import { initModal } from "./modal";
-import { toast, initToast } from "./toast";
+import { initClipboard } from "./clipboard.js";
+import { initTheme } from "./theme.js";
+import { initNav } from "./nav.js";
+import { initMenu } from "./menu.js";
+import { initTabs } from "./tabs.js";
+import { initModal } from "./modal.js";
+import { toast, initToast } from "./toast.js";
 export { initClipboard, initTheme, initNav, initMenu, initTabs, initModal, toast, initToast };
 export function initAll(root: ParentNode = document): void {
   initClipboard(root); initTheme(root); initNav(root); initMenu(root); initTabs(root); initModal(root); initToast(root);
