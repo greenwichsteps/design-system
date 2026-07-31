@@ -10,6 +10,7 @@
     "./ui.mjs": "./dist/ui.mjs",
     "./tokens.css": "./dist/tokens.css",
     "./themes/*": "./dist/themes/*",
+    "./identity/*": "./dist/identity/*",
     "./fonts.css": "./dist/fonts.css"
   },
   "//sideEffects": "ui.mjs is side-effect-free so bundlers can tree-shake to the behaviors actually imported. CSS and ui.js (the auto-initializing script build) genuinely have side effects and must stay listed, or a bundler may drop them.",
