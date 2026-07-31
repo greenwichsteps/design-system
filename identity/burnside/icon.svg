@@ -1,6 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Burnside Steps">
-  <rect x="1" y="1" width="30" height="30" rx="8" fill="#FF4D9D"/>
-  <rect x="6.2" y="19.8" width="6" height="6" fill="#121317"/>
-  <rect x="13.2" y="12.8" width="6" height="6" fill="#121317"/>
-  <circle cx="23.2" cy="8.8" r="3.4" fill="#121317"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Burnside Steps">
+  <style>
+    .bs-tile { fill: #FF4D9D }
+    .bs-ink { fill: #121317 }
+    @media (prefers-color-scheme: dark) { .bs-ink { fill: #F4F2EE } }
+  </style>
+  <rect x="1" y="1" width="30" height="30" rx="8" class="bs-tile"/>
+  <rect x="6.2" y="19.8" width="6" height="6" class="bs-ink"/>
+  <rect x="13.2" y="12.8" width="6" height="6" class="bs-ink"/>
+  <circle cx="23.2" cy="8.8" r="3.4" class="bs-ink"/>
 </svg>
