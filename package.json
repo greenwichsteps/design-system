@@ -21,8 +21,10 @@
     "test": "NODE_OPTIONS=--no-experimental-webstorage vitest run"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "esbuild": "^0.28.0",
     "jsdom": "^25.0.0",
+    "png-to-ico": "^3.0.2",
     "typescript": "^5.6.0",
     "vitest": "^4.1.0"
   }

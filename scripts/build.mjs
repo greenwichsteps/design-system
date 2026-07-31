@@ -23,7 +23,11 @@ writeFileSync(R("dist/tokens.css"), read("tokens/primitives.css") + "\n" + read(
 for (const f of readdirSync(R("themes"))) cpSync(R(`themes/${f}`), R(`dist/themes/${f}`));
 cpSync(R("fonts.css"), R("dist/fonts.css"));
 cpSync(R("fonts"), R("dist/fonts"), { recursive: true });
+// Identity: copy the SVG sources, then generate every raster from the pinned
+// variants. Rasters are build output committed to dist/, like the woff2 subset.
 cpSync(R("identity"), R("dist/identity"), { recursive: true });
+const { buildIdentity } = await import("./build-identity.mjs");
+await buildIdentity(root);
 
 // Two JS builds from two entry points, because the two consumption models want
 // opposite things.
