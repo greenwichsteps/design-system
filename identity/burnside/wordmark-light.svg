@@ -2,7 +2,6 @@
   <style>
     .bs-word { fill: #121317 }
     .bs-dot { fill: #FF4D9D }
-    @media (prefers-color-scheme: dark) { .bs-word { fill: #F4F2EE } }
   </style>
   <g class="bs-word">
     <path transform="translate(-74.00 710) scale(1 -1)" d="M74 0L407 0C569 0 648 88 648 200C648 294 594 356 502 370C585 392 630 453 630 527C630 631 556 710 394 710L74 710ZM243 119L243 306L364 306C435 306 472 269 472 214C472 160 437 119 360 119ZM243 418L243 591L349 591C422 591 454 555 454 505C454 457 425 418 349 418Z"/>

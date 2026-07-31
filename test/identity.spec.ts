@@ -80,3 +80,47 @@ describe("icon masters", () => {
     expect(read("icon-dark.svg")).toContain("#F4F2EE");
   });
 });
+
+describe("wordmark master", () => {
+  const read = (f: string) => readFileSync(src(`burnside/${f}`), "utf8");
+
+  // The defect this closes: the old file was <text font-family="GT America">.
+  // An external SVG in an <img> is a separate document and cannot reach the host
+  // page's @font-face rules, so it rendered in the visitor's UI font.
+  it("carries outlines, not live text", () => {
+    for (const f of ["wordmark.svg", "wordmark-light.svg", "wordmark-dark.svg"]) {
+      expect(read(f), `${f} still contains live text`).not.toMatch(/<text[\s>]/);
+      expect(read(f), `${f} has no path data`).toMatch(/<path[^>]*\sd="/);
+      expect(read(f), `${f} still references a font family`).not.toContain("font-family");
+    }
+  });
+
+  // 4251 x 1855 per-mille is the ink block: flush right on the letterforms with
+  // the period hanging outside. A different viewBox means the construction moved.
+  it("uses the settled ink viewBox", () => {
+    for (const f of ["wordmark.svg", "wordmark-light.svg", "wordmark-dark.svg"]) {
+      expect(read(f), `${f} viewBox is not the ink block`).toMatch(/viewBox="0 0 4251 1855"/);
+    }
+  });
+
+  it("keeps the period a separate, accented element", () => {
+    expect(read("wordmark.svg")).toContain("bs-dot");
+    expect(read("wordmark.svg")).toContain("#FF4D9D");
+  });
+
+  it("makes the master self-inverting and the variants pinned", () => {
+    expect(read("wordmark.svg")).toContain("prefers-color-scheme: dark");
+    for (const f of ["wordmark-light.svg", "wordmark-dark.svg"]) {
+      expect(read(f), `${f} carries a media query`).not.toContain("@media");
+    }
+    expect(read("wordmark-light.svg")).toContain("#121317");
+    expect(read("wordmark-dark.svg")).toContain("#F4F2EE");
+  });
+
+  it("does not pin width or height", () => {
+    for (const f of ["wordmark.svg", "wordmark-light.svg", "wordmark-dark.svg"]) {
+      expect(read(f), `${f} pins width`).not.toMatch(/<svg[^>]*\swidth=/);
+      expect(read(f), `${f} pins height`).not.toMatch(/<svg[^>]*\sheight=/);
+    }
+  });
+});
