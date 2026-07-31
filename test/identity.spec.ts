@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { PNG } from "pngjs";
 
 const root = join(__dirname, "..");
 const src = (p: string) => join(root, "identity", p);
@@ -208,5 +209,23 @@ describe("generated icon set", () => {
     expect(m.name).toBe("Burnside Steps");
     const purposes = m.icons.map((i: { purpose?: string }) => i.purpose);
     expect(purposes, "no maskable purpose declared").toContain("maskable");
+  });
+
+  // Dimension assertions cannot see an alpha channel. Android's circular crop
+  // reveals any transparency in a maskable icon, and iOS composites touch icons
+  // onto black, so both must be fully opaque at the edges.
+  it("makes the maskable and apple-touch icons opaque to the edge", () => {
+    for (const f of ["maskable-192.png", "maskable-512.png", "apple-touch-icon.png"]) {
+      const p = PNG.sync.read(readFileSync(dist(f)));
+      const corners = [[0, 0], [p.width - 1, 0], [0, p.height - 1], [p.width - 1, p.height - 1]];
+      for (const [x, y] of corners) {
+        expect(p.data[((p.width * y + x) << 2) + 3], `${f} is transparent at ${x},${y}`).toBe(255);
+      }
+    }
+  });
+
+  it("keeps the plain icons transparent outside the tile", () => {
+    const p = PNG.sync.read(readFileSync(dist("icon-512.png")));
+    expect(p.data[3], "icon-512.png lost its transparent corner").toBe(0);
   });
 });

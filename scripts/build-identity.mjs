@@ -33,16 +33,32 @@ export async function buildIdentity(root, brand = "burnside") {
 
   for (const s of ICON_PNG_SIZES) out(`icon-${s}.png`, render(light, s));
 
-  // Apple ignores transparency and the manifest; it wants a plain square.
-  out("apple-touch-icon.png", render(light, 180));
+  // The ink shapes alone, without the inset rounded background tile: both the
+  // apple-touch and maskable variants below need a full-bleed background
+  // behind this same ink, not the tile's 1-unit inset and rx="8" corners.
+  const INK = light
+    .match(/<(rect|circle)(?![^>]*rx="8")[^>]*\/>/g)
+    .join("\n  ");
 
-  // Maskable icons are cropped to a circle by Android, so the mark needs a
-  // safe zone: the spec's tile already insets 1/32, which is not enough. Pad
-  // to the 80% safe area by scaling the tile inside a larger canvas.
-  const maskable = light.replace(
-    'viewBox="0 0 32 32"',
-    'viewBox="-4 -4 40 40"',
-  );
+  // iOS ignores transparency and composites touch icons onto black, so the
+  // rounded tile's transparent corners would render black on the home screen.
+  // iOS rounds the corners itself; the source must be a full-bleed square.
+  const appleTouch = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" fill="#FF4D9D"/>
+  ${INK}
+</svg>`;
+  out("apple-touch-icon.png", render(appleTouch, 180));
+
+  // Maskable icons are cropped to a circle by Android, so the background must
+  // bleed to the canvas edge (transparency inside the crop shows as a hole) and
+  // the content must sit inside the 80% safe circle. Built from the tile
+  // colour plus the ink shapes, rather than scaling the inset rounded tile.
+  const maskable = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" fill="#FF4D9D"/>
+  <g transform="translate(3.2 3.2) scale(0.8)">
+  ${INK}
+  </g>
+</svg>`;
   out("maskable-192.png", render(maskable, 192));
   out("maskable-512.png", render(maskable, 512));
 
