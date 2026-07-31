@@ -95,11 +95,43 @@ describe("wordmark master", () => {
     }
   });
 
-  // 4251 x 1855 per-mille is the ink block: flush right on the letterforms with
+  // 4251 x 1870 per-mille is the ink block: flush right on the letterforms with
   // the period hanging outside. A different viewBox means the construction moved.
   it("uses the settled ink viewBox", () => {
     for (const f of ["wordmark.svg", "wordmark-light.svg", "wordmark-dark.svg"]) {
-      expect(read(f), `${f} viewBox is not the ink block`).toMatch(/viewBox="0 0 4251 1855"/);
+      expect(read(f), `${f} viewBox is not the ink block`).toMatch(/viewBox="0 0 4251 1870"/);
+    }
+  });
+
+  // Regression for a real defect: the generator first pinned line 1's baseline
+  // to cap height (710), but the d ascender reaches 725 and the i tittle
+  // reaches 718 in this font, so cap height does not bound the line. That
+  // shaved both flat. This doesn't just re-check the literal height above; it
+  // walks each glyph's own path data, which a future tracking or font swap
+  // could silently break again.
+  //
+  // Each glyph is `<path transform="translate(TX TY) scale(1 -1)" d="...">`.
+  // The font's y-up path coordinates get flipped by scale(1 -1) and offset by
+  // TY, so a local point at y=Y lands at global y = TY - Y. A cubic bezier
+  // never exceeds the convex hull of its own on/off-curve points, so the
+  // largest y-coordinate literally present in `d` is a sound upper bound on
+  // how far the rendered curve reaches — no font access required, just the
+  // committed SVG's own numbers. If TY - maxY dips below 0, that glyph's ink
+  // renders above the viewBox's top edge and gets clipped.
+  it("places no ink above the top edge of the viewBox", () => {
+    for (const f of ["wordmark.svg", "wordmark-light.svg", "wordmark-dark.svg"]) {
+      const svg = read(f);
+      const paths = [
+        ...svg.matchAll(/<path transform="translate\([-\d.]+ ([-\d.]+)\) scale\(1 -1\)" d="([^"]+)"/g),
+      ];
+      expect(paths.length, `${f} has no glyph paths to check`).toBeGreaterThan(0);
+      for (const [, ty, d] of paths) {
+        const coords = d.match(/-?\d+(?:\.\d+)?/g)!.map(Number);
+        const localYs = coords.filter((_, i) => i % 2 === 1);
+        const maxLocalY = Math.max(...localYs);
+        expect(Number(ty) - maxLocalY, `${f} clips a glyph: translate y=${ty}, ink reaches ${maxLocalY}`)
+          .toBeGreaterThanOrEqual(0);
+      }
     }
   });
 
