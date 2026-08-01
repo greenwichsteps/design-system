@@ -12,7 +12,7 @@ describe("behaviors barrel", () => {
 
   it("exports the behaviors by name", async () => {
     const mod = await import("../behaviors/index");
-    for (const fn of ["initClipboard", "initTheme", "initNav", "initMenu", "initTabs", "initModal", "initToast", "initAll"]) {
+    for (const fn of ["initClipboard", "initTheme", "initNav", "initStickyHeader", "initMenu", "initTabs", "initModal", "initToast", "initAll"]) {
       expect(typeof (mod as Record<string, unknown>)[fn], `${fn} not exported`).toBe("function");
     }
   });
