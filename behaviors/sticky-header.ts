@@ -11,6 +11,18 @@ export function initStickyHeader(root: ParentNode = document): void {
   const header = root.querySelector<HTMLElement>(".ds-header");
   if (!header) return;
 
+  // Unlike its neighbours in behaviors/, this function inserts a live DOM node
+  // (the sentinel below) and constructs an IntersectionObserver, not just event
+  // listeners. A second call on the same header (SPA route re-init, hot reload,
+  // a test harness reusing a document) would leave sentinels and observers
+  // physically accumulating in the tree, not just extra closures in memory, so
+  // this guard is load-bearing in a way the un-guarded pattern elsewhere is not.
+  // Do not remove it for consistency with the other behaviors.
+  // The flag lives on the header element itself, so a genuinely different
+  // .ds-header node (e.g. after the DOM is replaced) still gets initialized.
+  if (header.dataset.dsSticky) return;
+  header.dataset.dsSticky = "1";
+
   const publishHeight = () => {
     const h = Math.round(header.getBoundingClientRect().height);
     document.documentElement.style.setProperty("--ds-header-h", `${h}px`);
@@ -23,6 +35,7 @@ export function initStickyHeader(root: ParentNode = document): void {
   if (typeof IntersectionObserver === "undefined") return;
 
   const sentinel = document.createElement("div");
+  sentinel.className = "ds-header-sentinel";
   sentinel.setAttribute("aria-hidden", "true");
   sentinel.style.cssText = "position:absolute;top:0;left:0;height:1px;width:1px;pointer-events:none;";
   header.parentNode?.insertBefore(sentinel, header);

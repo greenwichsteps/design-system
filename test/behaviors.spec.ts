@@ -149,4 +149,12 @@ describe("sticky header", () => {
     expect(() => initStickyHeader()).not.toThrow();
     expect(document.documentElement.style.getPropertyValue("--ds-header-h")).toBe("44px");
   });
+
+  it("does not accumulate sentinels or observers on a second call", () => {
+    stubIO();
+    document.body.innerHTML = `<header class="ds-header"></header>`;
+    initStickyHeader();
+    initStickyHeader();
+    expect(document.querySelectorAll(".ds-header-sentinel").length).toBe(1);
+  });
 });
