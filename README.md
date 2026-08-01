@@ -37,9 +37,18 @@ with no error anywhere: Burnside's live markup is
 rule. On upgrade its nav mark drops from 32px to 26px, about 20% smaller,
 while still drawing the two-line stacked wordmark, with nothing in Burnside's
 own CSS pointing at the cause. Check every `<img>` inside `.ds-nav__brand`
-(and `.ds-footer__id`, which sets `--ds-brand-foot-h` the same way) against
-this before upgrading, and raise your own selector's specificity if it needs
-to win.
+against this before upgrading, and raise your own selector's specificity if it
+needs to win.
+
+**The footer has the same trap pointing the other way, and it is larger.**
+`components/footer.css` adds `.ds-footer__id img { height: var(--ds-brand-foot-h, 32px) }`,
+also (0,1,1), and `--ds-brand-foot-h` is 81px for Burnside because the footer
+slot is sized for the two-line stacked mark. Burnside's live footer rule sits
+at (0,1,0) and draws its mark at 2rem, so on upgrade that mark does not shrink
+by a fifth like the nav's, it jumps from 32px to 81px, roughly two and a half
+times, and it will be whatever asset the markup currently points at rather
+than the stacked one that height was calibrated for. Decide which mark belongs
+in your footer before you upgrade, not after.
 
 Four more things worth knowing before you upgrade:
 
