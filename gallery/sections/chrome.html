@@ -1,0 +1,61 @@
+<section id="chrome">
+  <h2>Page chrome</h2>
+
+  <!-- Not sticky in the gallery: one page showing many components cannot have
+       several bars competing for the top of the viewport. -->
+  <p class="ds-help">Rendered inline. On a real page .ds-header is sticky and gains its hairline on scroll.</p>
+  <header class="ds-header" style="position: static">
+    <div class="ds-container">
+      <div class="ds-nav">
+        <a class="ds-nav__brand" href="#chrome">
+          <img src="./dist/identity/burnside/wordmark-short.svg" alt="Burnside Steps">
+        </a>
+        <div class="ds-nav__links" data-ds-nav="gallery">
+          <a href="#chrome">Pricing</a><a href="#chrome">Docs</a><a href="#chrome">GitHub</a>
+        </div>
+        <a class="ds-btn ds-btn--sm ds-btn--secondary" href="#chrome">Start hosted</a>
+      </div>
+    </div>
+  </header>
+
+  <p class="ds-help">The .ds-section component provides consistent block padding and vertical rhythm, with hairline dividers between adjacent sections.</p>
+  <section class="ds-section">
+    <div class="ds-container">
+      <h2 class="ds-h2 ds-section__title">First section</h2>
+      <p>Sections carry their own block padding.</p>
+    </div>
+  </section>
+  <section class="ds-section">
+    <div class="ds-container">
+      <h2 class="ds-h2 ds-section__title">Second section</h2>
+      <p>Adjacent siblings divide with a hairline. The first section has none above it.</p>
+    </div>
+  </section>
+
+  <p class="ds-help">The .ds-footer__cols container organizes footer content into a flexible multi-column layout.</p>
+  <footer class="ds-footer">
+    <div class="ds-container">
+      <div class="ds-footer__cols">
+        <div class="ds-footer__id">
+          <img src="./dist/identity/burnside/wordmark.svg" alt="Burnside Steps">
+          <p>The footer draws the full stacked mark, where height is cheap.</p>
+        </div>
+        <div>
+          <h3 class="ds-footer__label" id="g-foot-a">Product</h3>
+          <ul class="ds-footer__list" aria-labelledby="g-foot-a">
+            <li><a class="ds-footer__link" href="#chrome">Pricing</a></li>
+            <li><a class="ds-footer__link" href="#chrome">Questions</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="ds-footer__label" id="g-foot-b">Company</h3>
+          <ul class="ds-footer__list" aria-labelledby="g-foot-b">
+            <li><a class="ds-footer__link" href="#chrome">Privacy</a></li>
+            <li><a class="ds-footer__link" href="#chrome">Terms</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="ds-footer__base"><span>&copy; 2026 Greenwich Steps</span><span>AGPL-3.0</span></div>
+    </div>
+  </footer>
+</section>
