@@ -1,11 +1,9 @@
-import { describe, it, expect, beforeAll } from "vitest";
-import { execSync } from "node:child_process";
+import { describe, it, expect } from "vitest";
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 const root = join(__dirname, "..");
 
 describe("build", () => {
-  beforeAll(() => execSync("node scripts/build.mjs", { cwd: root }));
   it("emits ui.css with reset first", () => {
     const css = readFileSync(join(root, "dist/ui.css"), "utf8");
     expect(css).toContain("box-sizing: border-box");
