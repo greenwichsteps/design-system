@@ -538,3 +538,32 @@ describe("farnsworth wordmark master", () => {
     }
   });
 });
+
+describe("farnsworth generated icon set", () => {
+  const dist = (p: string) => join(root, "dist/identity/farnsworth", p);
+
+  it("emits every raster the web platform asks for", () => {
+    for (const f of [
+      "favicon.ico", "apple-touch-icon.png", "maskable-192.png", "maskable-512.png",
+      "icon-32.png", "icon-64.png", "icon-128.png", "icon-192.png", "icon-256.png",
+      "icon-512.png", "site.webmanifest", "og-default.png", "github-social.png",
+    ]) {
+      expect(existsSync(dist(f)), `${f} not generated`).toBe(true);
+    }
+  });
+
+  it("resolves every icon the manifest declares", () => {
+    const m = JSON.parse(readFileSync(dist("site.webmanifest"), "utf8"));
+    expect(m.icons.length, "manifest declares no icons").toBeGreaterThan(0);
+    for (const icon of m.icons as { src: string }[]) {
+      expect(icon.src, "manifest points at another brand's directory").toContain("/identity/farnsworth/");
+      expect(existsSync(dist(icon.src.split("/").pop()!)), `manifest references ${icon.src} which was not generated`).toBe(true);
+    }
+  });
+
+  it("names the product, not the domain", () => {
+    const m = JSON.parse(readFileSync(dist("site.webmanifest"), "utf8"));
+    expect(m.name).toBe("Farnsworth");
+    expect(m.theme_color).toBe("#3B3BD9");
+  });
+});

@@ -1,9 +1,17 @@
 {
   "name": "@greenwichsteps/design-system",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Shared, themeable, CSS-first design system.",
   "type": "module",
-  "files": ["dist", "tokens", "themes", "components", "behaviors", "fonts", "identity"],
+  "files": [
+    "dist",
+    "tokens",
+    "themes",
+    "components",
+    "behaviors",
+    "fonts",
+    "identity"
+  ],
   "exports": {
     "./ui.css": "./dist/ui.css",
     "./ui.js": "./dist/ui.js",
@@ -14,7 +22,10 @@
     "./fonts.css": "./dist/fonts.css"
   },
   "//sideEffects": "ui.mjs is side-effect-free so bundlers can tree-shake to the behaviors actually imported. CSS and ui.js (the auto-initializing script build) genuinely have side effects and must stay listed, or a bundler may drop them.",
-  "sideEffects": ["*.css", "./dist/ui.js"],
+  "sideEffects": [
+    "*.css",
+    "./dist/ui.js"
+  ],
   "scripts": {
     "build": "node scripts/build.mjs",
     "build:gallery": "node scripts/build-gallery.mjs",

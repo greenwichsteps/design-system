@@ -27,7 +27,9 @@ cpSync(R("fonts"), R("dist/fonts"), { recursive: true });
 // variants. Rasters are build output committed to dist/, like the woff2 subset.
 cpSync(R("identity"), R("dist/identity"), { recursive: true });
 const { buildIdentity } = await import("./build-identity.mjs");
-await buildIdentity(root);
+// One call per brand. Adding a brand here plus a BRANDS entry in
+// build-identity.mjs is the whole of what a new product's rasters need.
+for (const brand of ["burnside", "farnsworth"]) await buildIdentity(root, brand);
 
 // Two JS builds from two entry points, because the two consumption models want
 // opposite things.
