@@ -3,8 +3,14 @@
 .ds-grid--2 { grid-template-columns: repeat(2, 1fr); }
 .ds-grid--3 { grid-template-columns: repeat(3, 1fr); }
 @media (max-width: 720px) { .ds-grid--2, .ds-grid--3 { grid-template-columns: 1fr; } }
-.ds-nav { display: flex; align-items: center; gap: var(--ds-space-5); padding: var(--ds-space-4) 0; }
-.ds-nav__brand { height: 24px; }
+/* padding-block, not `padding: X 0`. This element sits inside .ds-container, and
+   the shorthand's implicit 0 would overwrite the container's padding-inline,
+   putting the bar's contents 24px left of every section's. */
+.ds-nav { display: flex; align-items: center; gap: var(--ds-space-5); padding-block: var(--ds-space-2); }
+/* No height here. Height belongs on the asset, from a per-brand token: a fixed
+   anchor height does not grow for a taller mark, it just lets it overflow. */
+.ds-nav__brand { display: inline-flex; align-items: center; flex-shrink: 0; }
+.ds-nav__brand img { display: block; height: var(--ds-brand-nav-h, 26px); width: auto; }
 .ds-nav__spacer { flex: 1; }
 .ds-nav__links { display: flex; gap: var(--ds-space-5); }
 @media (max-width: 720px) { .ds-nav__links { display: none; } .ds-nav__links.is-open { display: flex; position: absolute; inset: 56px 0 auto; flex-direction: column; background: var(--ds-surface); padding: var(--ds-space-5); } }
