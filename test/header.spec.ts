@@ -6,6 +6,22 @@ const root = join(__dirname, "..");
 const read = (p: string) => readFileSync(join(root, p), "utf8");
 const header = () => read("components/header.css");
 
+// Extracts an at-rule's body by brace counting. A regex cannot find a block's
+// end: a nested rule's closing brace terminates the capture, and anchoring on a
+// column-zero brace couples the test to the file's indentation.
+function atRuleBody(css: string, header: RegExp): string | undefined {
+  const m = header.exec(css);
+  if (!m) return undefined;
+  const open = css.indexOf("{", m.index);
+  if (open < 0) return undefined;
+  let depth = 0;
+  for (let i = open; i < css.length; i++) {
+    if (css[i] === "{") depth++;
+    else if (css[i] === "}" && --depth === 0) return css.slice(open + 1, i);
+  }
+  return undefined;
+}
+
 describe(".ds-header", () => {
   it("sticks to the top", () => {
     expect(header()).toMatch(/\.ds-header\s*\{[^}]*position:\s*sticky/);
@@ -18,14 +34,26 @@ describe(".ds-header", () => {
     const base = /\.ds-header\s*\{([^}]*)\}/.exec(header())?.[1] ?? "";
     expect(base).toMatch(/background:\s*var\(--ds-bg\)/);
     expect(base).not.toContain("backdrop-filter");
-    // [^{]* rather than [^)]*: the condition is (backdrop-filter: blur(1px)),
-    // and a negated-) class halts at the inner paren, leaving the outer one
-    // unconsumed.
-    expect(header()).toMatch(/@supports\s*\([^{]*backdrop-filter[^{]*\)\s*\{[\s\S]*backdrop-filter/);
+    // Brace-counted, not a whole-file match: a whole-file "backdrop-filter"
+    // check is satisfied by the unrelated backdrop-filter: none further down
+    // in the prefers-reduced-transparency block, so the enhancement could be
+    // deleted here and an unscoped assertion would not notice. Requiring
+    // blur( rules out backdrop-filter: none too. The (?<!-) lookbehind on the
+    // unprefixed check matters: without it, "backdrop-filter: blur(" also
+    // matches as a bare substring of "-webkit-backdrop-filter: blur(", so a
+    // mutation that neuters only the unprefixed property to `none` while
+    // leaving -webkit-backdrop-filter: blur(...) alone would slip through.
+    const supports = atRuleBody(header(), /@supports\s*\(backdrop-filter/);
+    expect(supports).toBeDefined();
+    expect(supports).toMatch(/(?<!-)backdrop-filter:\s*blur\(/);
+    expect(supports).toMatch(/-webkit-backdrop-filter:\s*blur\(/);
   });
 
   it("drops to opaque under prefers-reduced-transparency", () => {
-    const q = /@media\s*\(prefers-reduced-transparency:\s*reduce\)\s*\{([\s\S]*?)\n\}/.exec(header())?.[1] ?? "";
+    // Brace-counted rather than regex-bounded: the previous \n\} anchor only
+    // worked because the outer @media closed at column zero while the inner
+    // rule closed indented, so any reformat would have broken it silently.
+    const q = atRuleBody(header(), /@media\s*\(prefers-reduced-transparency:\s*reduce\)/) ?? "";
     expect(q).toContain("backdrop-filter: none");
     expect(q).toMatch(/background:\s*var\(--ds-bg\)/);
   });
@@ -36,7 +64,12 @@ describe(".ds-header", () => {
   });
 
   it("carries a -webkit- prefixed backdrop-filter for Safari", () => {
-    expect(header()).toContain("-webkit-backdrop-filter");
+    // Scoped to the @supports block, not a whole-file check: the
+    // prefers-reduced-transparency block also carries a -webkit-backdrop-filter,
+    // just set to none, which a whole-file toContain cannot distinguish from
+    // the real enhancement.
+    const supports = atRuleBody(header(), /@supports\s*\(backdrop-filter/) ?? "";
+    expect(supports).toMatch(/-webkit-backdrop-filter:\s*blur\(/);
   });
 });
 
