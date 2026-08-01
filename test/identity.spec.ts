@@ -517,6 +517,25 @@ describe("farnsworth wordmark master", () => {
     expect(read("wordmark.svg")).toContain("#3B3BD9");
   });
 
+  // The check above covers the master only, and the master is not what ships on a
+  // share card: composeShare rasterises wordmark-dark.svg into og-default.png and
+  // github-social.png. The pinned variants carry no <style> block, so every colour
+  // has to be a literal fill. If the outliner's class-to-fill replace ever missed,
+  // a variant would keep a class attribute with nothing to resolve it, resvg would
+  // fall back to black, and a black period on the #121317 share field is invisible
+  // with the whole suite still green. This is the guard the icon block already has
+  // at "uses the brand accent and a white ink, in every file"; the wordmark went
+  // without it until the GRE-222 branch review.
+  it("pins every colour as a literal fill in the variants, leaving no orphaned class", () => {
+    for (const f of FILES) {
+      expect(read(f), `${f} lost the accent`).toContain("#3B3BD9");
+    }
+    for (const f of ["wordmark-light.svg", "wordmark-dark.svg"]) {
+      expect(read(f), `${f} carries a class attribute with no stylesheet to resolve it`)
+        .not.toMatch(/class="fw-/);
+    }
+  });
+
   it("never says Farnsworth Steps", () => {
     for (const f of FILES) {
       expect(read(f), `${f} uses the domain name as the product name`).not.toContain("Farnsworth Steps");

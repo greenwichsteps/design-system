@@ -67,7 +67,7 @@ export async function buildIdentity(root, brand = "burnside") {
   //
   // Excluding the tile by its rx attribute is format-sensitive: a quoting or
   // attribute-order change would silently include the tile as ink, or match
-  // nothing at all and emit a blank pink square. Neither crashes, and neither
+  // nothing at all and emit a blank tile in the brand accent. Neither crashes, and neither
   // is visible to an opacity check, so assert the shape count here.
   const INK_SHAPES = light.match(cfg.inkPattern) ?? [];
   if (INK_SHAPES.length !== cfg.inkCount) {
