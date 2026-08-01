@@ -1,0 +1,38 @@
+/* Grouped footer shell. Structure only, no content opinion: the track list is
+   auto-fit rather than a fixed set of columns, so a consumer with two groups
+   and a consumer with five both work and neither site's shape is baked in.
+   The base .ds-footer rule (border-top, padding, muted colour) is in layout.css. */
+.ds-footer__cols {
+  display: grid; align-items: start; gap: var(--ds-space-6);
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+}
+/* The identity block runs wider than a link column, so it claims two tracks. */
+.ds-footer__id { max-width: 26ch; grid-column: span 2; }
+.ds-footer__id img { display: block; height: var(--ds-brand-foot-h, 32px); width: auto; }
+/* The kit resets every margin, so without this the lede sits flush on the mark. */
+.ds-footer__id p { margin-top: var(--ds-space-4); font-size: var(--ds-text-sm); color: var(--ds-text-muted); }
+
+/* Sized as the mono eyebrow the family already uses for a small label, rather
+   than inventing a second vocabulary for the same job. */
+.ds-footer__label {
+  font-family: var(--ds-font-mono); font-size: var(--ds-text-xs); font-weight: 400;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ds-text-muted); margin-bottom: var(--ds-space-4);
+}
+.ds-footer__list {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: var(--ds-space-3);
+  font-size: var(--ds-text-sm);
+}
+/* Deliberately not .ds-link, which underlines in accent. Right for a link in
+   prose, wrong for a wall of navigation. */
+.ds-footer__link { color: var(--ds-text-muted); text-decoration: none; }
+.ds-footer__link:hover { color: var(--ds-text); }
+
+.ds-footer__base {
+  display: flex; flex-wrap: wrap; justify-content: space-between;
+  gap: var(--ds-space-3) var(--ds-space-5);
+  margin-top: var(--ds-space-8); padding-top: var(--ds-space-5);
+  border-top: 1px solid var(--ds-border);
+  font-size: var(--ds-text-sm); color: var(--ds-text-muted);
+}
