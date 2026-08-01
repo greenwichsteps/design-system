@@ -10,4 +10,9 @@
   --ds-accent-solid-press: #B81866;
   --ds-on-accent-solid: #ffffff;
   --ds-logo: url("../identity/burnside/wordmark.svg");
+  /* Nav draws the short mark (4264x737, same 737 as Farnsworth, so 26px matches
+     it exactly). The footer draws the full stacked mark (4251x1870), which needs
+     81px to put its glyphs at the same size as Farnsworth's 32px. */
+  --ds-brand-nav-h: 26px;
+  --ds-brand-foot-h: 81px;
 }

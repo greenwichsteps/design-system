@@ -11,6 +11,9 @@
   --ds-accent-solid-press: var(--ds-accent-press);
   --ds-on-accent-solid: var(--ds-on-accent);
   --ds-logo: url("../identity/farnsworth/wordmark.svg");
+  /* One line, 5462x737. Nav and footer differ because the footer has room. */
+  --ds-brand-nav-h: 26px;
+  --ds-brand-foot-h: 32px;
 }
 
 /* The accent must differ by theme. #3B3BD9 measures 6.67:1 on --ds-paper and

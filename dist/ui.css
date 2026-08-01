@@ -2,11 +2,13 @@
 /* Base reset + document defaults. Sorts first in ui.css. */
 *, *::before, *::after { box-sizing: border-box; }
 * { margin: 0; }
-html { -webkit-text-size-adjust: 100%; }
+/* --ds-header-h is written by initStickyHeader from the measured bar. The 0px
+   default keeps this inert on pages with no sticky header. */
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: var(--ds-header-h, 0px); }
 body {
   background: var(--ds-bg); color: var(--ds-text);
   font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-base); line-height: 1.5;
+  font-size: var(--ds-text-base); font-weight: 400; line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 img, svg, video { display: block; max-width: 100%; }
@@ -27,12 +29,13 @@ a { color: inherit; }
 /* button.css */
 .ds-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--ds-space-2);
-  padding: var(--ds-space-3) var(--ds-space-5); border: 1px solid transparent;
+  padding: var(--ds-space-3) var(--ds-space-4); border: 1px solid transparent;
   border-radius: var(--ds-radius-md); font-weight: 500; line-height: 1; cursor: pointer;
   background: transparent;
   transition: background var(--ds-dur) var(--ds-ease), border-color var(--ds-dur) var(--ds-ease);
   text-decoration: none; white-space: nowrap;
 }
+/* Must stay below .ds-btn: equal specificity, so this wins by source order only. */
 .ds-btn--sm { padding: var(--ds-space-2) var(--ds-space-4); font-size: var(--ds-text-sm); }
 .ds-btn--accent { background: var(--ds-accent-solid); color: var(--ds-on-accent-solid); }
 .ds-btn--accent:hover { background: var(--ds-accent-solid-press); }
@@ -64,9 +67,51 @@ a { color: inherit; }
 /* code.css */
 .ds-code { position: relative; background: var(--ds-code-bg); color: var(--ds-code-fg);
   border-radius: var(--ds-radius-md); padding: var(--ds-space-4); overflow-x: auto; }
-.ds-code pre, .ds-code code { font-family: var(--ds-font-mono); font-size: var(--ds-text-sm); }
+.ds-code pre, .ds-code code { font-family: var(--ds-font-mono); font-size: var(--ds-text-sm); font-weight: 400; }
 .ds-code__copy { position: absolute; top: var(--ds-space-2); right: var(--ds-space-2);
   background: var(--ds-code-fg); color: var(--ds-code-bg); border-color: transparent; }
+
+
+/* footer.css */
+/* Grouped footer shell. Structure only, no content opinion: the track list is
+   auto-fit rather than a fixed set of columns, so a consumer with two groups
+   and a consumer with five both work and neither site's shape is baked in.
+   The base .ds-footer rule (border-top, padding, muted colour) is in layout.css. */
+.ds-footer__cols {
+  display: grid; align-items: start; gap: var(--ds-space-6);
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+}
+/* The identity block width is a per-consumer design decision: consumers who want
+   a wider block can add grid-column: span or a custom grid-template-columns. */
+.ds-footer__id { max-width: 26ch; }
+.ds-footer__id img { display: block; height: var(--ds-brand-foot-h, 32px); width: auto; }
+/* The kit resets every margin, so without this the lede sits flush on the mark. */
+.ds-footer__id p { margin-top: var(--ds-space-4); font-size: var(--ds-text-sm); color: var(--ds-text-muted); }
+
+/* Sized as the mono eyebrow the family already uses for a small label, rather
+   than inventing a second vocabulary for the same job. */
+.ds-footer__label {
+  font-family: var(--ds-font-mono); font-size: var(--ds-text-xs); font-weight: 400;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ds-text-muted); margin-bottom: var(--ds-space-4);
+}
+.ds-footer__list {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: var(--ds-space-3);
+  font-size: var(--ds-text-sm);
+}
+/* Deliberately not .ds-link, which underlines in accent. Right for a link in
+   prose, wrong for a wall of navigation. */
+.ds-footer__link { color: var(--ds-text-muted); text-decoration: none; }
+.ds-footer__link:hover { color: var(--ds-text); }
+
+.ds-footer__base {
+  display: flex; flex-wrap: wrap; justify-content: space-between;
+  gap: var(--ds-space-3) var(--ds-space-5);
+  margin-top: var(--ds-space-8); padding-top: var(--ds-space-5);
+  border-top: 1px solid var(--ds-border);
+  font-size: var(--ds-text-sm); color: var(--ds-text-muted);
+}
 
 
 /* form.css */
@@ -99,6 +144,43 @@ a { color: inherit; }
 .ds-toggle input:checked + span::after { transform: translateX(18px); }
 
 
+/* header.css */
+/* Full-bleed sticky chrome. The consumer nests a .ds-container inside this, and
+   a .ds-nav inside that: three elements, one job each.
+   Do NOT collapse the container onto this element or onto .ds-nav. .ds-nav's
+   padding would zero the container's padding-inline and the bar's contents end
+   up 24px left of every section's. */
+.ds-header {
+  position: sticky; top: 0; z-index: 20;
+  background: var(--ds-bg);
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--ds-dur) var(--ds-ease);
+}
+
+/* Translucency is enhancement, never the base: without backdrop-filter a
+   transparent bar is unreadable, so only browsers that can blur get the alpha. */
+@supports (backdrop-filter: blur(1px)) {
+  .ds-header {
+    background: color-mix(in srgb, var(--ds-bg) 72%, transparent);
+    -webkit-backdrop-filter: blur(12px) saturate(1.6);
+    backdrop-filter: blur(12px) saturate(1.6);
+  }
+}
+
+/* macOS Reduce Transparency governs exactly this effect. */
+@media (prefers-reduced-transparency: reduce) {
+  .ds-header {
+    background: var(--ds-bg);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* No rule at rest, so the bar is invisible furniture at the top of the page and
+   only asserts itself in motion. initStickyHeader toggles the class. */
+.ds-header.is-scrolled { border-bottom-color: var(--ds-border); }
+
+
 /* hero.css */
 .ds-hero { padding: var(--ds-space-8) 0; text-align: center; }
 .ds-hero__lede { color: var(--ds-text-muted); max-width: 46ch; margin: var(--ds-space-4) auto 0; }
@@ -111,11 +193,17 @@ a { color: inherit; }
 .ds-grid--2 { grid-template-columns: repeat(2, 1fr); }
 .ds-grid--3 { grid-template-columns: repeat(3, 1fr); }
 @media (max-width: 720px) { .ds-grid--2, .ds-grid--3 { grid-template-columns: 1fr; } }
-.ds-nav { display: flex; align-items: center; gap: var(--ds-space-5); padding: var(--ds-space-4) 0; }
-.ds-nav__brand { height: 24px; }
+/* padding-block, not `padding: X 0`. This element sits inside .ds-container, and
+   the shorthand's implicit 0 would overwrite the container's padding-inline,
+   putting the bar's contents 24px left of every section's. */
+.ds-nav { display: flex; align-items: center; gap: var(--ds-space-5); padding-block: var(--ds-space-2); }
+/* No height here. Height belongs on the asset, from a per-brand token: a fixed
+   anchor height does not grow for a taller mark, it just lets it overflow. */
+.ds-nav__brand { display: inline-flex; align-items: center; flex-shrink: 0; }
+.ds-nav__brand img { display: block; height: var(--ds-brand-nav-h, 26px); width: auto; }
 .ds-nav__spacer { flex: 1; }
-.ds-nav__links { display: flex; gap: var(--ds-space-5); }
-@media (max-width: 720px) { .ds-nav__links { display: none; } .ds-nav__links.is-open { display: flex; position: absolute; inset: 56px 0 auto; flex-direction: column; background: var(--ds-surface); padding: var(--ds-space-5); } }
+.ds-nav__links { display: flex; gap: var(--ds-space-5); font-size: var(--ds-text-sm); }
+@media (max-width: 720px) { .ds-nav__links { display: none; } .ds-nav__links.is-open { display: flex; position: absolute; inset: 100% 0 auto; flex-direction: column; background: var(--ds-surface); padding: var(--ds-space-5); } }
 .ds-footer { border-top: 1px solid var(--ds-border); padding: var(--ds-space-8) 0; color: var(--ds-text-muted); }
 .ds-shell { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
 .ds-shell__side { border-right: 1px solid var(--ds-border); padding: var(--ds-space-5); }
@@ -125,7 +213,7 @@ a { color: inherit; }
 
 /* misc.css */
 .ds-stat { display: grid; gap: var(--ds-space-1); }
-.ds-stat__value { font-family: var(--ds-font-display); font-size: var(--ds-text-2xl); line-height: 1; }
+.ds-stat__value { font-family: var(--ds-font-display); font-size: var(--ds-text-2xl); font-weight: 400; line-height: 1; }
 .ds-stat__label { font-size: var(--ds-text-sm); color: var(--ds-text-muted); }
 .ds-empty { display: grid; gap: var(--ds-space-3); place-items: center; text-align: center; padding: var(--ds-space-10) var(--ds-space-5); color: var(--ds-text-muted); }
 .ds-empty__title { font-size: var(--ds-text-lg); color: var(--ds-text); }
@@ -148,6 +236,14 @@ dialog.ds-modal::backdrop { background: var(--ds-scrim); }
 .ds-toast { background: var(--ds-ink); color: var(--ds-on-ink); padding: var(--ds-space-3) var(--ds-space-4); border-radius: var(--ds-radius-md); box-shadow: var(--ds-shadow-pop); }
 
 
+/* section.css */
+.ds-section { padding-block: var(--ds-space-8); }
+.ds-section__title { margin-bottom: var(--ds-space-5); }
+/* Adjacent-sibling so the first section draws no rule under the hero and the
+   last draws none above the footer, which already has its own border-top. */
+.ds-section + .ds-section { border-top: 1px solid var(--ds-border); }
+
+
 /* table.css */
 .ds-table { width: 100%; border-collapse: collapse; }
 .ds-table th, .ds-table td { text-align: left; padding: var(--ds-space-3) var(--ds-space-4); border-bottom: 1px solid var(--ds-border); }
@@ -156,9 +252,9 @@ dialog.ds-modal::backdrop { background: var(--ds-scrim); }
 
 
 /* type.css */
-.ds-display { font-family: var(--ds-font-display); font-size: var(--ds-text-display); line-height: 1.02; letter-spacing: -0.02em; }
-.ds-h1 { font-family: var(--ds-font-display); font-size: var(--ds-text-3xl); line-height: 1.05; }
-.ds-h2 { font-family: var(--ds-font-display); font-size: var(--ds-text-2xl); line-height: 1.1; }
+.ds-display { font-family: var(--ds-font-display); font-size: var(--ds-text-display); font-weight: 400; line-height: 1.02; letter-spacing: -0.02em; }
+.ds-h1 { font-family: var(--ds-font-display); font-size: var(--ds-text-3xl); font-weight: 400; line-height: 1.05; }
+.ds-h2 { font-family: var(--ds-font-display); font-size: var(--ds-text-2xl); font-weight: 400; line-height: 1.1; }
 .ds-prose { max-width: 68ch; }
 .ds-prose p { margin-bottom: var(--ds-space-4); }
-.ds-quote { font-family: var(--ds-font-serif-text); font-size: var(--ds-text-xl); font-style: italic; border-left: 2px solid var(--ds-accent); padding-left: var(--ds-space-4); }
+.ds-quote { font-family: var(--ds-font-serif-text); font-size: var(--ds-text-xl); font-weight: 400; font-style: italic; border-left: 2px solid var(--ds-accent); padding-left: var(--ds-space-4); }
