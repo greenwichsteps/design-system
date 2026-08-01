@@ -307,3 +307,33 @@ describe("share composition", () => {
     expect(layoutShare(1280, 640).size).toBe(252);
   });
 });
+
+describe("the generated set is reproducible", () => {
+  // Not a comparison against committed dist/: test/global-setup.ts rebuilds
+  // dist/ before collection, so any such comparison is fresh-vs-fresh and
+  // passes unconditionally. What is worth asserting, and what the whole
+  // committed-artifact approach depends on, is that two builds of identical
+  // sources produce identical bytes. A timestamp or a map iteration order
+  // leaking into the PNGs would break that and make dist/ churn every build.
+  it("produces byte-identical output from two independent builds", async () => {
+    const { mkdtempSync, cpSync, readdirSync } = await import("node:fs");
+    const { tmpdir } = await import("node:os");
+    const { buildIdentity } = await import("../scripts/build-identity.mjs");
+
+    const build = async () => {
+      const tmp = mkdtempSync(join(tmpdir(), "identity-"));
+      cpSync(join(root, "identity"), join(tmp, "identity"), { recursive: true });
+      return await buildIdentity(tmp);
+    };
+
+    const [a, b] = [await build(), await build()];
+    const names = readdirSync(a).sort();
+    expect(names.length, "generator produced nothing to compare").toBeGreaterThan(5);
+    expect(readdirSync(b).sort(), "the two builds produced different file sets").toEqual(names);
+
+    const differing = names.filter(
+      (n) => Buffer.compare(readFileSync(join(a, n)), readFileSync(join(b, n))) !== 0,
+    );
+    expect(differing, `non-deterministic output: ${differing.join(", ")}`).toEqual([]);
+  });
+});
