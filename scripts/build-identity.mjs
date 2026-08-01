@@ -36,9 +36,19 @@ export async function buildIdentity(root, brand = "burnside") {
   // The ink shapes alone, without the inset rounded background tile: both the
   // apple-touch and maskable variants below need a full-bleed background
   // behind this same ink, not the tile's 1-unit inset and rx="8" corners.
-  const INK = light
-    .match(/<(rect|circle)(?![^>]*rx="8")[^>]*\/>/g)
-    .join("\n  ");
+  //
+  // Excluding the tile by its rx attribute is format-sensitive: a quoting or
+  // attribute-order change would silently include the tile as ink, or match
+  // nothing at all and emit a blank pink square. Neither crashes, and neither
+  // is visible to an opacity check, so assert the shape count here.
+  const INK_SHAPES = light.match(/<(rect|circle)(?![^>]*rx="8")[^>]*\/>/g) ?? [];
+  if (INK_SHAPES.length !== 3) {
+    throw new Error(
+      `expected 3 ink shapes in icon-light.svg, found ${INK_SHAPES.length}. ` +
+      `The tile-exclusion regex is format-sensitive; check the source markup.`,
+    );
+  }
+  const INK = INK_SHAPES.join("\n  ");
 
   // iOS ignores transparency and composites touch icons onto black, so the
   // rounded tile's transparent corners would render black on the home screen.

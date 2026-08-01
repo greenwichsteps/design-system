@@ -228,4 +228,19 @@ describe("generated icon set", () => {
     const p = PNG.sync.read(readFileSync(dist("icon-512.png")));
     expect(p.data[3], "icon-512.png lost its transparent corner").toBe(0);
   });
+
+  // A blank pink square passes every opacity assertion. Check the mark is
+  // actually present, and centred where the safe-circle transform puts it.
+  it("puts the mark inside the maskable field, not just colour", () => {
+    const p = PNG.sync.read(readFileSync(dist("maskable-512.png")));
+    const px = (x: number, y: number) => {
+      const i = (p.width * y + x) << 2;
+      return `#${[p.data[i], p.data[i + 1], p.data[i + 2]].map((v) => v.toString(16).padStart(2, "0")).join("")}`;
+    };
+    // Centre of the middle step square after translate(3.2 3.2) scale(0.8):
+    // (16.2, 15.8) in icon units -> 0.8*u + 3.2 -> (16.16, 15.84) of 32 -> px.
+    const u = (n: number) => Math.round(((0.8 * n + 3.2) / 32) * p.width);
+    expect(px(u(16.2), u(15.8)), "no dark ink at the middle step").toBe("#121317");
+    expect(px(2, 2), "corner is not the tile colour").toBe("#ff4d9d");
+  });
 });
