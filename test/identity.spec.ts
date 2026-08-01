@@ -387,6 +387,11 @@ describe("farnsworth icon masters", () => {
   const read = (f: string) => readFileSync(src(`farnsworth/${f}`), "utf8");
   const FILES = ["icon.svg", "icon-light.svg", "icon-dark.svg"];
 
+  // Close to tautological on its own, since FW_D is defined as FW_S / 2 two lines
+  // above: it mostly confirms floating-point arithmetic. Its real value is
+  // narrow but real, catching a future edit that redefines FW_D independently of
+  // FW_S. The geometry's actual correctness was established by deriving it from
+  // raw coordinates during review, not by this assertion.
   it("derives from a half-size offset, so the overlap is a quarter of each square", () => {
     expect(FW_D).toBe(6.5);
     expect((FW_S - FW_D) ** 2).toBeCloseTo(FW_S ** 2 / 4, 10);
@@ -435,6 +440,34 @@ describe("farnsworth icon masters", () => {
   it("carries no media query anywhere, master included", () => {
     for (const f of FILES) {
       expect(read(f), `${f} has a media query that would do nothing`).not.toContain("@media");
+    }
+  });
+
+  // Nothing else in this block pins the colours. Every other assertion checks a
+  // shape, or checks the two variants against EACH OTHER, so a wrong but
+  // mutually consistent hex in both would pass the lot. Burnside gets this
+  // coverage as a side effect of asserting its light and dark inks differ;
+  // Farnsworth's variants are identical by design, so that side effect is gone
+  // and the values have to be pinned directly.
+  it("uses the brand accent and a white ink, in every file", () => {
+    for (const f of FILES) {
+      expect(read(f), `${f} lost the accent`).toContain("#3B3BD9");
+      expect(read(f), `${f} lost the white ink`).toContain("#FFFFFF");
+    }
+  });
+
+  // A master whose class values drift from the pinned variants' literals would
+  // render one thing in a browser and rasterise another, and nothing else in the
+  // suite compares the two.
+  it("keeps the master's class values and the pinned literals in step", () => {
+    const master = read("icon.svg");
+    const tile = master.match(/\.fw-tile\s*\{\s*fill:\s*(#[0-9A-Fa-f]{6})/)?.[1];
+    const ink = master.match(/\.fw-ink\s*\{\s*fill:\s*(#[0-9A-Fa-f]{6})/)?.[1];
+    expect(tile, "icon.svg declares no .fw-tile fill").toBeDefined();
+    expect(ink, "icon.svg declares no .fw-ink fill").toBeDefined();
+    for (const f of ["icon-light.svg", "icon-dark.svg"]) {
+      expect(read(f), `${f} tile differs from the master's .fw-tile ${tile}`).toContain(`fill="${tile}"`);
+      expect(read(f), `${f} ink differs from the master's .fw-ink ${ink}`).toContain(`fill="${ink}"`);
     }
   });
 
