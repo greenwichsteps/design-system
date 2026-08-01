@@ -16,12 +16,23 @@ in `components/` (mark its row "promoted → components/<file>").
 
 ## Identity rules
 
-**No lockup.** Two masters per brand, `icon` and `wordmark`, never combined into
-a third file. Verified in a real nav at 760px and 375px: the stacked wordmark
-holds unaided, and adding the icon made it busier rather than better. The icon
-already appears beside the name as text in a browser tab, a GitHub avatar and
-the widget badge, so recognition transfer happens without a lockup asset. A
-lockup file would need clear-space and minimum-size rules no test can enforce.
+**No lockup.** `icon` and `wordmark` are separate masters per brand, never
+combined into a third file. Verified in a real nav at 760px and 375px: the
+stacked wordmark holds unaided, and adding the icon made it busier rather than
+better. The icon already appears beside the name as text in a browser tab, a
+GitHub avatar and the widget badge, so recognition transfer happens without a
+lockup asset. A lockup file would need clear-space and minimum-size rules no
+test can enforce.
+
+**Short forms are permitted; lockups are not.** A brand may ship a short
+wordmark for constrained horizontal slots, such as `wordmark-short.svg` drawing
+"Burnside." for a sticky nav where the stacked mark would either halve the glyph
+size or double the bar height. The condition is strict: a short form is the same
+wordmark rendered short, produced by the same script from the same font with the
+same tracking, and it **never changes the accessible name**. Every Burnside
+variant carries `aria-label="Burnside Steps"` and consumers set the full name in
+`alt`, whatever the mark draws. This is not a licence for a third design; it is a
+second rendering of the one wordmark.
 
 **Dark mode.** Each master carries its own `@media (prefers-color-scheme: dark)`
 block, which makes a single external SVG self-inverting even inside an `<img>`.

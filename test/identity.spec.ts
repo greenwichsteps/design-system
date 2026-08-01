@@ -560,6 +560,50 @@ describe("farnsworth wordmark master", () => {
   });
 });
 
+describe("burnside short wordmark", () => {
+  const shortPath = (v = "") => join(root, `identity/burnside/wordmark-short${v}.svg`);
+
+  it("ships a master and both pinned variants", () => {
+    for (const v of ["", "-light", "-dark"]) {
+      expect(existsSync(shortPath(v)), `missing wordmark-short${v}.svg`).toBe(true);
+    }
+  });
+
+  it("is one line, the same height as Farnsworth's mark", () => {
+    // Both are GT America Bold cap-to-ascender. Equal viewBox height is what
+    // lets one brand-height token value serve both brands' nav slots.
+    const vb = (p: string) => /viewBox="0 0 (\d+) (\d+)"/.exec(readFileSync(p, "utf8"))!.slice(1).map(Number);
+    const [, shortH] = vb(shortPath());
+    const [, fwH] = vb(join(root, "identity/farnsworth/wordmark.svg"));
+    expect(shortH).toBe(fwH);
+  });
+
+  it("is narrower than the full stacked mark is tall-equivalent, and wider than it", () => {
+    const vb = (p: string) => /viewBox="0 0 (\d+) (\d+)"/.exec(readFileSync(p, "utf8"))!.slice(1).map(Number);
+    const [sw, sh] = vb(shortPath());
+    const [fw, fh] = vb(join(root, "identity/burnside/wordmark.svg"));
+    expect(sw / sh).toBeGreaterThan(fw / fh); // one line is far wider per unit height
+  });
+
+  it("keeps the full brand name as the accessible name", () => {
+    // The rendered mark says "Burnside". The accessible name must not.
+    for (const v of ["", "-light", "-dark"]) {
+      expect(readFileSync(shortPath(v), "utf8")).toContain('aria-label="Burnside Steps"');
+    }
+  });
+
+  it("keeps the accent dot", () => {
+    expect(readFileSync(shortPath("-light"), "utf8")).toContain("#FF4D9D");
+    expect(readFileSync(shortPath("-dark"), "utf8")).toContain("#FF4D9D");
+  });
+
+  it("pins ink colour per variant and self-inverts only in the master", () => {
+    expect(readFileSync(shortPath("-light"), "utf8")).toContain("#121317");
+    expect(readFileSync(shortPath("-dark"), "utf8")).toContain("#F4F2EE");
+    expect(readFileSync(shortPath(), "utf8")).toContain("prefers-color-scheme: dark");
+  });
+});
+
 describe("farnsworth generated icon set", () => {
   const dist = (p: string) => join(root, "dist/identity/farnsworth", p);
 
