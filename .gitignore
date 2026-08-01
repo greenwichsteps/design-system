@@ -1,3 +1,10 @@
 node_modules
 gallery/dist
 .superpowers
+
+# Agent tooling and its worktrees. This repo is PUBLIC, so anything landing here lands
+# publicly. Nothing was exposed -- .claude/ currently holds only a registered git worktree,
+# which git will not descend into -- but the directory itself was unignored, so any ordinary
+# file it later gained (settings, agents, commands) would have committed cleanly with nothing
+# to stop it. The sibling burnsidesteps repo had the same gap and fixed it the same day.
+.claude/
