@@ -1,13 +1,14 @@
 import { initClipboard } from "./clipboard.js";
 import { initTheme } from "./theme.js";
 import { initNav } from "./nav.js";
+import { initStickyHeader } from "./sticky-header.js";
 import { initMenu } from "./menu.js";
 import { initTabs } from "./tabs.js";
 import { initModal } from "./modal.js";
 import { toast, initToast } from "./toast.js";
-export { initClipboard, initTheme, initNav, initMenu, initTabs, initModal, toast, initToast };
+export { initClipboard, initTheme, initNav, initStickyHeader, initMenu, initTabs, initModal, toast, initToast };
 export function initAll(root: ParentNode = document): void {
-  initClipboard(root); initTheme(root); initNav(root); initMenu(root); initTabs(root); initModal(root); initToast(root);
+  initClipboard(root); initTheme(root); initNav(root); initStickyHeader(root); initMenu(root); initTabs(root); initModal(root); initToast(root);
 }
 // This module is deliberately side-effect-free, so a consumer can import one
 // behavior without silently running the rest. That matters most for initTheme,
