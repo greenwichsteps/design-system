@@ -244,3 +244,66 @@ describe("generated icon set", () => {
     expect(px(2, 2), "corner is not the tile colour").toBe("#ff4d9d");
   });
 });
+
+describe("share images", () => {
+  const dist = (p: string) => join(root, "dist/identity/burnside", p);
+
+  it("emits both canvases at their exact dimensions", () => {
+    for (const [f, w, h] of [
+      ["og-default.png", 1200, 630],
+      ["github-social.png", 1280, 640],
+    ] as const) {
+      expect(existsSync(dist(f)), `${f} not generated`).toBe(true);
+      const buf = readFileSync(dist(f));
+      expect(buf.readUInt32BE(16), `${f} width`).toBe(w);
+      expect(buf.readUInt32BE(20), `${f} height`).toBe(h);
+    }
+  });
+
+  // A plain dark rectangle with no wordmark would pass every dimension and
+  // padding assertion above. Sample a point inside the "B" stem's waist -- the
+  // band between the glyph's two counters (local y 306-418 in wordmark-space),
+  // where the stem is solid ink from x=0 out past x=169 with no hole to land
+  // in. (86, 370) sits centred in that band: ~80 units of margin from the
+  // nearest edge on every side, well clear of resvg's anti-aliasing fringe, so
+  // small rounding differences in the layout math can't land it off the ink.
+  it("actually renders the wordmark ink, not just the field", async () => {
+    const { layoutShare } = await import("../scripts/lib/compose-share.mjs");
+    const WM_X = 86, WM_Y = 370;
+    for (const [f, w, h] of [
+      ["og-default.png", 1200, 630],
+      ["github-social.png", 1280, 640],
+    ] as const) {
+      const L = layoutShare(w, h);
+      const x = Math.round(L.left + (WM_X / 4251) * L.inkW);
+      const y = Math.round(L.top + (WM_Y / 1870) * L.inkH);
+      const p = PNG.sync.read(readFileSync(dist(f)));
+      const i = (p.width * y + x) << 2;
+      const hex = `#${[p.data[i], p.data[i + 1], p.data[i + 2]]
+        .map((v) => v.toString(16).padStart(2, "0"))
+        .join("")}`;
+      expect(hex, `${f} has no ink at (${x},${y}) -- wordmark missing or mispositioned`).toBe("#f4f2ee");
+    }
+  });
+});
+
+describe("share composition", () => {
+  it("never lets padding fall below the floor on either axis", async () => {
+    const { layoutShare } = await import("../scripts/lib/compose-share.mjs");
+    for (const [w, h] of [[1200, 630], [1280, 640]] as const) {
+      const L = layoutShare(w, h);
+      expect(L.left, `${w}x${h} side padding below floor`).toBeGreaterThanOrEqual(84);
+      expect(L.top, `${w}x${h} vertical padding below floor`).toBeGreaterThanOrEqual(84);
+      // The block must fit, not overflow: a cropped share image still looks
+      // fine in isolation, which is how it would survive review.
+      expect(L.left * 2 + L.inkW, `${w}x${h} overflows horizontally`).toBeLessThanOrEqual(w + 1);
+      expect(L.top * 2 + L.inkH, `${w}x${h} overflows vertically`).toBeLessThanOrEqual(h + 1);
+    }
+  });
+
+  it("matches the settled sizes from the spec", async () => {
+    const { layoutShare } = await import("../scripts/lib/compose-share.mjs");
+    expect(layoutShare(1200, 630).size).toBe(242);
+    expect(layoutShare(1280, 640).size).toBe(252);
+  });
+});

@@ -11,6 +11,7 @@ import { Resvg } from "@resvg/resvg-js";
 import pngToIco from "png-to-ico";
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
+import { composeShare } from "./lib/compose-share.mjs";
 
 // 192 is here because the manifest references icon-192.png. Removing it from
 // this list leaves a manifest pointing at a file that was never generated, which
@@ -87,6 +88,12 @@ export async function buildIdentity(root, brand = "burnside") {
     background_color: "#121317",
     display: "standalone",
   }, null, 2) + "\n");
+
+  // Share images use the DARK wordmark variant, because the field is #121317.
+  // The self-inverting master would raster in its light colours and vanish.
+  const wordmarkDark = readFileSync(src("wordmark-dark.svg"), "utf8");
+  out("og-default.png", render(composeShare(wordmarkDark, 1200, 630), 1200));
+  out("github-social.png", render(composeShare(wordmarkDark, 1280, 640), 1280));
 
   return outDir;
 }
