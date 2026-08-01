@@ -1,11 +1,12 @@
 .ds-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--ds-space-2);
-  padding: var(--ds-space-3) var(--ds-space-5); border: 1px solid transparent;
+  padding: var(--ds-space-3) var(--ds-space-4); border: 1px solid transparent;
   border-radius: var(--ds-radius-md); font-weight: 500; line-height: 1; cursor: pointer;
   background: transparent;
   transition: background var(--ds-dur) var(--ds-ease), border-color var(--ds-dur) var(--ds-ease);
   text-decoration: none; white-space: nowrap;
 }
+/* Must stay below .ds-btn: equal specificity, so this wins by source order only. */
 .ds-btn--sm { padding: var(--ds-space-2) var(--ds-space-4); font-size: var(--ds-text-sm); }
 .ds-btn--accent { background: var(--ds-accent-solid); color: var(--ds-on-accent-solid); }
 .ds-btn--accent:hover { background: var(--ds-accent-solid-press); }

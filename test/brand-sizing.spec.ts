@@ -50,3 +50,21 @@ describe("brand sizing", () => {
     expect(grab("burnside")).toBeGreaterThan(grab("farnsworth"));
   });
 });
+
+describe("chrome scale", () => {
+  it("scales nav links below body size", () => {
+    expect(layout()).toMatch(/\.ds-nav__links\s*\{[^}]*font-size:\s*var\(--ds-text-sm\)/);
+  });
+
+  it("trims .ds-btn horizontal padding to space-4", () => {
+    const decls = rule(read("components/button.css"), ".ds-btn");
+    expect(decls).toMatch(/padding:\s*var\(--ds-space-3\)\s+var\(--ds-space-4\)/);
+  });
+
+  it("keeps .ds-btn--sm after .ds-btn in source order", () => {
+    // Equal specificity: --sm wins only by coming later. A future edit that
+    // reorders them silently inflates every small button back to full size.
+    const css = read("components/button.css");
+    expect(css.indexOf(".ds-btn--sm")).toBeGreaterThan(css.indexOf(".ds-btn {"));
+  });
+});
