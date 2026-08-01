@@ -8,7 +8,7 @@ const src = (p: string) => join(root, "identity", p);
 
 describe("identity layout", () => {
   it("namespaces every mark under a brand directory", () => {
-    for (const f of ["burnside/icon.svg", "burnside/wordmark.svg", "farnsworth/placeholder.svg"]) {
+    for (const f of ["burnside/icon.svg", "burnside/wordmark.svg", "farnsworth/icon.svg", "farnsworth/wordmark.svg"]) {
       expect(existsSync(src(f)), `${f} missing`).toBe(true);
     }
   });
@@ -375,5 +375,216 @@ describe("the generated set is reproducible", () => {
       (n) => Buffer.compare(readFileSync(join(a, n)), readFileSync(join(b, n))) !== 0,
     );
     expect(differing, `non-deterministic output: ${differing.join(", ")}`).toEqual([]);
+  });
+});
+
+// The quarter-overlap is the whole idea of this mark, so it is asserted as
+// arithmetic rather than trusted to a picture. Squares of side s offset by d
+// share (s - d)^2; a quarter of s^2 requires d = s/2 exactly.
+const FW_S = 13, FW_D = FW_S / 2, FW_L = 16 - (FW_S * 1.5) / 2, FW_T = 2.4;
+
+describe("farnsworth icon masters", () => {
+  const read = (f: string) => readFileSync(src(`farnsworth/${f}`), "utf8");
+  const FILES = ["icon.svg", "icon-light.svg", "icon-dark.svg"];
+
+  // Close to tautological on its own, since FW_D is defined as FW_S / 2 two lines
+  // above: it mostly confirms floating-point arithmetic. Its real value is
+  // narrow but real, catching a future edit that redefines FW_D independently of
+  // FW_S. The geometry's actual correctness was established by deriving it from
+  // raw coordinates during review, not by this assertion.
+  it("derives from a half-size offset, so the overlap is a quarter of each square", () => {
+    expect(FW_D).toBe(6.5);
+    expect((FW_S - FW_D) ** 2).toBeCloseTo(FW_S ** 2 / 4, 10);
+    expect(FW_L).toBe(6.25);
+  });
+
+  it("carries the settled path in every file", () => {
+    const outline = `M${FW_L},${FW_L + FW_D}h${FW_S}v${FW_S}h-${FW_S}z`;
+    const window_ = `M${FW_L + FW_T},${FW_L + FW_D + FW_T}h${FW_S - 2 * FW_T}v${FW_S - 2 * FW_T}h-${FW_S - 2 * FW_T}z`;
+    const solid = `M${FW_L + FW_D},${FW_L}h${FW_S}v${FW_S}h-${FW_S}z`;
+    for (const f of FILES) {
+      const svg = read(f);
+      expect(svg, `${f} lost the outline square`).toContain(outline);
+      expect(svg, `${f} lost the frame window`).toContain(window_);
+      expect(svg, `${f} lost the solid square`).toContain(solid);
+      expect(svg, `${f} is not even-odd, so the overlaps will not knock out`)
+        .toMatch(/fill-rule="evenodd"/);
+    }
+  });
+
+  it("keeps the family tile", () => {
+    for (const f of FILES) {
+      expect(read(f), `${f} lost the tile`).toMatch(/<rect[^>]*x="1"[^>]*y="1"[^>]*width="30"[^>]*height="30"[^>]*rx="8"/);
+    }
+  });
+
+  it("lets consumers control size", () => {
+    for (const f of FILES) {
+      const svg = read(f);
+      expect(svg, `${f} has no viewBox`).toMatch(/viewBox="0 0 32 32"/);
+      expect(svg, `${f} pins width`).not.toMatch(/<svg[^>]*\swidth=/);
+      expect(svg, `${f} pins height`).not.toMatch(/<svg[^>]*\sheight=/);
+    }
+  });
+
+  // Deliberately the opposite of the Burnside assertion above, and the reason
+  // is worth reading before anyone "fixes" it. Burnside's ink is near-black on
+  // a pink tile and flips to cream in dark mode, which is a stylistic choice.
+  // Farnsworth's ink is white on an opaque indigo tile at 7.46:1. The tile
+  // supplies its own ground, so there is nothing to invert and a flip would be
+  // decoration. The variants are identical on purpose.
+  it("has identical light and dark variants, because the tile is opaque", () => {
+    expect(read("icon-light.svg")).toBe(read("icon-dark.svg"));
+  });
+
+  it("carries no media query anywhere, master included", () => {
+    for (const f of FILES) {
+      expect(read(f), `${f} has a media query that would do nothing`).not.toContain("@media");
+    }
+  });
+
+  // Nothing else in this block pins the colours. Every other assertion checks a
+  // shape, or checks the two variants against EACH OTHER, so a wrong but
+  // mutually consistent hex in both would pass the lot. Burnside gets this
+  // coverage as a side effect of asserting its light and dark inks differ;
+  // Farnsworth's variants are identical by design, so that side effect is gone
+  // and the values have to be pinned directly.
+  it("uses the brand accent and a white ink, in every file", () => {
+    for (const f of FILES) {
+      expect(read(f), `${f} lost the accent`).toContain("#3B3BD9");
+      expect(read(f), `${f} lost the white ink`).toContain("#FFFFFF");
+    }
+  });
+
+  // A master whose class values drift from the pinned variants' literals would
+  // render one thing in a browser and rasterise another, and nothing else in the
+  // suite compares the two.
+  it("keeps the master's class values and the pinned literals in step", () => {
+    const master = read("icon.svg");
+    const tile = master.match(/\.fw-tile\s*\{\s*fill:\s*(#[0-9A-Fa-f]{6})/)?.[1];
+    const ink = master.match(/\.fw-ink\s*\{\s*fill:\s*(#[0-9A-Fa-f]{6})/)?.[1];
+    expect(tile, "icon.svg declares no .fw-tile fill").toBeDefined();
+    expect(ink, "icon.svg declares no .fw-ink fill").toBeDefined();
+    for (const f of ["icon-light.svg", "icon-dark.svg"]) {
+      expect(read(f), `${f} tile differs from the master's .fw-tile ${tile}`).toContain(`fill="${tile}"`);
+      expect(read(f), `${f} ink differs from the master's .fw-ink ${ink}`).toContain(`fill="${ink}"`);
+    }
+  });
+
+  it("no longer ships the placeholder", () => {
+    expect(existsSync(src("farnsworth/placeholder.svg"))).toBe(false);
+  });
+});
+
+describe("farnsworth wordmark master", () => {
+  const read = (f: string) => readFileSync(src(`farnsworth/${f}`), "utf8");
+  const FILES = ["wordmark.svg", "wordmark-light.svg", "wordmark-dark.svg"];
+
+  it("carries outlines, not live text", () => {
+    for (const f of FILES) {
+      expect(read(f), `${f} still contains live text`).not.toMatch(/<text[\s>]/);
+      expect(read(f), `${f} has no path data`).toMatch(/<path[^>]*\sd="/);
+      expect(read(f), `${f} still references a font family`).not.toContain("font-family");
+    }
+  });
+
+  it("uses the ink viewBox", () => {
+    for (const f of FILES) {
+      // 5462, not 5426: the outliner hand-kerns `rt` open by 36 units so both
+      // r-joins in the word share a 60-unit tip. See outline-wordmark.mjs.
+      expect(read(f), `${f} viewBox is not the ink block`).toMatch(/viewBox="0 0 5462 737"/);
+    }
+  });
+
+  // Same reasoning as the Burnside check above: TY - maxLocalY below zero means
+  // the glyph renders above the top edge and gets clipped. Derived from the
+  // committed numbers, so it needs no font access.
+  it("places no ink above the top edge of the viewBox", () => {
+    for (const f of FILES) {
+      const paths = [...read(f).matchAll(/<path[^>]*transform="translate\([-\d.]+ ([-\d.]+)\) scale\(1 -1\)" d="([^"]+)"/g)];
+      expect(paths.length, `${f} has no glyph paths to check`).toBeGreaterThan(0);
+      for (const [, ty, d] of paths) {
+        const coords = d.match(/-?\d+(?:\.\d+)?/g)!.map(Number);
+        const maxLocalY = Math.max(...coords.filter((_, i) => i % 2 === 1));
+        expect(Number(ty) - maxLocalY, `${f} clips a glyph: translate y=${ty}, ink reaches ${maxLocalY}`)
+          .toBeGreaterThanOrEqual(0);
+      }
+    }
+  });
+
+  it("keeps the period a separate, accented element", () => {
+    expect(read("wordmark.svg")).toContain("fw-dot");
+    expect(read("wordmark.svg")).toContain("#3B3BD9");
+  });
+
+  // The check above covers the master only, and the master is not what ships on a
+  // share card: composeShare rasterises wordmark-dark.svg into og-default.png and
+  // github-social.png. The pinned variants carry no <style> block, so every colour
+  // has to be a literal fill. If the outliner's class-to-fill replace ever missed,
+  // a variant would keep a class attribute with nothing to resolve it, resvg would
+  // fall back to black, and a black period on the #121317 share field is invisible
+  // with the whole suite still green. This is the guard the icon block already has
+  // at "uses the brand accent and a white ink, in every file"; the wordmark went
+  // without it until the GRE-222 branch review.
+  it("pins every colour as a literal fill in the variants, leaving no orphaned class", () => {
+    for (const f of FILES) {
+      expect(read(f), `${f} lost the accent`).toContain("#3B3BD9");
+    }
+    for (const f of ["wordmark-light.svg", "wordmark-dark.svg"]) {
+      expect(read(f), `${f} carries a class attribute with no stylesheet to resolve it`)
+        .not.toMatch(/class="fw-/);
+    }
+  });
+
+  it("never says Farnsworth Steps", () => {
+    for (const f of FILES) {
+      expect(read(f), `${f} uses the domain name as the product name`).not.toContain("Farnsworth Steps");
+    }
+  });
+
+  it("makes the master self-inverting and the variants pinned", () => {
+    expect(read("wordmark.svg"), "dark media block does not target .fw-word")
+      .toMatch(/@media \(prefers-color-scheme: dark\)[^}]*\.fw-word/);
+    for (const f of ["wordmark-light.svg", "wordmark-dark.svg"]) {
+      expect(read(f), `${f} carries a media query`).not.toContain("@media");
+    }
+    expect(read("wordmark-light.svg")).toContain("#121317");
+    expect(read("wordmark-dark.svg")).toContain("#F4F2EE");
+  });
+
+  it("does not pin width or height", () => {
+    for (const f of FILES) {
+      expect(read(f), `${f} pins width`).not.toMatch(/<svg[^>]*\swidth=/);
+      expect(read(f), `${f} pins height`).not.toMatch(/<svg[^>]*\sheight=/);
+    }
+  });
+});
+
+describe("farnsworth generated icon set", () => {
+  const dist = (p: string) => join(root, "dist/identity/farnsworth", p);
+
+  it("emits every raster the web platform asks for", () => {
+    for (const f of [
+      "favicon.ico", "apple-touch-icon.png", "maskable-192.png", "maskable-512.png",
+      "icon-32.png", "icon-64.png", "icon-128.png", "icon-192.png", "icon-256.png",
+      "icon-512.png", "site.webmanifest", "og-default.png", "github-social.png",
+    ]) {
+      expect(existsSync(dist(f)), `${f} not generated`).toBe(true);
+    }
+  });
+
+  it("resolves every icon the manifest declares", () => {
+    const m = JSON.parse(readFileSync(dist("site.webmanifest"), "utf8"));
+    expect(m.icons.length, "manifest declares no icons").toBeGreaterThan(0);
+    for (const icon of m.icons as { src: string }[]) {
+      expect(icon.src, "manifest points at another brand's directory").toContain("/identity/farnsworth/");
+      expect(existsSync(dist(icon.src.split("/").pop()!)), `manifest references ${icon.src} which was not generated`).toBe(true);
+    }
+  });
+
+  it("names the product, not the domain", () => {
+    const m = JSON.parse(readFileSync(dist("site.webmanifest"), "utf8"));
+    expect(m.name).toBe("Farnsworth");
+    expect(m.theme_color).toBe("#3B3BD9");
   });
 });

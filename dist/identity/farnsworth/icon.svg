@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Farnsworth">
+  <style>
+    .fw-tile { fill: #3B3BD9 }
+    .fw-ink { fill: #FFFFFF }
+  </style>
+  <rect x="1" y="1" width="30" height="30" rx="8" class="fw-tile"/>
+  <path class="fw-ink" fill-rule="evenodd" d="M6.25,12.75h13v13h-13z M8.65,15.15h8.2v8.2h-8.2z M12.75,6.25h13v13h-13z"/>
+</svg>

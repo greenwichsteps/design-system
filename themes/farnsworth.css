@@ -1,11 +1,37 @@
-/* Farnsworth Steps — throwaway demo theme proving the accent+logo swap. */
+/* Farnsworth theme. Accent ramp plus the logo pointer. GRE-222. */
 [data-theme-brand="farnsworth"] {
-  --ds-accent: #2F6BFF;
-  --ds-accent-press: #1E52D6;
-  --ds-accent-tint: rgba(47,107,255,0.14);
+  --ds-accent: #3B3BD9;
+  --ds-accent-press: #3030B2;
+  --ds-accent-tint: rgba(59,59,217,0.14);
   --ds-on-accent: #FFFFFF;
+  /* Burnside needs accent-solid to be a deeper colour because its pink fails
+     as a solid fill. Indigo measures 7.46:1 against white, so the same value
+     serves both and there is one fewer thing to keep in step. */
   --ds-accent-solid: var(--ds-accent);
   --ds-accent-solid-press: var(--ds-accent-press);
   --ds-on-accent-solid: var(--ds-on-accent);
-  --ds-logo: url("../identity/farnsworth/placeholder.svg");
+  --ds-logo: url("../identity/farnsworth/wordmark.svg");
+}
+
+/* The accent must differ by theme. #3B3BD9 measures 6.67:1 on --ds-paper and
+   only 2.49:1 on --ds-bg, and no single value clears 4.5 on both: between
+   #3B3BD9 and #7B7BF0 (3.16 on paper, 5.25 on dark) there is nothing that
+   passes twice. Only accent-coloured TEXT was ever broken; white-on-accent is
+   a fixed pair, so filled buttons hold either way.
+
+   Both selector forms are needed. The first matches when the theme and brand
+   attributes sit on the same element, which is what the marketing site does on
+   <html>; the second covers a brand attribute nested inside a themed ancestor.
+
+   The kit-wide version of this problem is GRE-227. */
+[data-theme="dark"][data-theme-brand="farnsworth"],
+[data-theme="dark"] [data-theme-brand="farnsworth"] {
+  --ds-accent: #8285F2;
+  --ds-accent-press: #6E71E8;
+  --ds-accent-tint: rgba(130,133,242,0.16);
+  /* Flips to dark ink: white on this lighter indigo is only 3.19:1. */
+  --ds-on-accent: #121317;
+  --ds-accent-solid: var(--ds-accent);
+  --ds-accent-solid-press: var(--ds-accent-press);
+  --ds-on-accent-solid: var(--ds-on-accent);
 }

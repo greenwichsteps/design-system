@@ -19,6 +19,31 @@ import { composeShare } from "./lib/compose-share.mjs";
 const ICON_PNG_SIZES = [32, 64, 128, 192, 256, 512];
 const ICO_SIZES = [16, 32, 48];
 
+// Per-brand constants. Everything that used to be a Burnside literal lives
+// here, so adding a brand is a table entry rather than an edit to the logic.
+//
+// inkPattern selects the ink shapes that get re-composed on a full-bleed
+// background for the apple-touch and maskable icons, which need the ink
+// WITHOUT the inset rounded tile. inkCount is asserted because the pattern is
+// format-sensitive: a quoting or attribute-order change could silently match
+// nothing and emit a blank coloured square, which no opacity check would catch.
+const BRANDS = {
+  burnside: {
+    accent: "#FF4D9D",
+    // rect and circle, excluding the tile by its rx="8"
+    inkPattern: /<(rect|circle)(?![^>]*rx="8")[^>]*\/>/g,
+    inkCount: 3,
+    manifest: { name: "Burnside Steps", short_name: "Burnside" },
+  },
+  farnsworth: {
+    accent: "#3B3BD9",
+    // a single evenodd path; the tile is a rect and is excluded by element type
+    inkPattern: /<path[^>]*\/>/g,
+    inkCount: 1,
+    manifest: { name: "Farnsworth", short_name: "Farnsworth" },
+  },
+};
+
 export function render(svg, width) {
   const img = new Resvg(svg, { fitTo: { mode: "width", value: width } }).render();
   return img.asPng();
@@ -27,6 +52,8 @@ export function render(svg, width) {
 export async function buildIdentity(root, brand = "burnside") {
   const src = (f) => join(root, "identity", brand, f);
   const outDir = join(root, "dist/identity", brand);
+  const cfg = BRANDS[brand];
+  if (!cfg) throw new Error(`buildIdentity: no BRANDS entry for "${brand}"`);
   mkdirSync(outDir, { recursive: true });
   const out = (f, buf) => writeFileSync(join(outDir, f), buf);
 
@@ -40,12 +67,12 @@ export async function buildIdentity(root, brand = "burnside") {
   //
   // Excluding the tile by its rx attribute is format-sensitive: a quoting or
   // attribute-order change would silently include the tile as ink, or match
-  // nothing at all and emit a blank pink square. Neither crashes, and neither
+  // nothing at all and emit a blank tile in the brand accent. Neither crashes, and neither
   // is visible to an opacity check, so assert the shape count here.
-  const INK_SHAPES = light.match(/<(rect|circle)(?![^>]*rx="8")[^>]*\/>/g) ?? [];
-  if (INK_SHAPES.length !== 3) {
+  const INK_SHAPES = light.match(cfg.inkPattern) ?? [];
+  if (INK_SHAPES.length !== cfg.inkCount) {
     throw new Error(
-      `expected 3 ink shapes in icon-light.svg, found ${INK_SHAPES.length}. ` +
+      `expected ${cfg.inkCount} ink shapes in icon-light.svg for brand "${brand}", found ${INK_SHAPES.length}. ` +
       `The tile-exclusion regex is format-sensitive; check the source markup.`,
     );
   }
@@ -55,7 +82,7 @@ export async function buildIdentity(root, brand = "burnside") {
   // rounded tile's transparent corners would render black on the home screen.
   // iOS rounds the corners itself; the source must be a full-bleed square.
   const appleTouch = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" fill="#FF4D9D"/>
+  <rect width="32" height="32" fill="${cfg.accent}"/>
   ${INK}
 </svg>`;
   out("apple-touch-icon.png", render(appleTouch, 180));
@@ -65,7 +92,7 @@ export async function buildIdentity(root, brand = "burnside") {
   // the content must sit inside the 80% safe circle. Built from the tile
   // colour plus the ink shapes, rather than scaling the inset rounded tile.
   const maskable = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" fill="#FF4D9D"/>
+  <rect width="32" height="32" fill="${cfg.accent}"/>
   <g transform="translate(3.2 3.2) scale(0.8)">
   ${INK}
   </g>
@@ -77,16 +104,16 @@ export async function buildIdentity(root, brand = "burnside") {
   out("favicon.ico", ico);
 
   out("site.webmanifest", JSON.stringify({
-    name: "Burnside Steps",
-    short_name: "Burnside",
+    name: cfg.manifest.name,
+    short_name: cfg.manifest.short_name,
     start_url: "/",
     icons: [
-      { src: "/identity/burnside/icon-192.png", sizes: "192x192", type: "image/png" },
-      { src: "/identity/burnside/icon-512.png", sizes: "512x512", type: "image/png" },
-      { src: "/identity/burnside/maskable-192.png", sizes: "192x192", type: "image/png", purpose: "maskable" },
-      { src: "/identity/burnside/maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+      { src: `/identity/${brand}/icon-192.png`, sizes: "192x192", type: "image/png" },
+      { src: `/identity/${brand}/icon-512.png`, sizes: "512x512", type: "image/png" },
+      { src: `/identity/${brand}/maskable-192.png`, sizes: "192x192", type: "image/png", purpose: "maskable" },
+      { src: `/identity/${brand}/maskable-512.png`, sizes: "512x512", type: "image/png", purpose: "maskable" },
     ],
-    theme_color: "#FF4D9D",
+    theme_color: cfg.accent,
     background_color: "#121317",
     display: "standalone",
   }, null, 2) + "\n");
