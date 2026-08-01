@@ -196,7 +196,7 @@ describe("brand sizing", () => {
   it("does not pin a height on the brand anchor", () => {
     // A fixed anchor height clips nothing and grows nothing: a taller mark just
     // overflows it, so the bar silently refuses to accommodate the asset.
-    const decls = rule(layout(), "\\.ds-nav__brand");
+    const decls = rule(layout(), ".ds-nav__brand");
     expect(decls, ".ds-nav__brand rule not found").toBeTruthy();
     expect(decls).not.toMatch(/(^|;)\s*height\s*:/);
   });
@@ -209,7 +209,7 @@ describe("brand sizing", () => {
     // .ds-nav sits inside .ds-container. `padding: X 0` would zero the
     // container's padding-inline if the two were ever combined on one element,
     // putting the bar's contents 24px left of every section's.
-    const decls = rule(layout(), "\\.ds-nav");
+    const decls = rule(layout(), ".ds-nav");
     expect(decls, ".ds-nav rule not found").toBeTruthy();
     expect(decls).not.toMatch(/(^|;)\s*padding\s*:/);
     expect(decls).toMatch(/padding-block:\s*var\(--ds-space-2\)/);
@@ -323,7 +323,7 @@ describe("chrome scale", () => {
   });
 
   it("trims .ds-btn horizontal padding to space-4", () => {
-    const decls = rule(read("components/button.css"), "\\.ds-btn");
+    const decls = rule(read("components/button.css"), ".ds-btn");
     expect(decls).toMatch(/padding:\s*var\(--ds-space-3\)\s+var\(--ds-space-4\)/);
   });
 
@@ -1030,9 +1030,17 @@ Check the top of `test/identity.spec.ts` for the existing `root`, `join`, `exist
 Run: `pnpm exec vitest run test/identity.spec.ts`
 Expected: 6 failed, the short mark does not exist.
 
-- [ ] **Step 3: Add a `--short` mode to the outliner**
+- [ ] **Step 3: Branch in Burnside, then add a `--short` mode to the outliner**
 
-In `/Users/leewang/dev/burnsidesteps/scripts/outline-wordmark.mjs`, change the usage line and add the mode. Replace lines 11 to 17:
+The design-system worktree does not isolate `burnsidesteps`. Branch there first so the outliner change does not land on that repo's `main`:
+
+```bash
+cd /Users/leewang/dev/burnsidesteps
+git status --short            # must be clean before branching; stop and report if not
+git checkout -b gre-page-chrome-short-wordmark
+```
+
+Then in `/Users/leewang/dev/burnsidesteps/scripts/outline-wordmark.mjs`, change the usage line and add the mode. Replace lines 11 to 17:
 
 ```js
 // Usage: node scripts/outline-wordmark.mjs <output.svg> [--short]
@@ -1144,9 +1152,10 @@ Expected: 121 passed.
 
 - [ ] **Step 7: Commit, both repos**
 
-In `burnsidesteps`:
+In `burnsidesteps`, on the `gre-page-chrome-short-wordmark` branch created in Step 3. Do not merge or push it; the controller reports it for review at the end:
 
 ```bash
+cd /Users/leewang/dev/burnsidesteps
 git add scripts/outline-wordmark.mjs
 git commit -m "feat: --short mode on the wordmark outliner
 
