@@ -62,15 +62,17 @@ describe("font weights are backed by a real face", () => {
     expect(offenders).toEqual([]);
   });
 
-  // The original defect was a MISSING weight, not a wrong one: with nothing stated,
-  // <h1>/<h2> inherit the UA default of 700 and Canela has no 700 face. Requiring an
-  // explicit weight on the display classes is what closes that hole.
-  it("states an explicit weight on every display class", () => {
-    const missing: string[] = [];
-    for (const cls of [".ds-display", ".ds-h1", ".ds-h2"]) {
-      const rule = ruleBlocks().find((r) => r.selector === cls);
-      expect(rule, `${cls} rule not found in components/`).toBeTruthy();
-      if (!/font-weight:\s*\d+/.test(rule!.decls)) missing.push(cls);
+  // Every rule that sets a branded font family must also state its weight. The original
+  // defect was a MISSING weight: with nothing stated, headings inherit the UA default of 700,
+  // and Canela has no 700 face. But the same latent bug exists for any rule with a branded font,
+  // because font-weight inherits, so these rules can appear in elements with non-400 defaults.
+  // This guard ensures every branded font gets an explicit weight, preventing synthesis.
+  it("states an explicit weight on every rule with a branded font", () => {
+    const missing: Array<string> = [];
+    for (const { file, selector, decls } of ruleBlocks()) {
+      const tok = /font-family:\s*var\(--ds-font-([\w-]+)\)/.exec(decls)?.[1];
+      if (!tok) continue;
+      if (!/font-weight:\s*\d+/.test(decls)) missing.push(`${file}: ${selector}`);
     }
     expect(missing).toEqual([]);
   });
