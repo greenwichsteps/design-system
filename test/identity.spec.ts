@@ -64,7 +64,12 @@ describe("icon masters", () => {
 
   it("makes the master self-inverting", () => {
     const svg = read("icon.svg");
-    expect(svg, "master has no colour-scheme block").toContain("prefers-color-scheme: dark");
+    // Not just "the string exists somewhere" -- the dark media block must
+    // actually target the ink class. A block naming a class that doesn't
+    // exist (typo'd, or left over from a rename) would pass a bare
+    // `toContain("prefers-color-scheme: dark")` while doing nothing.
+    expect(svg, "dark media block does not target .bs-ink")
+      .toMatch(/@media \(prefers-color-scheme: dark\)[^}]*\.bs-ink/);
   });
 
   // resvg ignores every @media block, so the pinned variants are the only
@@ -142,7 +147,10 @@ describe("wordmark master", () => {
   });
 
   it("makes the master self-inverting and the variants pinned", () => {
-    expect(read("wordmark.svg")).toContain("prefers-color-scheme: dark");
+    // See the equivalent check on the icon master above: the block must
+    // target .bs-word specifically, not just mention the media query anywhere.
+    expect(read("wordmark.svg"), "dark media block does not target .bs-word")
+      .toMatch(/@media \(prefers-color-scheme: dark\)[^}]*\.bs-word/);
     for (const f of ["wordmark-light.svg", "wordmark-dark.svg"]) {
       expect(read(f), `${f} carries a media query`).not.toContain("@media");
     }
@@ -204,11 +212,43 @@ describe("generated icon set", () => {
     expect(ico.readUInt16LE(4), "expected three sizes in the ICO").toBe(3);
   });
 
-  it("declares the maskable icons in the manifest", () => {
+  it("declares an installable manifest", () => {
     const m = JSON.parse(readFileSync(dist("site.webmanifest"), "utf8"));
     expect(m.name).toBe("Burnside Steps");
-    const purposes = m.icons.map((i: { purpose?: string }) => i.purpose);
-    expect(purposes, "no maskable purpose declared").toContain("maskable");
+    // start_url and at least one ordinary (non-maskable) icon are two of
+    // Chrome's four installability requirements. A manifest whose only 512px
+    // entry is `purpose: "maskable"` -- with no plain entry -- fails
+    // installability even though the file exists and the JSON is valid.
+    expect(m.start_url, "no start_url -- Chrome will not offer to install this").toBe("/");
+    const bySize = (size: string, purpose?: string) =>
+      (m.icons as { sizes: string; purpose?: string }[]).some(
+        (i) => i.sizes === size && (purpose ? i.purpose === purpose : i.purpose === undefined),
+      );
+    expect(bySize("192x192"), "no ordinary (non-maskable) 192px icon declared").toBe(true);
+    expect(bySize("512x512"), "no ordinary (non-maskable) 512px icon declared").toBe(true);
+    expect(bySize("192x192", "maskable"), "no maskable 192px icon declared").toBe(true);
+    expect(bySize("512x512", "maskable"), "no maskable 512px icon declared").toBe(true);
+  });
+
+  // The forward check above (manifest -> file) only catches a manifest that
+  // points at nothing. It says nothing about a raster that gets generated and
+  // then never declared, which is exactly how icon-512.png shipped unused: the
+  // file existed, "resolves every icon the manifest declares" passed, and the
+  // manifest was still not installable. Walk file -> manifest too.
+  it("declares every generated icon and maskable in the manifest", () => {
+    const m = JSON.parse(readFileSync(dist("site.webmanifest"), "utf8"));
+    const declared = new Set((m.icons as { src: string }[]).map((i) => i.src.split("/").pop()));
+    const generated = readdirSync(dist("")).filter((f) => /^(icon|maskable)-.*\.png$/.test(f));
+
+    // Allowlist: icon-32/64/128/256.png exist for HTML favicon links
+    // (<link rel="icon" sizes="...">), not the web app manifest, which only
+    // needs the sizes it actually installs at (192 and 512). If a size is
+    // added here without being declared, it must be added to this allowlist
+    // with a reason, or the test below will fail.
+    const ALLOWLISTED_UNDECLARED = ["icon-32.png", "icon-64.png", "icon-128.png", "icon-256.png"];
+
+    const undeclared = generated.filter((f) => !declared.has(f) && !ALLOWLISTED_UNDECLARED.includes(f));
+    expect(undeclared, `generated but not declared in the manifest: ${undeclared.join(", ")}`).toEqual([]);
   });
 
   // Dimension assertions cannot see an alpha channel. Android's circular crop

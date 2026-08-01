@@ -79,8 +79,10 @@ export async function buildIdentity(root, brand = "burnside") {
   out("site.webmanifest", JSON.stringify({
     name: "Burnside Steps",
     short_name: "Burnside",
+    start_url: "/",
     icons: [
       { src: "/identity/burnside/icon-192.png", sizes: "192x192", type: "image/png" },
+      { src: "/identity/burnside/icon-512.png", sizes: "512x512", type: "image/png" },
       { src: "/identity/burnside/maskable-192.png", sizes: "192x192", type: "image/png", purpose: "maskable" },
       { src: "/identity/burnside/maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
     ],

@@ -7,5 +7,5 @@
   --ds-accent-solid: var(--ds-accent);
   --ds-accent-solid-press: var(--ds-accent-press);
   --ds-on-accent-solid: var(--ds-on-accent);
-  --ds-logo: url("../identity/farnsworth-placeholder.svg");
+  --ds-logo: url("../identity/farnsworth/placeholder.svg");
 }
