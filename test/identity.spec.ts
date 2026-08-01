@@ -8,7 +8,7 @@ const src = (p: string) => join(root, "identity", p);
 
 describe("identity layout", () => {
   it("namespaces every mark under a brand directory", () => {
-    for (const f of ["burnside/icon.svg", "burnside/wordmark.svg", "farnsworth/placeholder.svg"]) {
+    for (const f of ["burnside/icon.svg", "burnside/wordmark.svg", "farnsworth/icon.svg", "farnsworth/wordmark.svg"]) {
       expect(existsSync(src(f)), `${f} missing`).toBe(true);
     }
   });
@@ -375,5 +375,70 @@ describe("the generated set is reproducible", () => {
       (n) => Buffer.compare(readFileSync(join(a, n)), readFileSync(join(b, n))) !== 0,
     );
     expect(differing, `non-deterministic output: ${differing.join(", ")}`).toEqual([]);
+  });
+});
+
+// The quarter-overlap is the whole idea of this mark, so it is asserted as
+// arithmetic rather than trusted to a picture. Squares of side s offset by d
+// share (s - d)^2; a quarter of s^2 requires d = s/2 exactly.
+const FW_S = 13, FW_D = FW_S / 2, FW_L = 16 - (FW_S * 1.5) / 2, FW_T = 2.4;
+
+describe("farnsworth icon masters", () => {
+  const read = (f: string) => readFileSync(src(`farnsworth/${f}`), "utf8");
+  const FILES = ["icon.svg", "icon-light.svg", "icon-dark.svg"];
+
+  it("derives from a half-size offset, so the overlap is a quarter of each square", () => {
+    expect(FW_D).toBe(6.5);
+    expect((FW_S - FW_D) ** 2).toBeCloseTo(FW_S ** 2 / 4, 10);
+    expect(FW_L).toBe(6.25);
+  });
+
+  it("carries the settled path in every file", () => {
+    const outline = `M${FW_L},${FW_L + FW_D}h${FW_S}v${FW_S}h-${FW_S}z`;
+    const window_ = `M${FW_L + FW_T},${FW_L + FW_D + FW_T}h${FW_S - 2 * FW_T}v${FW_S - 2 * FW_T}h-${FW_S - 2 * FW_T}z`;
+    const solid = `M${FW_L + FW_D},${FW_L}h${FW_S}v${FW_S}h-${FW_S}z`;
+    for (const f of FILES) {
+      const svg = read(f);
+      expect(svg, `${f} lost the outline square`).toContain(outline);
+      expect(svg, `${f} lost the frame window`).toContain(window_);
+      expect(svg, `${f} lost the solid square`).toContain(solid);
+      expect(svg, `${f} is not even-odd, so the overlaps will not knock out`)
+        .toMatch(/fill-rule="evenodd"/);
+    }
+  });
+
+  it("keeps the family tile", () => {
+    for (const f of FILES) {
+      expect(read(f), `${f} lost the tile`).toMatch(/<rect[^>]*x="1"[^>]*y="1"[^>]*width="30"[^>]*height="30"[^>]*rx="8"/);
+    }
+  });
+
+  it("lets consumers control size", () => {
+    for (const f of FILES) {
+      const svg = read(f);
+      expect(svg, `${f} has no viewBox`).toMatch(/viewBox="0 0 32 32"/);
+      expect(svg, `${f} pins width`).not.toMatch(/<svg[^>]*\swidth=/);
+      expect(svg, `${f} pins height`).not.toMatch(/<svg[^>]*\sheight=/);
+    }
+  });
+
+  // Deliberately the opposite of the Burnside assertion above, and the reason
+  // is worth reading before anyone "fixes" it. Burnside's ink is near-black on
+  // a pink tile and flips to cream in dark mode, which is a stylistic choice.
+  // Farnsworth's ink is white on an opaque indigo tile at 7.46:1. The tile
+  // supplies its own ground, so there is nothing to invert and a flip would be
+  // decoration. The variants are identical on purpose.
+  it("has identical light and dark variants, because the tile is opaque", () => {
+    expect(read("icon-light.svg")).toBe(read("icon-dark.svg"));
+  });
+
+  it("carries no media query anywhere, master included", () => {
+    for (const f of FILES) {
+      expect(read(f), `${f} has a media query that would do nothing`).not.toContain("@media");
+    }
+  });
+
+  it("no longer ships the placeholder", () => {
+    expect(existsSync(src("farnsworth/placeholder.svg"))).toBe(false);
   });
 });
