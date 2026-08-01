@@ -490,7 +490,9 @@ describe("farnsworth wordmark master", () => {
 
   it("uses the ink viewBox", () => {
     for (const f of FILES) {
-      expect(read(f), `${f} viewBox is not the ink block`).toMatch(/viewBox="0 0 5426 737"/);
+      // 5462, not 5426: the outliner hand-kerns `rt` open by 36 units so both
+      // r-joins in the word share a 60-unit tip. See outline-wordmark.mjs.
+      expect(read(f), `${f} viewBox is not the ink block`).toMatch(/viewBox="0 0 5462 737"/);
     }
   });
 
