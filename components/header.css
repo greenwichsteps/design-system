@@ -1,0 +1,34 @@
+/* Full-bleed sticky chrome. The consumer nests a .ds-container inside this, and
+   a .ds-nav inside that: three elements, one job each.
+   Do NOT collapse the container onto this element or onto .ds-nav. .ds-nav's
+   padding would zero the container's padding-inline and the bar's contents end
+   up 24px left of every section's. */
+.ds-header {
+  position: sticky; top: 0; z-index: 20;
+  background: var(--ds-bg);
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--ds-dur) var(--ds-ease);
+}
+
+/* Translucency is enhancement, never the base: without backdrop-filter a
+   transparent bar is unreadable, so only browsers that can blur get the alpha. */
+@supports (backdrop-filter: blur(1px)) {
+  .ds-header {
+    background: color-mix(in srgb, var(--ds-bg) 72%, transparent);
+    -webkit-backdrop-filter: blur(12px) saturate(1.6);
+    backdrop-filter: blur(12px) saturate(1.6);
+  }
+}
+
+/* macOS Reduce Transparency governs exactly this effect. */
+@media (prefers-reduced-transparency: reduce) {
+  .ds-header {
+    background: var(--ds-bg);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* No rule at rest, so the bar is invisible furniture at the top of the page and
+   only asserts itself in motion. initStickyHeader toggles the class. */
+.ds-header.is-scrolled { border-bottom-color: var(--ds-border); }
