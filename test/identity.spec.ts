@@ -475,3 +475,66 @@ describe("farnsworth icon masters", () => {
     expect(existsSync(src("farnsworth/placeholder.svg"))).toBe(false);
   });
 });
+
+describe("farnsworth wordmark master", () => {
+  const read = (f: string) => readFileSync(src(`farnsworth/${f}`), "utf8");
+  const FILES = ["wordmark.svg", "wordmark-light.svg", "wordmark-dark.svg"];
+
+  it("carries outlines, not live text", () => {
+    for (const f of FILES) {
+      expect(read(f), `${f} still contains live text`).not.toMatch(/<text[\s>]/);
+      expect(read(f), `${f} has no path data`).toMatch(/<path[^>]*\sd="/);
+      expect(read(f), `${f} still references a font family`).not.toContain("font-family");
+    }
+  });
+
+  it("uses the ink viewBox", () => {
+    for (const f of FILES) {
+      expect(read(f), `${f} viewBox is not the ink block`).toMatch(/viewBox="0 0 5426 737"/);
+    }
+  });
+
+  // Same reasoning as the Burnside check above: TY - maxLocalY below zero means
+  // the glyph renders above the top edge and gets clipped. Derived from the
+  // committed numbers, so it needs no font access.
+  it("places no ink above the top edge of the viewBox", () => {
+    for (const f of FILES) {
+      const paths = [...read(f).matchAll(/<path[^>]*transform="translate\([-\d.]+ ([-\d.]+)\) scale\(1 -1\)" d="([^"]+)"/g)];
+      expect(paths.length, `${f} has no glyph paths to check`).toBeGreaterThan(0);
+      for (const [, ty, d] of paths) {
+        const coords = d.match(/-?\d+(?:\.\d+)?/g)!.map(Number);
+        const maxLocalY = Math.max(...coords.filter((_, i) => i % 2 === 1));
+        expect(Number(ty) - maxLocalY, `${f} clips a glyph: translate y=${ty}, ink reaches ${maxLocalY}`)
+          .toBeGreaterThanOrEqual(0);
+      }
+    }
+  });
+
+  it("keeps the period a separate, accented element", () => {
+    expect(read("wordmark.svg")).toContain("fw-dot");
+    expect(read("wordmark.svg")).toContain("#3B3BD9");
+  });
+
+  it("never says Farnsworth Steps", () => {
+    for (const f of FILES) {
+      expect(read(f), `${f} uses the domain name as the product name`).not.toContain("Farnsworth Steps");
+    }
+  });
+
+  it("makes the master self-inverting and the variants pinned", () => {
+    expect(read("wordmark.svg"), "dark media block does not target .fw-word")
+      .toMatch(/@media \(prefers-color-scheme: dark\)[^}]*\.fw-word/);
+    for (const f of ["wordmark-light.svg", "wordmark-dark.svg"]) {
+      expect(read(f), `${f} carries a media query`).not.toContain("@media");
+    }
+    expect(read("wordmark-light.svg")).toContain("#121317");
+    expect(read("wordmark-dark.svg")).toContain("#F4F2EE");
+  });
+
+  it("does not pin width or height", () => {
+    for (const f of FILES) {
+      expect(read(f), `${f} pins width`).not.toMatch(/<svg[^>]*\swidth=/);
+      expect(read(f), `${f} pins height`).not.toMatch(/<svg[^>]*\sheight=/);
+    }
+  });
+});
