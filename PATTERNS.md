@@ -11,6 +11,7 @@ in `components/` (mark its row "promoted → components/<file>").
 | pricing-card | burnside-www, burnside-hosted | 2026-07-25 | Tier card with price, description, and a single action; one tier emphasised via `.ds-card--pop`. **Markup convention, no CSS of its own**, so there is nothing to graduate: it is `.ds-card` + `.ds-h2` + `.ds-badge--accent` assembled per consumer. | `www/web/index.html` `#pricing`, `hosted/web/buy.html` `.ds-card--pop` |
 | hero-left | burnside-www | 2026-07-27 | Left-aligned hero carrying a copyable install prompt as its primary action; overrides `.ds-hero` centring | **Retired GRE-166.** This branch reverted `.site-hero` to centred and removed the copyable install prompt in favour of the tabbed install card. |
 | install-card | burnside-www | 2026-07-29 | Tabbed install card with a CSS-only tab and selector mechanism (radio inputs plus sibling combinator); JS only for the clipboard | `www/web/styles.css` `.site-ic` |
+| section | burnside-www, farnsworth-www | 2026-08-01 | Vertical rhythm and divider for a marketing page's stacked content blocks | promoted → `components/section.css` (`.ds-section`) |
 
 ## Identity rules
 

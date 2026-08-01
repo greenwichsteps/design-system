@@ -1,0 +1,5 @@
+.ds-section { padding-block: var(--ds-space-8); }
+.ds-section__title { margin-bottom: var(--ds-space-5); }
+/* Adjacent-sibling so the first section draws no rule under the hero and the
+   last draws none above the footer, which already has its own border-top. */
+.ds-section + .ds-section { border-top: 1px solid var(--ds-border); }
