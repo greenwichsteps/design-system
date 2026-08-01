@@ -10,11 +10,19 @@ const baseFiles = () => {
   return files;
 };
 
+// Hardcoded rather than derived from themes/*.css: that directory also holds
+// dark.css, which is not a brand, so deriving the list would mean filtering
+// it back out, which is less obvious to a reader than naming the two brands
+// directly.
+const BRANDS = ["burnside", "farnsworth"];
+
 describe("shared base is project-neutral", () => {
-  it("contains no 'burnside' anywhere in the shared base", () => {
+  it("contains no brand name anywhere in the shared base", () => {
     for (const rel of baseFiles()) {
       const text = readFileSync(join(root, rel), "utf8").toLowerCase();
-      expect(text.includes("burnside"), `${rel} must not mention a project`).toBe(false);
+      for (const brand of BRANDS) {
+        expect(text.includes(brand), `${rel} must not mention a project (${brand})`).toBe(false);
+      }
     }
   });
   it("components reference only semantic/primitive tokens, never a raw hex", () => {

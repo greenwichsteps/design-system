@@ -419,7 +419,9 @@ describe(".ds-header", () => {
     const base = /\.ds-header\s*\{([^}]*)\}/.exec(header())?.[1] ?? "";
     expect(base).toMatch(/background:\s*var\(--ds-bg\)/);
     expect(base).not.toContain("backdrop-filter");
-    expect(header()).toMatch(/@supports\s*\(backdrop-filter[^)]*\)\s*\{[\s\S]*backdrop-filter/);
+    // [^{]* rather than [^)]*: the condition is `(backdrop-filter: blur(1px))`, and a
+    // negated-) class halts at the inner paren, leaving the outer one unconsumed.
+    expect(header()).toMatch(/@supports\s*\(backdrop-filter[^{]*\)\s*\{[\s\S]*backdrop-filter/);
   });
 
   it("drops to opaque under prefers-reduced-transparency", () => {

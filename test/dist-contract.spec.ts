@@ -24,7 +24,7 @@ describe("published artifacts", () => {
 
   it("ships ui.mjs as real ESM with named exports", async () => {
     const mod = await import("../dist/ui.mjs");
-    for (const fn of ["initClipboard", "initTheme", "initNav", "initMenu", "initTabs", "initModal", "initToast", "initAll"]) {
+    for (const fn of ["initClipboard", "initTheme", "initNav", "initStickyHeader", "initMenu", "initTabs", "initModal", "initToast", "initAll"]) {
       expect(typeof (mod as Record<string, unknown>)[fn], `${fn} not exported from dist/ui.mjs`).toBe("function");
     }
   });

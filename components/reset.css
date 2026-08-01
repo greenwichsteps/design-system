@@ -1,11 +1,13 @@
 /* Base reset + document defaults. Sorts first in ui.css. */
 *, *::before, *::after { box-sizing: border-box; }
 * { margin: 0; }
-html { -webkit-text-size-adjust: 100%; }
+/* --ds-header-h is written by initStickyHeader from the measured bar. The 0px
+   default keeps this inert on pages with no sticky header. */
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: var(--ds-header-h, 0px); }
 body {
   background: var(--ds-bg); color: var(--ds-text);
   font-family: var(--ds-font-sans);
-  font-size: var(--ds-text-base); line-height: 1.5;
+  font-size: var(--ds-text-base); font-weight: 400; line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 img, svg, video { display: block; max-width: 100%; }
