@@ -6,8 +6,9 @@
   display: grid; align-items: start; gap: var(--ds-space-6);
   grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
 }
-/* The identity block runs wider than a link column, so it claims two tracks. */
-.ds-footer__id { max-width: 26ch; grid-column: span 2; }
+/* The identity block width is a per-consumer design decision: consumers who want
+   a wider block can add grid-column: span or a custom grid-template-columns. */
+.ds-footer__id { max-width: 26ch; }
 .ds-footer__id img { display: block; height: var(--ds-brand-foot-h, 32px); width: auto; }
 /* The kit resets every margin, so without this the lede sits flush on the mark. */
 .ds-footer__id p { margin-top: var(--ds-space-4); font-size: var(--ds-text-sm); color: var(--ds-text-muted); }

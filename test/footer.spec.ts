@@ -17,6 +17,9 @@ describe(".ds-footer shell", () => {
     // Not a fixed track list: that would bake one site's group structure into
     // the kit, which is the thing the promotion rule exists to prevent.
     expect(footer()).toMatch(/grid-template-columns:\s*repeat\(auto-fit,\s*minmax\([^)]+\)\)/);
+    // Reject any space-separated fr values (fixed track list), but allow the
+    // legitimate minmax(9rem, 1fr) which has only one fr value.
+    expect(footer()).not.toMatch(/grid-template-columns:[^}]*\d+\.?\d*fr\s+[^}]*\d+\.?\d*fr/);
   });
 
   it("stacks without a media query", () => {
