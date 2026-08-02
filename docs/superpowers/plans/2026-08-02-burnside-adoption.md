@@ -109,7 +109,8 @@ up. Later commits in this branch fix it."
 - Modify: `www/web/partials/nav.html`
 - Modify: `www/web/index.html:29-31`, `www/web/404.html:19-21`, `www/web/docs/index.html:19-21`, `www/web/pricing/index.html:29-31`, `www/web/pricing/self-hosted/index.html:29-31`
 - Modify: `www/web/styles.css` (delete the toggle rules and the lockup height)
-- Modify: `www/test/sections.spec.ts` if its nav assertions break
+- Modify: `www/web/boot.ts` (wire `initStickyHeader`)
+- Modify: `www/test/sections.spec.ts:143-151` (the wordmark assertion breaks)
 
 **Interfaces:**
 - Consumes: `.ds-header`, `.ds-nav`, `.ds-btn--sm`, `--ds-brand-nav-h` from the kit.
@@ -179,17 +180,46 @@ In `www/web/styles.css`, delete these three, with their comments:
 
 Keep `.site-lockup` itself if it carries anything the kit does not, and keep every `.site-nav__link` rule: the kit's `.ds-link` still underlines, and those overrides are still doing work.
 
-- [ ] **Step 4: Run the suite and fix what this task broke**
+- [ ] **Step 4: Wire `initStickyHeader`, or the header will stick and do nothing else**
+
+`position: sticky` is CSS and works on its own. But **the hairline and the anchor offset are both JavaScript.** The kit's `initStickyHeader` toggles `is-scrolled` and writes `--ds-header-h`, which `reset.css` feeds into `scroll-padding-top`. Without the call, the bar sticks but never gains its rule and every anchor jump lands under it.
+
+`www/web/boot.ts` deliberately calls each behavior by name through a `safeInit` wrapper, and currently calls four. Add the fifth. Change the import:
+
+```ts
+import { initTheme, initClipboard, initNav, initStickyHeader } from "@greenwichsteps/design-system/ui.mjs";
+```
+
+and add a call alongside the others, following the file's established comment style:
+
+```ts
+// Toggles .ds-header's is-scrolled hairline from a sentinel, and publishes the measured
+// bar height as --ds-header-h, which the kit's reset feeds into scroll-padding-top so
+// anchor jumps clear the bar. Both are JavaScript; position: sticky alone gives neither.
+safeInit("initStickyHeader", initStickyHeader);
+```
+
+Keep the `safeInit` wrapper. That file's comment explains why isolation matters there, and the reasoning applies unchanged.
+
+- [ ] **Step 5: Run the suite and fix what this task broke**
 
 ```bash
 pnpm --dir www test 2>&1 | tail -30
 ```
 
-`www/test/sections.spec.ts:57` asserts `toContain("ds-nav")` and `:1103` asserts `toContain('data-ds-nav="main"')`. Both strings survive the restructure, so those should pass. `www/test/build.spec.ts:19-23` carries a comment about `toContain('class="ds-nav site-nav"')`; that exact string also survives, since the inner div keeps both classes in that order.
+**One breakage is expected and is not your fault.** `www/test/sections.spec.ts:143-151`, `it("renders the wordmark from the outlined master")`, asserts `toMatch(/<img[^>]*identity\/burnside\/wordmark\.svg/)`. The nav now draws `wordmark-short.svg`, which does not contain the substring `wordmark.svg`. Widen the regex so it accepts either mark:
 
-If any nav assertion fails, **read it before changing it**. An assertion that fails because the markup genuinely changed shape should be updated to assert the new shape. An assertion that fails because you broke something should be fixed in the markup. Say which you concluded in your report.
+```ts
+expect(nav).toMatch(/<img[^>]*identity\/burnside\/wordmark(-short)?\.svg/);
+```
 
-- [ ] **Step 5: Confirm the header actually sticks**
+The footer still draws the unsuffixed master, so the test keeps meaning something for that case.
+
+These should pass unchanged, so investigate rather than edit if any fails: `sections.spec.ts:57` (`toContain("ds-nav")`), `:1103` (`data-ds-nav="main"`), `:1126-1127` (a single `<header` per page), and `pages.spec.ts:75` (`includes("<header")`). Every one of those strings survives the restructure.
+
+For anything else that fails, **read it before changing it**. An assertion failing because the markup genuinely changed shape should be updated to assert the new shape. One failing because you broke something should be fixed in the markup. Say which you concluded, per assertion, in your report.
+
+- [ ] **Step 6: Confirm the header actually sticks**
 
 The suite cannot check this; no test in either repo can. Build and look:
 
@@ -199,10 +229,10 @@ pnpm --dir www build
 
 Then open `www/public/index.html` in a browser, scroll, and confirm the bar stays at the top and gains its hairline. Also confirm the anchor links in the page jump to headings that clear the bar rather than tucking under it. Report what you saw. If you cannot open a browser, say so plainly rather than claiming it works.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
-git add www/web/partials/nav.html www/web/index.html www/web/404.html www/web/docs/index.html www/web/pricing/index.html www/web/pricing/self-hosted/index.html www/web/styles.css
+git add www/web/partials/nav.html www/web/index.html www/web/404.html www/web/docs/index.html www/web/pricing/index.html www/web/pricing/self-hosted/index.html www/web/styles.css www/web/boot.ts www/test/sections.spec.ts
 git commit -m "feat: adopt the kit's sticky header
 
 position: sticky is bounded by the parent's content box, and the nav sat
@@ -210,8 +240,11 @@ inside a container that wrapped only the nav, so its sticky travel was
 zero. The container moves inside a full-bleed .ds-header, which means
 all five including pages unwrap their own wrapper.
 
-The nav mark becomes the short wordmark: the stacked one needs 66px to
-reach the same glyph size, which would make an 82px bar.
+The nav mark becomes the short wordmark. The stacked mark is two lines,
+so matching its glyph size to the other brand's would roughly double the
+bar's height. No specific figure is quoted here deliberately: the spec
+retracted its earlier bar-height numbers and requires any plan reasoning
+toward one to measure it rather than inherit it.
 
 Three local rules go, all now owned by the kit: the toggle's visibility
 pair, its flex-shrink, and the lockup height. The height one is not
@@ -230,8 +263,8 @@ Only structure moves. Burnside's tuned five-track `grid-template-columns` stays 
 
 **Files:**
 - Modify: `www/web/partials/footer.html`
-- Modify: `www/web/styles.css:457-497` approximately, the `.site-foot*` block
-- Modify: `www/test/sections.spec.ts:839,844`
+- Modify: `www/web/styles.css:457-517`, the whole `.site-foot*` block **including its two media queries at 500-517**
+- Modify: `www/test/sections.spec.ts:837-849`
 
 **Interfaces:**
 - Consumes: `.ds-footer__cols`, `__id`, `__label`, `__list`, `__link`, `__base`, and `--ds-brand-foot-h` from the kit.
@@ -259,7 +292,7 @@ Keep `class="ds-footer site-foot"` on the `<footer>` itself: `.ds-footer` is the
 
 In `www/web/styles.css`, in the `.site-foot*` block, delete the rules the kit now owns: `.site-foot__id`, `.site-foot__word`, `.site-foot__id p`, `.site-foot__label`, `.site-foot__list`, `.site-foot__link`, `.site-foot__link:hover`, `.site-foot__base`.
 
-**Keep exactly two things**, rewritten to the new class names:
+**Keep three things**, rewritten to the new class names:
 
 ```css
 .site-foot { padding: var(--ds-space-8) 0 var(--ds-space-5); }
@@ -270,13 +303,33 @@ In `www/web/styles.css`, in the `.site-foot*` block, delete the rules the kit no
 .ds-footer__cols { grid-template-columns: 1.3fr 1fr 1fr .8fr 1.2fr; }
 ```
 
-Preserve the existing long comment above the track list if it explains the ratios; it is the reason the override survives promotion.
+and, critically, **the two media queries at lines 500-517 with their comment**:
 
-- [ ] **Step 3: Update the two tests that assert on the old class names**
+```css
+@media (max-width: 999px) {
+  .ds-footer__cols { grid-template-columns: repeat(2, 1fr); }
+  .ds-footer__id { grid-column: 1 / -1; max-width: 46ch; }
+}
+@media (max-width: 460px) {
+  .ds-footer__cols { gap: var(--ds-space-5); }
+}
+```
 
-`www/test/sections.spec.ts:839` matches `/\.site-foot__cols\s*\{[^}]*\}/` and `:844` matches `/\.site-foot__list\s*\{[^}]*\}/`.
+**These are not optional and the kit does not replace them.** The kit's `.ds-footer__cols` is `repeat(auto-fit, minmax(9rem, 1fr))`, which reflows on its own. The moment the fixed five-track override above replaces it, that self-reflow is gone, and these breakpoints are the only thing collapsing the row on a narrow viewport. Delete them and the five-column grid stays active down to 375px, which is exactly what Task 6's `scrollWidth` check exists to catch.
 
-The first should now match `.ds-footer__cols` in the site's own stylesheet, since the track override still lives there. **The second cannot**: `.ds-footer__list` moved into the kit entirely, so there is no local rule left to match. Read what that assertion was checking, then either point it at the kit's stylesheet or delete it as superseded, and say which you chose and why. Do not weaken it to something that passes without checking anything.
+The comment above them records that the breakpoints were measured in a real browser rather than guessed, including which widths were checked on either side of the 460px step. Preserve it. Preserve the long comment above the track list too; it is the reason the override survives promotion.
+
+- [ ] **Step 3: Rewrite the footer test block, which needs more than a rename**
+
+`www/test/sections.spec.ts:837-849` is one `it` block whose `css()` helper reads **only** `www/public/styles.css`, the site's own sheet. It never sees the kit's `dist/ui.css`. That is what makes this more than a find-and-replace:
+
+- `:839` matches `/\.site-foot__cols\s*\{[^}]*\}/`. Renaming the target to `.ds-footer__cols` makes the match succeed again, because the track override still lives locally.
+- But the **same block** then asserts `toMatch(/display:\s*grid/)` and checks the gap token against that captured rule. Both of those declarations have moved into the kit, so the local rule now contains `grid-template-columns` and nothing else. Those two assertions fail even after the rename.
+- `:844` matches `/\.site-foot__list\s*\{[^}]*\}/`. **This one has no local rule left at all**: `.ds-footer__list` moved wholesale into the kit.
+
+So rewrite the block rather than renaming inside it. Assert against the local sheet only what the local sheet is still responsible for, which is the track list and the two breakpoints. For anything now owned by the kit, either drop the assertion as superseded or point it at the kit's stylesheet deliberately, and **say which you chose per assertion and why** in your report.
+
+Do not weaken an assertion into something that passes without checking anything. If you are unsure whether an assertion still earns its place, say so rather than quietly deleting it.
 
 - [ ] **Step 4: Run the suite**
 
@@ -329,7 +382,11 @@ Both sites declared byte-identical `.site-section` rules, which is why the kit p
 
 - [ ] **Step 1: Rename in the markup**
 
-Replace `site-section__title` with `ds-section__title` and `site-section` with `ds-section` across `www/web`. **Do the `__title` one first**: `site-section` is a substring of `site-section__title`, so renaming the shorter string first would corrupt the longer one into `ds-section__title` prefixed wrongly.
+Replace `site-section__title` with `ds-section__title` and `site-section` with `ds-section` across `www/web`.
+
+Order does not matter here, and an earlier draft of this plan wrongly claimed it did. `site-section` is a substring of `site-section__title`, which looks like a corruption hazard, but `ds-section` is a prefix of `ds-section__title` in exactly the same way, so a plain substring replace converges on the correct result from either direction. This was checked with `sed` in both orders and the outputs were byte-identical. It is recorded here only so nobody reintroduces the false warning.
+
+**Scope the rename to markup.** Run it over `www/web/**/*.html` and the partials, not over `www/web/styles.css`: Step 2 deletes the local rules outright, and sweeping the stylesheet into the same replace would rename rules you are about to remove, making Step 2's deletion snippet no longer match the file.
 
 Verify afterwards:
 
@@ -516,8 +573,20 @@ This plan ends here. Deployment is the founder's call.
 
 **Type consistency.** Class names are consistent across tasks: `ds-footer__cols` is introduced in Task 3 Step 1 and referenced in Task 3 Step 2 and Task 6 Step 2 identically. `ds-section` and `ds-section__title` likewise.
 
-**Three things flagged for the pre-flight reviewer.**
+## Pre-flight review, 2026-08-02: what it found and what changed
 
-1. Task 4 Step 1's ordering constraint is load-bearing and easy to get wrong: `site-section` is a substring of `site-section__title`, so a naive replace-all in the wrong order corrupts the longer class. The step says so, but it is the kind of instruction an implementer skims.
-2. Task 3 Step 3 asks the implementer to decide the fate of an existing assertion. That is the shape of decision that produced weak tests earlier in this project. The step forbids the weakening outcome by name, but a reviewer should check what was actually done.
-3. No task adds a `scrollWidth` regression test, only a manual check in Task 6. Neither site has such a guard today. Deciding whether one should exist is arguably Part 3's problem, since that is where the overflow risk actually lives, but a reviewer may reasonably say it belongs here.
+The reviewer read every cited path and snippet against the real files, read the kit at v0.7.1 to check each deletion had a genuine replacement, read six of the site's spec files, and ran `sed` to test one of this plan's own claims. Six findings, all fixed above.
+
+**Two were Critical.**
+
+1. **The footer block runs to line 517, not 497**, and lines 500-517 hold two media queries collapsing the fixed five-track grid at 999px and 460px. The kit does not replace them: its `auto-fit` default reflows on its own, but the moment Burnside's fixed track list overrides it that self-reflow is gone. The original "keep exactly two things" instruction would have deleted them, leaving five columns active at 375px, and Task 6's `scrollWidth` check would then have failed the work this plan had just done. Their comment records that the breakpoints were measured in a browser rather than guessed.
+2. **`initStickyHeader` was never wired.** `www/web/boot.ts` calls each behavior by name and calls four; the plan added no fifth. `position: sticky` is CSS and would have worked, but the hairline and `--ds-header-h` are both JavaScript, so the bar would have stuck while never gaining its rule and every anchor jump would have landed under it. Task 2 Step 6 instructs the implementer to verify exactly those two behaviors, so the plan asked for a check it had made impossible.
+
+**Four were Important:** an unanticipated test breakage at `sections.spec.ts:143-151`, whose wordmark regex cannot match `wordmark-short.svg`; a claim that the footer `cols` test needed only a rename when two of its other assertions also break; unmeasured bar-height figures in a commit message that the spec had explicitly forbidden inheriting; and the ordering claim below.
+
+**One of this plan's own confident claims was false.** An earlier draft said Task 4's rename order was load-bearing, because `site-section` is a substring of `site-section__title`. The reviewer tested both orders with `sed` and got byte-identical correct output, since `ds-section` is a prefix of `ds-section__title` in the same way. The warning has been replaced with a note saying order does not matter, so nobody reintroduces it.
+
+**Two things remain flagged for the task reviewers.**
+
+1. Task 3 Step 3 asks the implementer to decide, per assertion, what survives promotion. That is the shape of decision that produced weak tests earlier in this project. The step forbids the weakening outcome by name, but a reviewer should check what was actually done rather than that something was done.
+2. No task adds a `scrollWidth` regression test, only the manual check in Task 6. Neither site has such a guard today. The overflow risk is materially larger on Farnsworth, so Part 3 is the natural home, but a reviewer may reasonably argue it belongs wherever it is first checked.
