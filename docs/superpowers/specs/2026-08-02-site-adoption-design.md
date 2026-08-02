@@ -68,9 +68,26 @@ saying the toggle appears below 720px, matching how the chrome section already e
 Added to `components/layout.css`:
 
 ```css
-[data-ds-nav-toggle] { display: none; flex-shrink: 0; }
+[data-ds-nav-toggle] { display: none; flex-shrink: 0; align-items: center; justify-content: center; }
 @media (max-width: 720px) { [data-ds-nav-toggle] { display: inline-flex; } }
 ```
+
+**The centring is not decoration, and it fixes a live bug in both sites.** Found by this plan's
+pre-flight review, which loaded the compiled `dist/ui.css` into jsdom and read `getComputedStyle`
+rather than reasoning about it.
+
+`[data-ds-nav-toggle]` and `.ds-iconbtn` have equal specificity (0,1,0), and `components/button.css`
+sorts before `components/layout.css` in the alphabetical concatenation, so the toggle rule's `display`
+wins. `.ds-iconbtn` is `display: inline-grid` with `place-items: center`, and `justify-items` has no
+effect on a flex container, so once the toggle rule turns it into a flex box the glyph falls to
+flex-start instead of centring in its 40px square.
+
+Both sites already have this. Each loads `styles.css` after `ui.css` and declares the same
+`display: inline-flex` override against the same `<button class="ds-iconbtn" data-ds-nav-toggle>`, so
+**both currently render a left-aligned hamburger below 720px.** Promoting the rule verbatim would have
+carried the defect into the kit. The two centring declarations are inert while the element is
+`display: none` and take effect the moment it is revealed, so they belong in the base rule rather than
+the media query.
 
 `flex-shrink: 0` is lifted from `burnsidesteps/www/web/styles.css:195`, which exists because the
 toggle was the only shrinkable nav child and collapsed to roughly 22px at narrow widths, under the
