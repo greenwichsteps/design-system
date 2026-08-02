@@ -31,6 +31,15 @@ cascades per property, and your local rule declares only `display` and
 competing declaration for the two properties the kit now sets. The centring
 lands on upgrade whether or not you keep your local copy.
 
+**Escape hatch.** The `[data-ds-nav-toggle]` selector is deliberately bare
+and unscoped, not tied to `.ds-nav`, so it works for any element carrying
+that attribute. If you need the toggle visible at every width instead, for
+instance reusing the attribute pair for something other than a nav,
+declare your own `[data-ds-nav-toggle]` rule after `ui.css` in your
+stylesheet load order. Your rule and the kit's are equal specificity,
+(0,1,0), and equal specificity resolves by source order, so loading after
+the kit wins.
+
 ## v0.7.0 breaking change: header markup
 
 `.ds-header` is new and the header must be restructured. Before:

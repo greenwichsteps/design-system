@@ -13,7 +13,7 @@ in `components/` (mark its row "promoted → components/<file>").
 | install-card | burnside-www | 2026-07-29 | Tabbed install card with a CSS-only tab and selector mechanism (radio inputs plus sibling combinator); JS only for the clipboard | `www/web/styles.css` `.site-ic` |
 | section | burnside-www, farnsworth-www | 2026-08-01 | Vertical rhythm and divider for a marketing page's stacked content blocks | promoted → `components/section.css` (`.ds-section`) |
 | footer | burnside-www (farnsworth-www adopting) | 2026-08-01 | Grouped link footer with an identity block and a baseline row | promoted → `components/footer.css` (`.ds-footer__cols`). Structure only: per-consumer `grid-template-columns` overrides stay local, because track ratios are tuned to a specific set of groups. |
-| nav-toggle | burnside-www, farnsworth-www | 2026-08-02 | Hide the nav toggle above the breakpoint that reveals the links, and stop it shrinking under the tap-target minimum | promoted → `components/layout.css` (`[data-ds-nav-toggle]`) |
+| nav-toggle | burnside-www, farnsworth-www | 2026-08-02 | Hide the nav toggle above the breakpoint that reveals the links, and stop it shrinking under the tap-target minimum | promoted → `components/layout.css` (`[data-ds-nav-toggle]`). Selector is deliberately bare and unscoped, specificity (0,1,0), the minimum a consumer needs to beat to override it; scoping it later (e.g. to `.ds-nav [data-ds-nav-toggle]`) would raise specificity and is a breaking change. |
 
 ## Identity rules
 
