@@ -49,9 +49,21 @@ that the plan does not deliver. Findings are fixed in the plan, not discovered t
 ## Part 1: kit v0.7.1, promote the nav toggle
 
 Both sites declare byte-identical rules (`burnsidesteps/www/web/styles.css:14-15`,
-`farnsworthsteps/www/web/styles.css:8-10`), comment included. The kit ships none, which is why its own
-mobile bar measures **57px** against the 48px the v0.7.0 design targeted: the 40px `.ds-iconbtn` is
-visible at every width in the kit's own gallery.
+`farnsworthsteps/www/web/styles.css:8-10`), comment included. The kit ships none, so the 40px
+`.ds-iconbtn` is visible at every width and the kit's own bar measures **57px** rather than the 48px
+v0.7.0 designed for.
+
+**Precisely what this fixes, corrected 2026-08-02.** The rule takes the **desktop** bar to 48px by
+hiding the toggle above 720px. Mobile legitimately stays around 56px, because once the toggle appears
+it is the tallest child in the row. v0.7.0's final review described this as a mobile-bar problem; it is
+a desktop one.
+
+It also fixes the kit's own gallery, which is currently demonstrating an impossible state.
+`gallery/sections/layout-overlay.html:13` places a toggle inside a `.ds-nav`, and above 720px the
+gallery renders that button **alongside** the visible `.ds-nav__links`. A nav shows one or the other,
+never both. The promotion corrects the demo rather than degrading it, and the section gains a line
+saying the toggle appears below 720px, matching how the chrome section already explains its
+`position: static` override.
 
 Added to `components/layout.css`:
 
