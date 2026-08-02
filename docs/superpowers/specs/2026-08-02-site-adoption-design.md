@@ -50,13 +50,30 @@ that the plan does not deliver. Findings are fixed in the plan, not discovered t
 
 Both sites declare byte-identical rules (`burnsidesteps/www/web/styles.css:14-15`,
 `farnsworthsteps/www/web/styles.css:8-10`), comment included. The kit ships none, so the 40px
-`.ds-iconbtn` is visible at every width and the kit's own bar measures **57px** rather than the 48px
-v0.7.0 designed for.
+`.ds-iconbtn` is visible at every width. This spec originally claimed that the kit's own bar measured
+**57px** rather than the 48px v0.7.0 designed for, and that the rule "takes the desktop bar to 48px."
+Both numbers were wrong; see the correction below.
 
-**Precisely what this fixes, corrected 2026-08-02.** The rule takes the **desktop** bar to 48px by
-hiding the toggle above 720px. Mobile legitimately stays around 56px, because once the toggle appears
-it is the tallest child in the row. v0.7.0's final review described this as a mobile-bar problem; it is
-a desktop one.
+**Correction of record, whole-branch review, 2026-08-02: the height claim above, and the "Precisely
+what this fixes" framing it was written under, are both wrong.** The reviewer measured it. Against the
+gallery's verbatim markup, `.ds-header` is **48px before v0.7.1 and 40px after**. Neither the 57px nor
+the 48px in the original claim matches either state.
+
+Worse, on **both real consuming sites the desktop bar height does not change at all**, for two
+independent reasons: each site already hides the toggle at desktop with its own local rule, so the
+toggle was never contributing to the desktop bar's height in the first place; and each nav also carries
+a `.ds-btn` CTA at least as tall as the 40px toggle, so even where the toggle is visible it was never
+the tallest child in the row. A `.ds-header` built to v0.7.0's own example markup measured 59px before
+this change and 59px after: a zero delta.
+
+The real justification for v0.7.1 is not a bar-height change. It is **the centring fix and the
+deduplication**, both of which are correct and are what the README and PATTERNS.md already say. The
+height framing was a mistake in the reasoning that produced this spec, not in the shipped CSS, the
+tests, or the README.
+
+Part 2's wordmark sizing below already reasons toward a 48px bar target inherited from this section.
+Any plan, there or elsewhere, that reasons toward a specific bar height must measure that height
+directly rather than inherit a number from this section.
 
 It also fixes the kit's own gallery, which is currently demonstrating an impossible state.
 `gallery/sections/layout-overlay.html:13` places a toggle inside a `.ds-nav`, and above 720px the
@@ -68,9 +85,26 @@ saying the toggle appears below 720px, matching how the chrome section already e
 Added to `components/layout.css`:
 
 ```css
-[data-ds-nav-toggle] { display: none; flex-shrink: 0; }
+[data-ds-nav-toggle] { display: none; flex-shrink: 0; align-items: center; justify-content: center; }
 @media (max-width: 720px) { [data-ds-nav-toggle] { display: inline-flex; } }
 ```
+
+**The centring is not decoration, and it fixes a live bug in both sites.** Found by this plan's
+pre-flight review, which loaded the compiled `dist/ui.css` into jsdom and read `getComputedStyle`
+rather than reasoning about it.
+
+`[data-ds-nav-toggle]` and `.ds-iconbtn` have equal specificity (0,1,0), and `components/button.css`
+sorts before `components/layout.css` in the alphabetical concatenation, so the toggle rule's `display`
+wins. `.ds-iconbtn` is `display: inline-grid` with `place-items: center`, and `justify-items` has no
+effect on a flex container, so once the toggle rule turns it into a flex box the glyph falls to
+flex-start instead of centring in its 40px square.
+
+Both sites already have this. Each loads `styles.css` after `ui.css` and declares the same
+`display: inline-flex` override against the same `<button class="ds-iconbtn" data-ds-nav-toggle>`, so
+**both currently render a left-aligned hamburger below 720px.** Promoting the rule verbatim would have
+carried the defect into the kit. The two centring declarations are inert while the element is
+`display: none` and take effect the moment it is revealed, so they belong in the base rule rather than
+the media query.
 
 `flex-shrink: 0` is lifted from `burnsidesteps/www/web/styles.css:195`, which exists because the
 toggle was the only shrinkable nav child and collapsed to roughly 22px at narrow widths, under the
@@ -196,6 +230,31 @@ That is everything the site has. The auto-fit grid serves two groups without a m
 why the kit's track list is not fixed. Adopting this is also what makes the v0.7.0 footer promotion
 honest: PATTERNS.md currently records `burnside-www (farnsworth-www adopting)`, and that row updates to
 two real consumers when this lands.
+
+### Risks
+
+**The reclaimed toggle width has to go somewhere.** Part 1's promoted rule gives Farnsworth's toggle a
+`flex-shrink: 0` it never declared locally. That is a genuine fix on its own: without it, Farnsworth's
+toggle is the only shrinkable nav child below 720px and collapses to **21.8px**, under the 24px
+tap-target minimum; with the promoted rule it holds a correct 40px.
+
+But the 18.2px the toggle stops absorbing does not disappear. Below 720px, Farnsworth's only other
+shrinkable nav child is `<a class="ds-btn ds-btn--accent">Join the waitlist</a>`, which is
+`white-space: nowrap`, so it cannot wrap to give the width back and the nav gets wider instead. Measured
+document `scrollWidth` in the reviewer's fixture went from **417px to 436px** across this change.
+
+Burnside is not exposed to this: it already carried its own `flex-shrink: 0` on the toggle before
+v0.7.1 (the rule this promotion is lifted from), and it additionally shrinks its nav button's padding
+and font-size below 720px, so it has somewhere for the reclaimed space to go.
+
+**State the uncertainty honestly.** The reviewer could not load the sites' real web fonts, so its
+absolute widths are inflated, and it explicitly declined to claim the live site overflows today. The
++18.2px delta itself is font-independent and certain; whether it crosses into visible horizontal
+scroll on the real site is not established.
+
+**Requirement for this part's plan.** Measure the Farnsworth nav at 320px and 375px against the real
+fonts under v0.7.1, and add an assertion that document `scrollWidth` does not exceed the viewport width
+at both. Neither site has a horizontal-overflow guard today; this is the first one.
 
 ## Verification
 

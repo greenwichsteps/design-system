@@ -14,6 +14,21 @@
 .ds-nav__spacer { flex: 1; }
 .ds-nav__links { display: flex; gap: var(--ds-space-5); font-size: var(--ds-text-sm); }
 @media (max-width: 720px) { .ds-nav__links { display: none; } .ds-nav__links.is-open { display: flex; position: absolute; inset: 100% 0 auto; flex-direction: column; background: var(--ds-surface); padding: var(--ds-space-5); } }
+/* A nav shows its links or its toggle, never both, so this reveals at exactly the
+   breakpoint above that hides them. Promoted from two consumers that declared it
+   identically. flex-shrink comes with it: the toggle is the only shrinkable child
+   in this row, and without it the toggle absorbs the whole deficit at narrow
+   widths and drops to about 22px, under the 24px tap-target minimum.
+
+   The centring is load-bearing. This selector and .ds-iconbtn have equal
+   specificity, and button.css sorts before layout.css, so this display wins and
+   turns that inline-grid box into a flex one. .ds-iconbtn centres with
+   place-items, and justify-items does nothing on a flex container, so without
+   these two lines the glyph falls to flex-start in its 40px square. Both
+   consuming sites ship that bug today. Declared here rather than in the media
+   query because they are inert while the element is display: none. */
+[data-ds-nav-toggle] { display: none; flex-shrink: 0; align-items: center; justify-content: center; }
+@media (max-width: 720px) { [data-ds-nav-toggle] { display: inline-flex; } }
 .ds-footer { border-top: 1px solid var(--ds-border); padding: var(--ds-space-8) 0; color: var(--ds-text-muted); }
 .ds-shell { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
 .ds-shell__side { border-right: 1px solid var(--ds-border); padding: var(--ds-space-5); }

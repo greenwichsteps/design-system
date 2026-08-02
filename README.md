@@ -2,6 +2,44 @@
 
 A shared, themeable, CSS-first design system for the Greenwich Steps family of products: install with `pnpm install`, build the published CSS/JS output with `pnpm build`, run the test suite with `pnpm test`, and consume it in another project as a git dependency pinned to a tag (e.g. `"@greenwichsteps/design-system": "github:greenwichsteps/design-system#v0.1.0"`), which resolves via its `prepare` script so `dist/` is built automatically on install.
 
+## v0.7.1: the nav toggle is now the kit's job, and it fixes a live bug
+
+`[data-ds-nav-toggle]` is hidden by default and revealed below 720px, the
+same breakpoint that hides `.ds-nav__links`: a nav shows its links or its
+toggle, never both. It also carries `flex-shrink: 0`, because it is the only
+shrinkable child in the `.ds-nav` flex row and would otherwise fall under the
+24px tap-target minimum at narrow widths.
+
+This is a fix, not just deduplication. `[data-ds-nav-toggle]` and
+`.ds-iconbtn` share the same specificity, (0,1,0), and `button.css` sorts
+before `layout.css`, so the toggle rule's `display` was winning and turning
+`.ds-iconbtn`'s `inline-grid` box into a flex one. `.ds-iconbtn` centres with
+`place-items: center`, which expands to `align-items` and `justify-items`.
+`align-items` still applies on a flex container, so the glyph stayed
+vertically centred, but `justify-items` does nothing there, and nothing else
+declared `justify-content`, which defaults to `flex-start`. So the glyph
+packed to the left edge of its 40px box rather than sitting centred. The
+promoted rule now carries `align-items: center; justify-content: center` to
+restore full centring. Both consuming sites ship that left-packed glyph
+today, because the rule each declared locally was byte-identical and never
+declared `justify-content` either.
+
+If you declare this rule locally, delete it: it duplicates the kit for no
+benefit. Deleting is housekeeping, not a prerequisite for the fix. CSS
+cascades per property, and your local rule declares only `display` and
+`flex-shrink`, never `align-items` or `justify-content`, so there is no
+competing declaration for the two properties the kit now sets. The centring
+lands on upgrade whether or not you keep your local copy.
+
+**Escape hatch.** The `[data-ds-nav-toggle]` selector is deliberately bare
+and unscoped, not tied to `.ds-nav`, so it works for any element carrying
+that attribute. If you need the toggle visible at every width instead, for
+instance reusing the attribute pair for something other than a nav,
+declare your own `[data-ds-nav-toggle]` rule after `ui.css` in your
+stylesheet load order. Your rule and the kit's are equal specificity,
+(0,1,0), and equal specificity resolves by source order, so loading after
+the kit wins.
+
 ## v0.7.0 breaking change: header markup
 
 `.ds-header` is new and the header must be restructured. Before:
