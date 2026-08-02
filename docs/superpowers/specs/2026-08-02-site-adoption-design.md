@@ -21,6 +21,31 @@ otherwise adopt while still carrying it.
 minors rather than one and carries both documented specificity traps, so the riskier path runs while
 the reasoning is fresh.
 
+## How this gets built, decided 2026-08-02
+
+Two process changes, both a direct response to how the v0.7.0 run actually went.
+
+**One plan per part, not one plan for the spec.** Each part ends in something shippable on its own:
+v0.7.1 is a release, Burnside adoption is deployable, Farnsworth adoption is deployable. The founder
+reviews between them and can stop after any one. A single twelve-task plan is the size of the run that
+produced v0.7.0, which took a full day.
+
+**Every plan gets a pre-flight review before its first task is dispatched.** The v0.7.0 run produced
+twelve Important findings across ten tasks, and **all twelve were defects in the plan**, not in any
+implementation: three broken tests, one CSS rule that overflowed a 375px viewport, and six absent
+guards. The implementers transcribed faithfully, which is what they were asked to do, so the plan was
+the only place a defect could survive.
+
+Every one of those was visible by reading. The `@supports` assertion that could not match the CSS it
+checked, the guard that only covered three hardcoded selectors, the `grid-column: span 2` under an
+auto-fit track list, the assertion satisfied by the substring inside `ds-section__title`: none needed
+execution to find. Each instead cost a fix dispatch, a scoped re-review, and in two cases a question to
+the founder.
+
+So: a reviewer reads the plan document itself, against this spec, before Task 1 is dispatched. It
+looks for assertions that cannot fail, code that contradicts the spec, and guards the spec asks for
+that the plan does not deliver. Findings are fixed in the plan, not discovered task by task.
+
 ## Part 1: kit v0.7.1, promote the nav toggle
 
 Both sites declare byte-identical rules (`burnsidesteps/www/web/styles.css:14-15`,
