@@ -13,17 +13,23 @@ shrinkable child in the `.ds-nav` flex row and would otherwise fall under the
 This is a fix, not just deduplication. `[data-ds-nav-toggle]` and
 `.ds-iconbtn` share the same specificity, (0,1,0), and `button.css` sorts
 before `layout.css`, so the toggle rule's `display` was winning and turning
-`.ds-iconbtn`'s `inline-grid` box into a flex one. `place-items: center` does
-nothing on a flex container, so the icon fell to the top-left corner of its
-40px square instead of sitting centred. The promoted rule now carries
-`align-items: center; justify-content: center` to restore that centring.
-Both consuming sites ship the misalignment today, because the rule each
-declared locally was byte-identical and never had the centring pair either.
+`.ds-iconbtn`'s `inline-grid` box into a flex one. `.ds-iconbtn` centres with
+`place-items: center`, which expands to `align-items` and `justify-items`.
+`align-items` still applies on a flex container, so the glyph stayed
+vertically centred, but `justify-items` does nothing there, and nothing else
+declared `justify-content`, which defaults to `flex-start`. So the glyph
+packed to the left edge of its 40px box rather than sitting centred. The
+promoted rule now carries `align-items: center; justify-content: center` to
+restore full centring. Both consuming sites ship that left-packed glyph
+today, because the rule each declared locally was byte-identical and never
+declared `justify-content` either.
 
-If you declare this rule locally, delete it rather than leave it in place.
-It is not just harmless duplication: your local copy is the uncentred
-version, and depending on load order it can keep masking the kit's fix even
-after you upgrade.
+If you declare this rule locally, delete it: it duplicates the kit for no
+benefit. Deleting is housekeeping, not a prerequisite for the fix. CSS
+cascades per property, and your local rule declares only `display` and
+`flex-shrink`, never `align-items` or `justify-content`, so there is no
+competing declaration for the two properties the kit now sets. The centring
+lands on upgrade whether or not you keep your local copy.
 
 ## v0.7.0 breaking change: header markup
 
