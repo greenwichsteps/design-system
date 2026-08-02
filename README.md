@@ -2,6 +2,29 @@
 
 A shared, themeable, CSS-first design system for the Greenwich Steps family of products: install with `pnpm install`, build the published CSS/JS output with `pnpm build`, run the test suite with `pnpm test`, and consume it in another project as a git dependency pinned to a tag (e.g. `"@greenwichsteps/design-system": "github:greenwichsteps/design-system#v0.1.0"`), which resolves via its `prepare` script so `dist/` is built automatically on install.
 
+## v0.7.1: the nav toggle is now the kit's job, and it fixes a live bug
+
+`[data-ds-nav-toggle]` is hidden by default and revealed below 720px, the
+same breakpoint that hides `.ds-nav__links`: a nav shows its links or its
+toggle, never both. It also carries `flex-shrink: 0`, because it is the only
+shrinkable child in the `.ds-nav` flex row and would otherwise fall under the
+24px tap-target minimum at narrow widths.
+
+This is a fix, not just deduplication. `[data-ds-nav-toggle]` and
+`.ds-iconbtn` share the same specificity, (0,1,0), and `button.css` sorts
+before `layout.css`, so the toggle rule's `display` was winning and turning
+`.ds-iconbtn`'s `inline-grid` box into a flex one. `place-items: center` does
+nothing on a flex container, so the icon fell to the top-left corner of its
+40px square instead of sitting centred. The promoted rule now carries
+`align-items: center; justify-content: center` to restore that centring.
+Both consuming sites ship the misalignment today, because the rule each
+declared locally was byte-identical and never had the centring pair either.
+
+If you declare this rule locally, delete it rather than leave it in place.
+It is not just harmless duplication: your local copy is the uncentred
+version, and depending on load order it can keep masking the kit's fix even
+after you upgrade.
+
 ## v0.7.0 breaking change: header markup
 
 `.ds-header` is new and the header must be restructured. Before:
