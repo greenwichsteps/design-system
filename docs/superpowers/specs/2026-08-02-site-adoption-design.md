@@ -244,8 +244,20 @@ shrinkable nav child is `<a class="ds-btn ds-btn--accent">Join the waitlist</a>`
 document `scrollWidth` in the reviewer's fixture went from **417px to 436px** across this change.
 
 Burnside is not exposed to this: it already carried its own `flex-shrink: 0` on the toggle before
-v0.7.1 (the rule this promotion is lifted from), and it additionally shrinks its nav button's padding
-and font-size below 720px, so it has somewhere for the reclaimed space to go.
+v0.7.1, which is the rule this promotion was lifted from.
+
+**Correction of record, Part 2's whole-branch review, 2026-08-02.** An earlier version of this
+paragraph also said Burnside "additionally shrinks its nav button's padding and font-size below 720px,
+so it has somewhere for the reclaimed space to go." **That second half is no longer true and must not
+be inherited.** The rule it referred to declared exactly `padding: var(--ds-space-2) var(--ds-space-4);
+font-size: var(--ds-text-sm);` inside a 720px media query, which is byte-identical to the kit's
+`.ds-btn--sm`. Part 2 put `ds-btn--sm` on that element at every width, making the local rule a no-op,
+and Part 2's fix wave deleted it after confirming the two were identical.
+
+So Burnside's protection is the `flex-shrink: 0` alone, not a second mechanism. Part 2 measured no
+overflow at 375px on all five pages after the change, so the conclusion holds for Burnside on the
+evidence. But **Part 3 must not reason from the deleted rule**, and must not assume Farnsworth is
+merely a weaker version of a Burnside situation that was itself half-imagined.
 
 **State the uncertainty honestly.** The reviewer could not load the sites' real web fonts, so its
 absolute widths are inflated, and it explicitly declined to claim the live site overflows today. The
