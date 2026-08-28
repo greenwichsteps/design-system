@@ -1,0 +1,40 @@
+# Licence
+
+## Scope, read this first
+
+This licence covers the **design system**: the CSS, tokens, themes, components, behaviours, build
+scripts, identity artwork and documentation in this repository.
+
+It does **not** cover `fonts/`. Those twelve files are licensed retail typefaces that Greenwich
+Steps LLC did not create and cannot sublicense:
+
+- **Canela** and **Canela Text** — Commercial Type
+- **GT America** — Grilli Type
+
+They are present here in error and are being removed; see GRE-403. Nothing in this file grants any
+right to use, copy, modify or redistribute them. If you have cloned or forked this repository, you
+have not acquired a licence to those files, and you should obtain your own from the foundry before
+using them. The kit degrades to the fallback stacks in `tokens.css` (Georgia, system-ui) when
+`fonts.css` is not loaded, so it works without them.
+
+---
+
+## MIT Licence
+
+Copyright (c) 2026 Greenwich Steps LLC
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+associated documentation files (the "Software"), **excluding the contents of the `fonts/`
+directory**, to deal in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+and to permit persons to whom the Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
+OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

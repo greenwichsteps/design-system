@@ -1,6 +1,7 @@
 {
   "name": "@greenwichsteps/design-system",
   "version": "0.7.1",
+  "license": "SEE LICENSE IN LICENSE",
   "description": "Shared, themeable, CSS-first design system.",
   "type": "module",
   "files": [
