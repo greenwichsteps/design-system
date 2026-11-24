@@ -103,3 +103,70 @@ describe("app set: stack and radius scope", () => {
     expect(b).toBeGreaterThan(a);
   });
 });
+
+describe("app set: shell and side nav", () => {
+  it("lays .ds-app out as a sidebar column and a flexible main column", () => {
+    const d = flat(".ds-app");
+    expect(d["display"]).toBe("grid");
+    expect(d["grid-template-columns"]).toBe("248px minmax(0, 1fr)");
+    expect(d["min-height"]).toBe("100vh");
+  });
+
+  it("collapses to one column at 720px", () => {
+    expect(narrow(".ds-app")["grid-template-columns"]).toBe("minmax(0, 1fr)");
+  });
+
+  it("draws the sidebar as a bordered surface column", () => {
+    const d = flat(".ds-app__sidebar");
+    expect(d["border-right"]).toBe("1px solid var(--ds-border)");
+    expect(d["background"]).toBe("var(--ds-surface)");
+    expect(d["display"]).toBe("flex");
+    expect(d["flex-direction"]).toBe("column");
+    expect(d["padding"]).toBe("var(--ds-space-4) var(--ds-space-3)");
+    expect(d["gap"]).toBe("var(--ds-space-5)");
+  });
+
+  it("moves the sidebar border to the bottom at 720px", () => {
+    const n = narrow(".ds-app__sidebar");
+    expect(n["border-right"]).toBe("0");
+    expect(n["border-bottom"]).toBe("1px solid var(--ds-border)");
+  });
+
+  it("never hides the sidebar", () => {
+    const hide = (rs: Rule[]) =>
+      rs.filter((r) => r.selectors.some((s) => /\.ds-app__sidebar\b/.test(s)) && decls(r.body)["display"] === "none");
+    expect(hide(flatRules)).toEqual([]);
+    expect(hide(mediaRules)).toEqual([]);
+  });
+
+  it("lets the main column shrink and pads it", () => {
+    const d = flat(".ds-app__main");
+    expect(d["min-width"]).toBe("0");
+    expect(d["padding"]).toBe("var(--ds-space-6) var(--ds-space-6) var(--ds-space-10)");
+  });
+
+  it("stacks side nav items vertically, then wraps them in a row at 720px", () => {
+    const d = flat(".ds-sidenav");
+    expect(d["display"]).toBe("flex");
+    expect(d["flex-direction"]).toBe("column");
+    const n = narrow(".ds-sidenav");
+    expect(n["flex-direction"]).toBe("row");
+    expect(n["flex-wrap"]).toBe("wrap");
+  });
+
+  it("styles side nav items", () => {
+    const d = flat(".ds-sidenav__item");
+    expect(d["font-size"]).toBe("14px");
+    expect(d["font-weight"]).toBe("500");
+    expect(d["padding"]).toBe("var(--ds-space-2) var(--ds-space-3)");
+    expect(d["border-radius"]).toBe("var(--ds-radius-sm)");
+    expect(d["color"]).toBe("var(--ds-text-muted)");
+    expect(flat(".ds-sidenav__item:hover")["background"]).toBe("var(--ds-hover)");
+  });
+
+  it("marks the current page with the hover fill and full-strength text", () => {
+    const d = flat('.ds-sidenav__item[aria-current="page"]');
+    expect(d["background"]).toBe("var(--ds-hover)");
+    expect(d["color"]).toBe("var(--ds-text)");
+  });
+});
