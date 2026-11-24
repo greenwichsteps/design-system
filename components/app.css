@@ -116,6 +116,10 @@
     flex-direction: row;
     flex-wrap: wrap;
   }
+  /* In the row an item sizes to its content; width: 100% would give each one a whole line. */
+  .ds-sidenav__item {
+    width: auto;
+  }
 }
 
 /* Page header: title and lede on the left, actions on the right, wrapping on a

@@ -218,6 +218,12 @@ describe("app set: shell and side nav", () => {
     expect(n["flex-wrap"]).toBe("wrap");
   });
 
+  // GRE-632: width: 100% fills the column; in the wrapping phone row it gave every item a line.
+  it("sizes side nav items to their content in the phone row, full width in the column", () => {
+    expect(narrow(".ds-sidenav__item")["width"]).toBe("auto");
+    expect(flat(".ds-sidenav__item")["width"]).toBe("100%");
+  });
+
   it("styles side nav items", () => {
     const d = flat(".ds-sidenav__item");
     expect(d["font-size"]).toBe("14px");
