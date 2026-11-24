@@ -24,7 +24,11 @@ a { color: inherit; }
    existing .ds-shell are untouched. Tested in test/app-set.spec.ts. */
 
 /* Vertical rhythm for direct children. Sets no display, so it composes with any
-   container. The gap is a variable so the modifiers change one value. */
+   container. The gap is a variable so the modifiers change one value. Every stack
+   resets the variable for its own children, because custom properties inherit and a
+   plain stack inside a loose one would otherwise take the loose gap. The reset must
+   stay before the modifiers: same specificity, so source order lets them win. */
+.ds-stack { --ds-stack-gap: var(--ds-space-4); }
 .ds-stack > * + * { margin-block-start: var(--ds-stack-gap, var(--ds-space-4)); }
 .ds-stack--tight { --ds-stack-gap: var(--ds-space-2); }
 .ds-stack--loose { --ds-stack-gap: var(--ds-space-6); }

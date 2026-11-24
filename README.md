@@ -2,6 +2,10 @@
 
 A shared, themeable, CSS-first design system for the Greenwich Steps family of products: install with `pnpm install`, build the published CSS/JS output with `pnpm build`, run the test suite with `pnpm test`, and consume it in another project as a git dependency pinned to a tag (e.g. `"@greenwichsteps/design-system": "github:greenwichsteps/design-system#v0.1.0"`), which resolves via its `prepare` script so `dist/` is built automatically on install.
 
+## v0.9.1: nested stacks keep their own gap
+
+A plain `.ds-stack` nested inside `.ds-stack--loose` (or `--tight`) used to inherit the outer gap, because custom properties inherit, so it spaced its children at 32px (or 8px) instead of 16px. Every `.ds-stack` now resets `--ds-stack-gap` for its own children, and the modifiers still win by source order. Pages that relied on the inherited 32px will tighten to 16px.
+
 ## v0.9.0: app set
 
 Patterns for application screens such as a dashboard, all in `components/app.css`.
