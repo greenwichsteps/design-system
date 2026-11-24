@@ -1,0 +1,17 @@
+/* The app set (GRE-615): patterns for application screens such as a dashboard.
+   Spec: the GRE-615 dashboard redesign spec. Everything here
+   is scoped to .ds-app or carries its own ds-* class, so marketing pages and the
+   existing .ds-shell are untouched. Tested in test/app-set.spec.ts. */
+
+/* Vertical rhythm for direct children. Sets no display, so it composes with any
+   container. The gap is a variable so the modifiers change one value. */
+.ds-stack > * + * { margin-block-start: var(--ds-stack-gap, var(--ds-space-4)); }
+.ds-stack--tight { --ds-stack-gap: var(--ds-space-2); }
+.ds-stack--loose { --ds-stack-gap: var(--ds-space-6); }
+
+/* Application screens use tighter corners than the marketing site. The tokens are
+   overridden here so every component inside inherits them with no extra class. */
+.ds-app {
+  --ds-radius-md: 8px;
+  --ds-radius-lg: 12px;
+}
