@@ -238,6 +238,12 @@ describe("app set: page header and list", () => {
     expect(d["padding"]).toBe("var(--ds-space-4) var(--ds-space-5)");
   });
 
+  it("gives a row a flexible main cell so trailing actions sit at the end", () => {
+    const d = flat(".ds-list__main");
+    expect(d["flex"]).toBe("1 1 auto");
+    expect(d["min-width"]).toBe("0");
+  });
+
   it("separates adjacent rows with a top border", () => {
     expect(flat(".ds-list__row + .ds-list__row")["border-top"]).toBe("1px solid var(--ds-border)");
   });
