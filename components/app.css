@@ -97,6 +97,7 @@
 .ds-pagehead .ds-lede { font-size: var(--ds-text-base); }
 .ds-pagehead__actions {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--ds-space-2);
 }
 

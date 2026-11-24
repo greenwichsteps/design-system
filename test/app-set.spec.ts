@@ -218,6 +218,7 @@ describe("app set: page header and list", () => {
     const d = flat(".ds-pagehead__actions");
     expect(d["display"]).toBe("flex");
     expect(d["gap"]).toBe("var(--ds-space-2)");
+    expect(d["flex-wrap"]).toBe("wrap");
   });
 
   it("draws the list as a bordered rounded surface", () => {
