@@ -62,7 +62,6 @@ a { color: inherit; }
   flex-direction: column;
   gap: var(--ds-space-1);
   list-style: none;
-  margin: 0;
   padding: 0;
 }
 .ds-sidenav__item {
@@ -102,7 +101,6 @@ a { color: inherit; }
   gap: var(--ds-space-4);
 }
 .ds-pagehead__title {
-  margin: 0;
   font-family: var(--ds-font-sans);
   font-size: 1.5rem;
   font-weight: 700; /* the sans family ships 400/500/700, so 600 would only round up */
@@ -121,7 +119,6 @@ a { color: inherit; }
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
   list-style: none;
-  margin: 0;
   padding: 0;
 }
 .ds-list__row {

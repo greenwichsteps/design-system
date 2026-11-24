@@ -282,3 +282,19 @@ describe("app set: settings sections and message", () => {
     }
   });
 });
+
+// A margin on any other app rule ties the stack rule on specificity (0,1,0) and wins
+// by source order, silently cancelling the gap for that element. reset.css already
+// zeroes margins, so the stack rule is the only place a margin belongs.
+describe("app set: margins belong to the stack", () => {
+  it("declares no margin property outside the stack rule, flat or in a media query", () => {
+    const src = stripComments(readFileSync(join(root, "components/app.css"), "utf8"));
+    const parts = splitMedia(src, QUERY);
+    const all = [...parseRules(parts.flat), ...parts.media.flatMap(parseRules)];
+    expect(all.length).toBeGreaterThan(10);
+    const offenders = all
+      .filter((r) => !(r.selectors.length === 1 && r.selectors[0] === ".ds-stack > * + *"))
+      .flatMap((r) => Object.keys(decls(r.body)).filter((p) => /^margin/.test(p)).map((p) => `${r.selectors.join(", ")} sets ${p}`));
+    expect(offenders).toEqual([]);
+  });
+});
