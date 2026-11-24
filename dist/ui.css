@@ -133,6 +133,53 @@ a { color: inherit; }
 }
 .ds-list__row + .ds-list__row { border-top: 1px solid var(--ds-border); }
 
+/* Settings: sections in one bordered surface. Each section is an aside (title and
+   help) beside a body. The body grows far faster than the aside, and both wrap, so
+   a narrow screen stacks them with no media query. */
+.ds-settings {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-lg);
+}
+.ds-settings__section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-5) var(--ds-space-8);
+  padding: var(--ds-space-6);
+}
+.ds-settings__section + .ds-settings__section { border-top: 1px solid var(--ds-border); }
+.ds-settings__aside {
+  flex: 1 1 220px;
+  max-width: 320px;
+}
+.ds-settings__body {
+  flex: 999 1 360px;
+  min-width: 0;
+}
+
+/* Message: an inline notice in a block. Not a badge, so the corners follow the
+   app radius and are never a pill. The tint is the tone mixed into the surface,
+   which keeps it theme-aware with no new colour. */
+.ds-message {
+  display: block;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-hover);
+  color: var(--ds-text);
+  font-size: var(--ds-text-sm);
+}
+.ds-message--danger {
+  border-color: color-mix(in srgb, var(--ds-danger) 40%, var(--ds-surface));
+  background: color-mix(in srgb, var(--ds-danger) 8%, var(--ds-surface));
+  color: var(--ds-danger);
+}
+.ds-message--success {
+  border-color: color-mix(in srgb, var(--ds-success-fg) 40%, var(--ds-surface));
+  background: color-mix(in srgb, var(--ds-success-fg) 8%, var(--ds-surface));
+  color: var(--ds-success-fg);
+}
+
 
 /* badge.css */
 .ds-badge { display: inline-flex; align-items: center; gap: var(--ds-space-1); padding: 2px var(--ds-space-2);

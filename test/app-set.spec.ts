@@ -229,3 +229,56 @@ describe("app set: page header and list", () => {
     expect(flat(".ds-list__row + .ds-list__row")["border-top"]).toBe("1px solid var(--ds-border)");
   });
 });
+
+describe("app set: settings sections and message", () => {
+  it("draws the settings container as a bordered rounded surface", () => {
+    const d = flat(".ds-settings");
+    expect(d["background"]).toBe("var(--ds-surface)");
+    expect(d["border"]).toBe("1px solid var(--ds-border)");
+    expect(d["border-radius"]).toBe("var(--ds-radius-lg)");
+  });
+
+  it("lays each section out as a wrapping aside and body pair", () => {
+    const d = flat(".ds-settings__section");
+    expect(d["display"]).toBe("flex");
+    expect(d["flex-wrap"]).toBe("wrap");
+    expect(d["gap"]).toBe("var(--ds-space-5) var(--ds-space-8)");
+    expect(d["padding"]).toBe("var(--ds-space-6)");
+    expect(flat(".ds-settings__section + .ds-settings__section")["border-top"]).toBe("1px solid var(--ds-border)");
+  });
+
+  it("sizes the aside and body so the body takes the spare width and wraps below 360px", () => {
+    const a = flat(".ds-settings__aside");
+    expect(a["flex"]).toBe("1 1 220px");
+    expect(a["max-width"]).toBe("320px");
+    const b = flat(".ds-settings__body");
+    expect(b["flex"]).toBe("999 1 360px");
+    expect(b["min-width"]).toBe("0");
+  });
+
+  it("styles a message as a quiet bordered block", () => {
+    const d = flat(".ds-message");
+    expect(d["display"]).toBe("block");
+    expect(d["padding"]).toBe("var(--ds-space-3) var(--ds-space-4)");
+    expect(d["border-radius"]).toBe("var(--ds-radius-md)");
+    expect(d["border"]).toBe("1px solid var(--ds-border)");
+    expect(d["background"]).toBe("var(--ds-hover)");
+    expect(d["color"]).toBe("var(--ds-text)");
+    expect(d["font-size"]).toBe("var(--ds-text-sm)");
+  });
+
+  it("is not a badge, so no rule on a message rounds it to a pill", () => {
+    const hits = flatRules.filter((r) => r.selectors.some((s) => /\.ds-message\b/.test(s)) && /radius-pill/.test(r.body));
+    expect(hits).toEqual([]);
+  });
+
+  it("tints danger and success messages from the tone over the surface", () => {
+    for (const [mod, tone] of [["danger", "--ds-danger"], ["success", "--ds-success-fg"]] as const) {
+      const d = flat(`.ds-message--${mod}`);
+      const mix = new RegExp(`^color-mix\\(in srgb, var\\(${tone}\\) \\d+%, var\\(--ds-surface\\)\\)$`);
+      expect(d["border-color"], `${mod} border-color`).toMatch(mix);
+      expect(d["background"], `${mod} background`).toMatch(mix);
+      expect(d["color"], `${mod} color`).toBe(`var(${tone})`);
+    }
+  });
+});
