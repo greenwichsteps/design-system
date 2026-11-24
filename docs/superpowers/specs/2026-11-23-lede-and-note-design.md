@@ -19,7 +19,7 @@ the kit, not carelessness in one product:
 ## Goals
 
 - Every kind of supporting sentence has a class named for what it is.
-- `.ds-hero__lede` looks exactly as it does today.
+- Nothing already shipped changes appearance. The release only adds.
 
 ## Non-goals
 
@@ -63,18 +63,20 @@ Calls made in the design (approved with it):
   a field and turns red with it (`.ds-field[data-invalid] .ds-help`); a note never does.
 - `.ds-lede` has no width cap and no centring. The context decides alignment.
 - `.ds-lede` carries its own top margin, since a lede always follows a heading.
-- `.ds-hero__lede` becomes `.ds-lede` plus the hero's centring, 46ch measure and
-  `--ds-space-4` top margin, with no visible change.
+- `.ds-hero__lede` is left exactly as it is (Lee, 2026-11-23, after review). The first
+  version of this design said it would be rebuilt on `.ds-lede` with no visible change, which
+  was impossible: the hero lede is body size (16px) and `.ds-lede` is 20px. Making hero
+  subtitles 20px is a marketing-page decision for GRE-430, not part of this release.
 
 ## Ships with
 
 - A gallery section showing paragraph, lede, note and field hint side by side.
 - A dist contract test that `dist/ui.css` carries both classes.
-- Contrast: muted text on the page background clears 4.5:1 in light and dark.
+- Contrast: muted text clears 4.5:1 on the page background and on a card, in light and dark
+  (measured 4.69 / 5.31 / 5.25 / 4.81). Dark `--ds-surface-raised` measures 4.37 and is
+  out of scope: no component puts muted text there, and `.ds-help` shares the gap.
 - Release v0.8.0 (additive, so minor).
 
 ## Left to the builder
 
-- How `.ds-hero__lede` composes with `.ds-lede` (markup class pair vs shared declarations),
-  as long as the hero looks the same.
 - Exact gallery copy and placement.
