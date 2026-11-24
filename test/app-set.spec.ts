@@ -137,6 +137,28 @@ describe("app set: shell and side nav", () => {
     expect(d["gap"]).toBe("var(--ds-space-5)");
   });
 
+  // Above 720px the sidebar is pinned to the viewport and its nav grows, which pushes the
+  // foot to the bottom with no margin (the margin guard below forbids margin-top: auto).
+  it("pins the sidebar to the viewport above 720px and lets the nav grow", () => {
+    const d = wide(".ds-app__sidebar");
+    expect(d["position"]).toBe("sticky");
+    expect(d["top"]).toBe("0");
+    expect(d["height"]).toBe("100vh");
+    expect(d["overflow-y"]).toBe("auto");
+    expect(wide(".ds-app__sidebar .ds-sidenav")["flex"]).toBe("1 1 auto");
+    // Under 720px nothing is pinned and the foot simply follows the nav.
+    expect(narrow(".ds-app__sidebar")["position"]).toBeUndefined();
+    expect(flat(".ds-app__sidebar")["position"]).toBeUndefined();
+    expect(flat(".ds-sidenav")["flex"]).toBeUndefined();
+  });
+
+  it("stacks the sidebar foot as a column", () => {
+    const d = flat(".ds-app__sidebar-foot");
+    expect(d["display"]).toBe("flex");
+    expect(d["flex-direction"]).toBe("column");
+    expect(d["gap"]).toBe("var(--ds-space-3)");
+  });
+
   it("moves the sidebar border to the bottom at 720px", () => {
     const n = narrow(".ds-app__sidebar");
     expect(n["border-right"]).toBe("0");
