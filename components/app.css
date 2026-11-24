@@ -60,7 +60,11 @@
 }
 
 @media (max-width: 720px) {
-  .ds-app { grid-template-columns: minmax(0, 1fr); }
+  .ds-app {
+    grid-template-columns: minmax(0, 1fr);
+    /* min-height: 100vh would otherwise share spare height with the sidebar row. */
+    grid-template-rows: auto 1fr;
+  }
   .ds-app__sidebar {
     border-right: 0;
     border-bottom: 1px solid var(--ds-border);

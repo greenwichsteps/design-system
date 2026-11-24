@@ -48,8 +48,11 @@ function splitMedia(s: string, query: string): { flat: string; media: string[] }
 }
 
 const QUERY = "(max-width: 720px)";
+const WIDE = "(min-width: 721px)";
 const clean = stripComments(css);
-const split = splitMedia(clean, QUERY);
+const wideSplit = splitMedia(clean, WIDE);
+const split = splitMedia(wideSplit.flat, QUERY);
+const wideRules = wideSplit.media.flatMap(parseRules);
 const flatRules = parseRules(split.flat);
 const mediaRules = split.media.flatMap(parseRules);
 
@@ -69,6 +72,9 @@ function flat(sel: string): Record<string, string> {
 }
 function narrow(sel: string): Record<string, string> {
   return Object.assign({}, ...mediaRules.filter((r) => r.selectors.includes(sel)).map((r) => decls(r.body)));
+}
+function wide(sel: string): Record<string, string> {
+  return Object.assign({}, ...wideRules.filter((r) => r.selectors.includes(sel)).map((r) => decls(r.body)));
 }
 function exists(sel: string, from = flatRules): boolean {
   return from.some((r) => r.selectors.includes(sel));
@@ -114,6 +120,11 @@ describe("app set: shell and side nav", () => {
 
   it("collapses to one column at 720px", () => {
     expect(narrow(".ds-app")["grid-template-columns"]).toBe("minmax(0, 1fr)");
+  });
+
+  // A short sidebar must not be stretched by min-height: 100vh sharing spare height.
+  it("sizes the narrow rows so only the main row takes spare height", () => {
+    expect(narrow(".ds-app")["grid-template-rows"]).toBe("auto 1fr");
   });
 
   it("draws the sidebar as a bordered surface column", () => {
