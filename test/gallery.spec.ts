@@ -35,6 +35,12 @@ describe("gallery coverage", () => {
     expect(hasClassToken('<div class="x\n  ds-stack">', "ds-stack")).toBe(true);
   });
 
+  // A static demo message is not a live announcement; role="alert" would be wrong in a real page.
+  it("does not mark the static app demo as an alert", () => {
+    const html = readFileSync(join(root, "gallery/sections/app.html"), "utf8").replace(/<!--[\s\S]*?-->/g, "");
+    expect(html).not.toMatch(/role="alert"/);
+  });
+
   it("shows the short Burnside mark where the header is demonstrated", () => {
     expect(sections()).toContain("wordmark-short");
   });
