@@ -278,7 +278,9 @@ describe("app set: settings sections and message", () => {
       const mix = new RegExp(`^color-mix\\(in srgb, var\\(${tone}\\) \\d+%, var\\(--ds-surface\\)\\)$`);
       expect(d["border-color"], `${mod} border-color`).toMatch(mix);
       expect(d["background"], `${mod} background`).toMatch(mix);
-      expect(d["color"], `${mod} color`).toBe(`var(${tone})`);
+      // GRE-615 browser check: the raw tone measured 3.1 to 4.3 against its tint, under 4.5.
+      // Mixing 60/40 into the theme's text colour measured 5.98 (dark) and 7.88 (light).
+      expect(d["color"], `${mod} color`).toBe(`color-mix(in srgb, var(${tone}) 60%, var(--ds-text))`);
     }
   });
 });

@@ -156,7 +156,9 @@ a { color: inherit; }
 
 /* Message: an inline notice in a block. Not a badge, so the corners follow the
    app radius and are never a pill. The tint is the tone mixed into the surface,
-   which keeps it theme-aware with no new colour. */
+   which keeps it theme-aware with no new colour. The text is the tone mixed 60/40 into
+   the page text colour: the raw tone is 4.3:1 on its tint in light and 3.1 to 3.3:1 in
+   dark, so the text colour pulls it toward whichever end the theme needs. */
 .ds-message {
   display: block;
   padding: var(--ds-space-3) var(--ds-space-4);
@@ -169,12 +171,12 @@ a { color: inherit; }
 .ds-message--danger {
   border-color: color-mix(in srgb, var(--ds-danger) 40%, var(--ds-surface));
   background: color-mix(in srgb, var(--ds-danger) 8%, var(--ds-surface));
-  color: var(--ds-danger);
+  color: color-mix(in srgb, var(--ds-danger) 60%, var(--ds-text));
 }
 .ds-message--success {
   border-color: color-mix(in srgb, var(--ds-success-fg) 40%, var(--ds-surface));
   background: color-mix(in srgb, var(--ds-success-fg) 8%, var(--ds-surface));
-  color: var(--ds-success-fg);
+  color: color-mix(in srgb, var(--ds-success-fg) 60%, var(--ds-text));
 }
 
 
