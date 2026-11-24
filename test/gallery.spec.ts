@@ -36,4 +36,17 @@ describe("gallery coverage", () => {
     expect(html).toMatch(/<p>[^<]+<\/p>/); // a plain, unclassed paragraph
     expect(html).toMatch(/class="[^"]*\bds-field\b/); // the hint sits in a real field
   });
+
+  // GRE-615. The app set is only legible as a whole screen, so one section composes it.
+  it("demonstrates the app set as one composed screen", () => {
+    const html = readFileSync(join(root, "gallery/sections/app.html"), "utf8").replace(/<!--[\s\S]*?-->/g, "");
+    for (const cls of ["ds-app", "ds-sidenav__item", "ds-pagehead", "ds-list__row", "ds-settings__section", "ds-message--danger", "ds-message--success", "ds-stack"])
+      expect(html, cls).toMatch(new RegExp(`class="[^"]*\\b${cls}\\b[^"]*"`));
+    expect(html).toMatch(/<a[^>]*class="[^"]*\bds-sidenav__item\b[^"]*"[^>]*aria-current="page"|<a[^>]*aria-current="page"[^>]*class="[^"]*\bds-sidenav__item\b/);
+    const field = html.match(/<div[^>]*class="[^"]*\bds-field\b[^"]*"[^>]*data-invalid[^>]*>[\s\S]*?<\/div>\s*<\/div>|<div[^>]*data-invalid[^>]*class="[^"]*\bds-field\b[^"]*"[^>]*>[\s\S]*?<\/div>/);
+    expect(field).not.toBeNull();
+    const describedby = field![0].match(/aria-describedby="([^"]+)"/);
+    expect(describedby).not.toBeNull();
+    expect(field![0]).toMatch(new RegExp(`id="${describedby![1]}"[^>]*class="[^"]*\\bds-help\\b|class="[^"]*\\bds-help\\b[^"]*"[^>]*id="${describedby![1]}"`));
+  });
 });

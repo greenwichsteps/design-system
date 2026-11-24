@@ -1,0 +1,75 @@
+<section id="app">
+  <h2>App set</h2>
+  <p>A contained mini app. The frame scrolls inside itself so it does not take over this page.</p>
+
+  <div class="ds-app gallery-app-frame">
+    <aside class="ds-app__sidebar">
+      <strong>Example app</strong>
+      <ul class="ds-sidenav">
+        <li><a class="ds-sidenav__item" href="#app" aria-current="page">Overview</a></li>
+        <li><a class="ds-sidenav__item" href="#app">Projects</a></li>
+        <li><a class="ds-sidenav__item" href="#app">Team</a></li>
+        <li><a class="ds-sidenav__item" href="#app">Settings</a></li>
+      </ul>
+      <div class="ds-card">
+        <p class="ds-note">Plan box: a small card at the foot of the sidebar for the current plan.</p>
+      </div>
+    </aside>
+
+    <div class="ds-app__main ds-stack ds-stack--loose">
+      <header class="ds-pagehead">
+        <div>
+          <h3 class="ds-pagehead__title">Overview</h3>
+          <p class="ds-lede">.ds-pagehead: the title and lede on the left, the page actions on the right.</p>
+        </div>
+        <div class="ds-pagehead__actions">
+          <button type="button" class="ds-btn ds-btn--accent">New project</button>
+        </div>
+      </header>
+
+      <ul class="ds-list">
+        <li class="ds-list__row">
+          <span>.ds-list__row: one record per row, divided by a hairline.</span>
+          <span class="ds-badge">Active</span>
+        </li>
+        <li class="ds-list__row">
+          <span>A second row shows the divider between rows.</span>
+          <span class="ds-badge">Paused</span>
+        </li>
+      </ul>
+
+      <div class="ds-settings">
+        <section class="ds-settings__section">
+          <div class="ds-settings__aside">
+            <h4>Profile</h4>
+            <p class="ds-help">.ds-settings__section: the title and help sit beside the fields, and stack on a narrow screen.</p>
+          </div>
+          <div class="ds-settings__body ds-stack">
+            <div class="ds-field">
+              <label class="ds-label" for="app-name">Display name</label>
+              <input id="app-name" class="ds-input" type="text" value="Example name">
+            </div>
+          </div>
+        </section>
+        <section class="ds-settings__section">
+          <div class="ds-settings__aside">
+            <h4>Contact</h4>
+            <p class="ds-help">A second section, with one field in its invalid state.</p>
+          </div>
+          <div class="ds-settings__body ds-stack">
+            <div class="ds-field" data-invalid>
+              <label class="ds-label" for="app-email">Email</label>
+              <input id="app-email" class="ds-input" type="email" value="not-an-email" aria-invalid="true" aria-describedby="app-email-help">
+              <div id="app-email-help" class="ds-help">Enter an address with an @ in it.</div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="ds-stack ds-stack--tight">
+        <p class="ds-message ds-message--danger" role="alert">.ds-message--danger: something failed and needs attention.</p>
+        <p class="ds-message ds-message--success" role="status">.ds-message--success: the change was saved.</p>
+      </div>
+    </div>
+  </div>
+</section>

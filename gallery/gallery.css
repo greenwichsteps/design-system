@@ -87,3 +87,13 @@ main > section > h4 {
   align-items: center;
   gap: var(--ds-space-3);
 }
+
+/* App set demo: .ds-app sets min-height: 100vh for real apps, which would take this
+   page over. The frame is fixed-height and scrolls inside itself instead. */
+.gallery-app-frame {
+  min-height: 0;
+  height: 640px;
+  overflow: auto;
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-lg);
+}
