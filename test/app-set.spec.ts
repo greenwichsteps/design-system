@@ -82,14 +82,39 @@ function exists(sel: string, from = flatRules): boolean {
 }
 
 describe("app set: stack and radius scope", () => {
-  it("spaces direct children with a stack gap that defaults to space-4", () => {
-    expect(exists(".ds-stack > * + *")).toBe(true);
-    expect(flat(".ds-stack > * + *")["margin-block-start"]).toBe("var(--ds-stack-gap, var(--ds-space-4))");
+  it("spaces direct children by the PARENT's class, with no variable read", () => {
+    expect(flat(".ds-stack > * + *")).toEqual({ "margin-block-start": "var(--ds-space-4)" });
+    expect(flat(".ds-stack--tight > * + *")).toEqual({ "margin-block-start": "var(--ds-space-2)" });
+    expect(flat(".ds-stack--loose > * + *")).toEqual({ "margin-block-start": "var(--ds-space-6)" });
   });
 
-  it("tight and loose only change the gap variable", () => {
+  // Source order is what lets the modifiers (same specificity) win over the base.
+  it("each stack margin selector appears in exactly one flat rule", () => {
+    for (const sel of STACK_MARGIN_RULES) {
+      expect(flatRules.filter((r) => r.selectors.includes(sel))).toHaveLength(1);
+    }
+  });
+
+  it("puts the modifier margin rules after the base margin rule", () => {
+    const at = (sel: string) => flatRules.findIndex((r) => r.selectors.includes(sel));
+    expect(at(".ds-stack > * + *")).toBeGreaterThanOrEqual(0);
+    expect(at(".ds-stack > * + *")).toBeLessThan(at(".ds-stack--tight > * + *"));
+    expect(at(".ds-stack > * + *")).toBeLessThan(at(".ds-stack--loose > * + *"));
+  });
+
+  it("no margin rule reads --ds-stack-gap (custom properties inherit)", () => {
+    const hits = [...flatRules, ...mediaRules, ...wideRules].filter((r) =>
+      /--ds-stack-gap/.test(Object.entries(decls(r.body)).filter(([k]) => /^margin/.test(k)).map(([, v]) => v).join(" ")));
+    expect(hits).toEqual([]);
+  });
+
+  it("still publishes --ds-stack-gap as information, per stack kind", () => {
+    expect(flat(".ds-stack")).toEqual({ "--ds-stack-gap": "var(--ds-space-4)" });
     expect(flat(".ds-stack--tight")).toEqual({ "--ds-stack-gap": "var(--ds-space-2)" });
     expect(flat(".ds-stack--loose")).toEqual({ "--ds-stack-gap": "var(--ds-space-6)" });
+    const at = (sel: string) => flatRules.findIndex((r) => r.selectors.includes(sel));
+    expect(at(".ds-stack")).toBeLessThan(at(".ds-stack--tight"));
+    expect(at(".ds-stack")).toBeLessThan(at(".ds-stack--loose"));
   });
 
   it("never sets display on a stack rule", () => {
@@ -333,9 +358,11 @@ describe("app set: settings sections and message", () => {
   });
 });
 
-// A margin on any other app rule ties the stack rule on specificity (0,1,0) and wins
-// by source order, silently cancelling the gap for that element. reset.css already
-// zeroes margins, so the stack rule is the only place a margin belongs.
+// A margin on any other app rule ties the three stack margin rules on specificity
+// (0,1,0) and wins by source order, silently cancelling the gap for that element.
+// reset.css already zeroes margins, so those three rules are the only place a margin
+// belongs.
+const STACK_MARGIN_RULES = [".ds-stack > * + *", ".ds-stack--tight > * + *", ".ds-stack--loose > * + *"];
 describe("app set: margins belong to the stack", () => {
   it("declares no margin property outside the stack rule, flat or in a media query", () => {
     const src = stripComments(readFileSync(join(root, "components/app.css"), "utf8"));
@@ -343,7 +370,7 @@ describe("app set: margins belong to the stack", () => {
     const all = [...parseRules(parts.flat), ...parts.media.flatMap(parseRules)];
     expect(all.length).toBeGreaterThan(10);
     const offenders = all
-      .filter((r) => !(r.selectors.length === 1 && r.selectors[0] === ".ds-stack > * + *"))
+      .filter((r) => !(r.selectors.length === 1 && STACK_MARGIN_RULES.includes(r.selectors[0])))
       .flatMap((r) => Object.keys(decls(r.body)).filter((p) => /^margin/.test(p)).map((p) => `${r.selectors.join(", ")} sets ${p}`));
     expect(offenders).toEqual([]);
   });

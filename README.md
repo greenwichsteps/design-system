@@ -2,6 +2,11 @@
 
 A shared, themeable, CSS-first design system for the Greenwich Steps family of products: install with `pnpm install`, build the published CSS/JS output with `pnpm build`, run the test suite with `pnpm test`, and consume it in another project as a git dependency pinned to a tag (e.g. `"@greenwichsteps/design-system": "github:greenwichsteps/design-system#v0.1.0"`), which resolves via its `prepare` script so `dist/` is built automatically on install.
 
+## v0.9.1: nested stacks keep their own gap
+
+A plain `.ds-stack` nested inside `.ds-stack--loose` (or `--tight`) used to inherit the outer gap, because the margin read a custom property and custom properties inherit, so its children sat 32px (or 8px) apart instead of 16px. The margin rules are now keyed on the parent's class (`.ds-stack > * + *`, `.ds-stack--tight > * + *`, `.ds-stack--loose > * + *`) and read no variable, so a stack's gap comes only from its own class and the gap above a nested stack comes from its parent. `--ds-stack-gap` is still set on each stack for consumers that read it, but no rule uses it for margins. 
+Migration: a plain stack inside a loose one tightens its children from 32px to 16px; a plain stack inside a tight one loosens its children from 8px to 16px. The gap above a nested stack is unchanged, because it comes from the parent. Setting `--ds-stack-gap` yourself no longer changes any gap; it is published for reading only. A modifier now spaces its children even without `.ds-stack` (before, it set only the variable), so always pair `ds-stack` with a modifier.
+
 ## v0.9.0: app set
 
 Patterns for application screens such as a dashboard, all in `components/app.css`.
