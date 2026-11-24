@@ -2,6 +2,32 @@
 
 A shared, themeable, CSS-first design system for the Greenwich Steps family of products: install with `pnpm install`, build the published CSS/JS output with `pnpm build`, run the test suite with `pnpm test`, and consume it in another project as a git dependency pinned to a tag (e.g. `"@greenwichsteps/design-system": "github:greenwichsteps/design-system#v0.1.0"`), which resolves via its `prepare` script so `dist/` is built automatically on install.
 
+## v0.8.0: text roles, `.ds-lede` and `.ds-note`
+
+Two new classes, so every kind of supporting sentence has a class named for
+what it is:
+
+| Sentence | Markup |
+| --- | --- |
+| Ordinary paragraph | plain `<p>`, no class |
+| The one sentence right under a heading | `.ds-lede` |
+| Small print: footnote, aside, the line beside a price | `.ds-note` |
+| Hint attached to a form field | `.ds-help` |
+
+`.ds-lede` is 20px in the muted colour, with a small top margin because it
+always follows a heading. It has no width cap or alignment of its own: the
+screen it sits on decides.
+
+`.ds-note` looks the same as `.ds-help` (14px, muted). The difference is
+meaning. A hint belongs to a field and turns red with it when the field is
+invalid; a note never does. Use `.ds-help` only for a hint attached to a
+form field, ideally linked with `aria-describedby`.
+
+`.ds-hero__lede` is unchanged at body size (16px). It is not an alias of
+`.ds-lede`.
+
+The release only adds, so upgrading changes no existing page.
+
 ## v0.7.1: the nav toggle is now the kit's job, and it fixes a live bug
 
 `[data-ds-nav-toggle]` is hidden by default and revealed below 720px, the

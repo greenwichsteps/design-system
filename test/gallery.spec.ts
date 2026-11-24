@@ -26,4 +26,14 @@ describe("gallery coverage", () => {
   it("shows the short Burnside mark where the header is demonstrated", () => {
     expect(sections()).toContain("wordmark-short");
   });
+
+  // GRE-597. The roles only make sense side by side: a lede shown alone does not show
+  // how it differs from a paragraph, nor a note from a field hint.
+  it("demonstrates all four text roles together in one section", () => {
+    const html = readFileSync(join(root, "gallery/sections/text-roles.html"), "utf8").replace(/<!--[\s\S]*?-->/g, "");
+    for (const cls of ["ds-lede", "ds-note", "ds-help"])
+      expect(html).toMatch(new RegExp(`class="[^"]*\\b${cls}\\b[^"]*"`));
+    expect(html).toMatch(/<p>[^<]+<\/p>/); // a plain, unclassed paragraph
+    expect(html).toMatch(/class="[^"]*\bds-field\b/); // the hint sits in a real field
+  });
 });
