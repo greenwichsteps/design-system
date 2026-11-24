@@ -176,10 +176,14 @@ a { color: inherit; }
   gap: var(--ds-space-4);
   padding: var(--ds-space-4) var(--ds-space-5);
 }
-/* The main cell takes the spare width, so a trailing action (a menu button) sits at
-   the row end with no consumer margins. min-width: 0 lets long text shrink and wrap. The basis is 0, not auto: an auto basis is the
-   text's full width, which on a phone wraps the trailing action onto its own line. */
-.ds-list__main { flex: 1 1 0; min-width: 0; }
+/* The main cell takes the spare width, so a trailing action (a menu button) sits at the
+   row end with no consumer margins. Its basis is 0, so the text's full width never forces
+   a wrap by itself; its 12rem floor is what triggers one, wrapping the trailing items to
+   the next line when the name would get less. overflow-wrap lets an unbreakable string
+   break instead of overflowing. A row with a main cell packs to the end, so wrapped lines
+   sit at the row's right edge (the main cell fills its own line, so nothing else moves). */
+.ds-list__main { flex: 1 1 0; min-width: min(12rem, 100%); overflow-wrap: anywhere; }
+.ds-list__row:has(> .ds-list__main) { justify-content: flex-end; }
 .ds-list__row + .ds-list__row { border-top: 1px solid var(--ds-border); }
 
 /* Settings: sections in one bordered surface. Each section is an aside (title and

@@ -319,7 +319,21 @@ describe("app set: page header and list", () => {
     // GRE-619: a zero basis, so a long name shrinks to share the line instead of
     // claiming its full text width and pushing the trailing action onto a second line.
     expect(d["flex"]).toBe("1 1 0");
-    expect(d["min-width"]).toBe("0");
+    // A floor that is also the wrap trigger: below 12rem of spare width the trailing items
+    // wrap to the next line instead of squeezing the name. The 100% cap keeps it inside a
+    // container narrower than 12rem.
+    expect(d["min-width"]).toBe("min(12rem, 100%)");
+    expect(d["overflow-wrap"]).toBe("anywhere");
+  });
+
+  // The floor lets a crowded row wrap, and a wrapped item would start at the line's start.
+  // The main cell grows to fill its own line, so end-packing the row moves nothing on that
+  // line and right-aligns every wrapped line. An auto margin on the first trailing item
+  // only aligned the first wrapped line, so it is not used. Rows with no main cell keep
+  // their start alignment.
+  it("packs a row's wrapped items to the inline end, only when the row has a main cell", () => {
+    expect(flat(".ds-list__row:has(> .ds-list__main)")).toEqual({ "justify-content": "flex-end" });
+    expect(exists(".ds-list__main + *")).toBe(false);
   });
 
   it("separates adjacent rows with a top border", () => {
