@@ -11,8 +11,8 @@ const root = join(__dirname, "..");
 // dark = light overlaid with themes/dark.css, following var() aliases, so a theme
 // change is tested rather than a copy of today's hex.
 //
-// --ds-surface-raised is deliberately absent: dark muted on it measures 4.37:1.
-// No component puts muted text there today. Filed as GRE-598.
+// --ds-surface-raised is covered too since GRE-598: dark muted on it measured 4.37:1
+// until --ds-ink-muted went from #8A8891 to #8D8B94.
 
 const lin = (v: number) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
 const lum = (hex: string) => {
@@ -43,10 +43,11 @@ function resolve(t: Tokens, name: string, seen: string[] = []): string {
 }
 
 describe("muted text contrast", () => {
-  // Measured 2026-11-23: light 4.69 / 5.25, dark 5.31 / 4.81.
+  // Measured 2026-11-24: light 4.69 / 5.25 / 5.25, dark 5.53 / 5.01 / 4.54 (bg, surface, raised).
   it.each([
     ["light", "--ds-bg"], ["light", "--ds-surface"],
     ["dark", "--ds-bg"], ["dark", "--ds-surface"],
+    ["light", "--ds-surface-raised"], ["dark", "--ds-surface-raised"],
   ])("muted text clears AA on %s %s", (theme, surface) => {
     const t = theme === "light" ? light : dark;
     const fg = resolve(t, "--ds-text-muted");
@@ -56,7 +57,7 @@ describe("muted text contrast", () => {
 
   it("resolves through the theme rather than a fixed hex", () => {
     expect(resolve(light, "--ds-text-muted")).toBe("#6E6C66");
-    expect(resolve(dark, "--ds-text-muted")).toBe("#8A8891");
+    expect(resolve(dark, "--ds-text-muted")).toBe("#8D8B94");
   });
 });
 
