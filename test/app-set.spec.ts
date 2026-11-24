@@ -173,6 +173,8 @@ describe("app set: shell and side nav", () => {
     expect(d["border-radius"]).toBe("var(--ds-radius-sm)");
     expect(d["color"]).toBe("var(--ds-text-muted)");
     expect(flat(".ds-sidenav__item:hover")["background"]).toBe("var(--ds-hover)");
+    // The muted text measured 4.06:1 on the dark hover tint, so hover lifts it to full strength.
+    expect(flat(".ds-sidenav__item:hover")["color"]).toBe("var(--ds-text)");
   });
 
   it("marks the current page with the hover fill and full-strength text", () => {

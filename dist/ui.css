@@ -73,7 +73,10 @@ a { color: inherit; }
   color: var(--ds-text-muted);
   text-decoration: none;
 }
-.ds-sidenav__item:hover { background: var(--ds-hover); }
+.ds-sidenav__item:hover {
+  background: var(--ds-hover);
+  color: var(--ds-text); /* muted text is 4.06:1 on the dark hover tint */
+}
 .ds-sidenav__item[aria-current="page"] {
   background: var(--ds-hover);
   color: var(--ds-text);
