@@ -177,8 +177,9 @@ a { color: inherit; }
   padding: var(--ds-space-4) var(--ds-space-5);
 }
 /* The main cell takes the spare width, so a trailing action (a menu button) sits at
-   the row end with no consumer margins. min-width: 0 lets long text shrink and wrap. */
-.ds-list__main { flex: 1 1 auto; min-width: 0; }
+   the row end with no consumer margins. min-width: 0 lets long text shrink and wrap. The basis is 0, not auto: an auto basis is the
+   text's full width, which on a phone wraps the trailing action onto its own line. */
+.ds-list__main { flex: 1 1 0; min-width: 0; }
 .ds-list__row + .ds-list__row { border-top: 1px solid var(--ds-border); }
 
 /* Settings: sections in one bordered surface. Each section is an aside (title and

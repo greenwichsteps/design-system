@@ -316,7 +316,9 @@ describe("app set: page header and list", () => {
 
   it("gives a row a flexible main cell so trailing actions sit at the end", () => {
     const d = flat(".ds-list__main");
-    expect(d["flex"]).toBe("1 1 auto");
+    // GRE-619: a zero basis, so a long name shrinks to share the line instead of
+    // claiming its full text width and pushing the trailing action onto a second line.
+    expect(d["flex"]).toBe("1 1 0");
     expect(d["min-width"]).toBe("0");
   });
 
