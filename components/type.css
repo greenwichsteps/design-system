@@ -4,3 +4,7 @@
 .ds-prose { max-width: 68ch; }
 .ds-prose p { margin-bottom: var(--ds-space-4); }
 .ds-quote { font-family: var(--ds-font-serif-text); font-size: var(--ds-text-xl); font-weight: 400; font-style: italic; border-left: 2px solid var(--ds-accent); padding-left: var(--ds-space-4); }
+/* The one sentence under a heading. No width or alignment of its own: the context decides. */
+.ds-lede { font-size: var(--ds-text-lg); color: var(--ds-text-muted); line-height: 1.4; margin-top: var(--ds-space-3); }
+/* Small print: footnotes, asides, the line beside a price. Unlike .ds-help it is not tied to a form field. */
+.ds-note { font-size: var(--ds-text-sm); color: var(--ds-text-muted); }

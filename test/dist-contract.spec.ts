@@ -106,3 +106,48 @@ describe("published artifacts", () => {
     }
   });
 });
+
+// GRE-597: the text-role classes. Selectors are matched as whole entries in a rule's
+// selector list, with comments stripped, so `.ds-lede-x` or a comment that names
+// `.ds-lede` cannot satisfy them. Only flat rules are read; ui.css has @media blocks,
+// and the regex skips their opening line rather than mistaking it for a selector.
+const read = (p: string) => readFileSync(join(root, p), "utf8");
+function rules(css: string): Array<{ selectors: string[]; body: string }> {
+  return [...css.replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+    .map((m) => ({ selectors: m[1].split(",").map((s) => s.trim()), body: m[2] }));
+}
+
+describe("text roles in the published stylesheet", () => {
+  it("ships .ds-lede with the spec's declarations", () => {
+    const r = rules(read("dist/ui.css")).filter((x) => x.selectors.includes(".ds-lede"));
+    expect(r).toHaveLength(1);
+    expect(r[0].selectors).toEqual([".ds-lede"]);
+    for (const d of ["font-size: var(--ds-text-lg)", "color: var(--ds-text-muted)", "line-height: 1.4", "margin-top: var(--ds-space-3)"])
+      expect(r[0].body).toContain(d);
+    // The context decides width and alignment, not the lede.
+    expect(r[0].body).not.toMatch(/max-width|text-align|margin:\s|auto/);
+  });
+
+  it("ships .ds-note with the spec's declarations", () => {
+    const r = rules(read("dist/ui.css")).filter((x) => x.selectors.includes(".ds-note"));
+    expect(r).toHaveLength(1);
+    expect(r[0].selectors).toEqual([".ds-note"]);
+    expect(r[0].body).toContain("font-size: var(--ds-text-sm)");
+    expect(r[0].body).toContain("color: var(--ds-text-muted)");
+  });
+
+  // What separates a note from .ds-help: a hint turns red with its invalid field,
+  // a note never does. A negative assertion, so it was mutated once to prove it fails.
+  it("never colours a note as an error", () => {
+    const hits = rules(read("dist/ui.css")).filter((x) => x.selectors.some((s) => /\bds-note\b/.test(s)) && /--ds-danger/.test(x.body));
+    expect(hits).toEqual([]);
+  });
+
+  // type.css sorts after hero.css in ui.css, so a new rule that also matched the
+  // hero lede would silently win. The hero is pinned byte-for-byte to v0.7.1.
+  it("leaves the hero lede exactly as v0.7.1 shipped it", () => {
+    const r = rules(read("dist/ui.css")).filter((x) => x.selectors.includes(".ds-hero__lede"));
+    expect(r).toHaveLength(1);
+    expect(r[0].body.trim()).toBe("color: var(--ds-text-muted); max-width: 46ch; margin: var(--ds-space-4) auto 0;");
+  });
+});
