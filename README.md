@@ -15,15 +15,20 @@ own `ds-*` class, so marketing pages are untouched.
 | `.ds-app__sidebar`, `.ds-app__main` | The two columns. The main may shrink below its content width. |
 | `.ds-sidenav`, `.ds-sidenav__item` | Side navigation. Mark the current page with `aria-current="page"`. |
 | `.ds-pagehead`, `__title`, `__actions` | Page header: title and lede left, actions right, wrapping when narrow. The title is the sans face. |
-| `.ds-list`, `.ds-list__row` | Rows in one bordered surface, divided by a hairline. |
+| `.ds-app__sidebar-foot` | The bottom of the sidebar (a plan box, the account). Above 720px the sidebar is pinned to the viewport and the foot sits at its bottom; below 720px it follows the nav. |
+| `.ds-list`, `.ds-list__row`, `.ds-list__main` | Rows in one bordered surface, divided by a hairline. Wrap a row's text in `.ds-list__main` and it takes the spare width, so a trailing action (a menu button) sits at the end with no margins. |
 | `.ds-settings`, `__section`, `__aside`, `__body` | Settings sections: title and help beside the fields, stacking on a narrow screen with no media query. |
-| `.ds-message` (`--danger`, `--success`) | An inline notice in a block. Not a badge, so never a pill. |
+| `.ds-message` (`--danger`, `--success`) | An inline notice in a block. Three tones: neutral (no modifier), danger and success. Not a badge, so never a pill. |
+| `.ds-app-scope` | Opts a screen outside the grid shell into the app radii, e.g. a sign-in card. |
 
 Inside `.ds-app` the radii are re-scoped: `--ds-radius-md` is 8px and
 `--ds-radius-lg` is 12px, so every component there inherits tighter corners with no
 extra class. Outside `.ds-app` the tokens are unchanged, unless an ancestor carries
 `.ds-app-scope`: put it on a sign-in card or any screen outside the grid shell to opt
 in to the same radii.
+
+`.ds-list` sets `list-style: none`, so a numbered steps list written as `<ol class="ds-list">`
+shows no numbers: write the numbers in the markup.
 
 `.ds-shell` is unchanged and is not the app shell. Use `.ds-app` for application
 screens.
