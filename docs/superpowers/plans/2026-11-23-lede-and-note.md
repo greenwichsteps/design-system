@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Status:** plan, not yet executed. Linear: GRE-597.
+**Status:** executed 2026-11-23, released as v0.8.0. Linear: GRE-597.
 
 **Goal:** Add two text-role classes to the kit, `.ds-lede` (subtitle under a heading) and `.ds-note` (small print), and release them as v0.8.0.
 
