@@ -4,7 +4,8 @@ A shared, themeable, CSS-first design system for the Greenwich Steps family of p
 
 ## v0.9.1: nested stacks keep their own gap
 
-A plain `.ds-stack` nested inside `.ds-stack--loose` (or `--tight`) used to inherit the outer gap, because the margin read a custom property and custom properties inherit, so its children sat 32px (or 8px) apart instead of 16px. The margin rules are now keyed on the parent's class (`.ds-stack > * + *`, `.ds-stack--tight > * + *`, `.ds-stack--loose > * + *`) and read no variable, so a stack's gap comes only from its own class and the gap above a nested stack comes from its parent. `--ds-stack-gap` is still set on each stack for consumers that read it, but no rule uses it for margins. Pages that relied on the inherited 32px will tighten to 16px.
+A plain `.ds-stack` nested inside `.ds-stack--loose` (or `--tight`) used to inherit the outer gap, because the margin read a custom property and custom properties inherit, so its children sat 32px (or 8px) apart instead of 16px. The margin rules are now keyed on the parent's class (`.ds-stack > * + *`, `.ds-stack--tight > * + *`, `.ds-stack--loose > * + *`) and read no variable, so a stack's gap comes only from its own class and the gap above a nested stack comes from its parent. `--ds-stack-gap` is still set on each stack for consumers that read it, but no rule uses it for margins. 
+Migration: a plain stack inside a loose one tightens its children from 32px to 16px; a plain stack inside a tight one loosens its children from 8px to 16px. The gap above a nested stack is unchanged, because it comes from the parent. Setting `--ds-stack-gap` yourself no longer changes any gap; it is published for reading only. A modifier now spaces its children even without `.ds-stack` (before, it set only the variable), so always pair `ds-stack` with a modifier.
 
 ## v0.9.0: app set
 

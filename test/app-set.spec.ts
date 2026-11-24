@@ -89,6 +89,12 @@ describe("app set: stack and radius scope", () => {
   });
 
   // Source order is what lets the modifiers (same specificity) win over the base.
+  it("each stack margin selector appears in exactly one flat rule", () => {
+    for (const sel of STACK_MARGIN_RULES) {
+      expect(flatRules.filter((r) => r.selectors.includes(sel))).toHaveLength(1);
+    }
+  });
+
   it("puts the modifier margin rules after the base margin rule", () => {
     const at = (sel: string) => flatRules.findIndex((r) => r.selectors.includes(sel));
     expect(at(".ds-stack > * + *")).toBeGreaterThanOrEqual(0);
@@ -97,7 +103,8 @@ describe("app set: stack and radius scope", () => {
   });
 
   it("no margin rule reads --ds-stack-gap (custom properties inherit)", () => {
-    const hits = flatRules.filter((r) => /--ds-stack-gap/.test(Object.entries(decls(r.body)).filter(([k]) => /^margin/.test(k)).map(([, v]) => v).join(" ")));
+    const hits = [...flatRules, ...mediaRules, ...wideRules].filter((r) =>
+      /--ds-stack-gap/.test(Object.entries(decls(r.body)).filter(([k]) => /^margin/.test(k)).map(([, v]) => v).join(" ")));
     expect(hits).toEqual([]);
   });
 
@@ -351,9 +358,10 @@ describe("app set: settings sections and message", () => {
   });
 });
 
-// A margin on any other app rule ties the stack rule on specificity (0,1,0) and wins
-// by source order, silently cancelling the gap for that element. reset.css already
-// zeroes margins, so the stack rule is the only place a margin belongs.
+// A margin on any other app rule ties the three stack margin rules on specificity
+// (0,1,0) and wins by source order, silently cancelling the gap for that element.
+// reset.css already zeroes margins, so those three rules are the only place a margin
+// belongs.
 const STACK_MARGIN_RULES = [".ds-stack > * + *", ".ds-stack--tight > * + *", ".ds-stack--loose > * + *"];
 describe("app set: margins belong to the stack", () => {
   it("declares no margin property outside the stack rule, flat or in a media query", () => {
