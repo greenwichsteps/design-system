@@ -74,10 +74,20 @@ a { color: inherit; }
   list-style: none;
   padding: 0;
 }
+/* An item is an <a> or a <button>. The reset below (background through appearance) strips
+   what a button brings, so the two render the same. `font: inherit` comes first because
+   the shorthand would otherwise wipe the size and weight set after it. */
 .ds-sidenav__item {
   display: block;
+  width: 100%;
   padding: var(--ds-space-2) var(--ds-space-3);
+  border: 0;
   border-radius: var(--ds-radius-sm);
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  appearance: none;
   font-size: 14px;
   font-weight: 500;
   color: var(--ds-text-muted);
@@ -166,9 +176,14 @@ a { color: inherit; }
   gap: var(--ds-space-4);
   padding: var(--ds-space-4) var(--ds-space-5);
 }
-/* The main cell takes the spare width, so a trailing action (a menu button) sits at
-   the row end with no consumer margins. min-width: 0 lets long text shrink and wrap. */
-.ds-list__main { flex: 1 1 auto; min-width: 0; }
+/* The main cell takes the spare width, so a trailing action (a menu button) sits at the
+   row end with no consumer margins. Its basis is 0, so the text's full width never forces
+   a wrap by itself; its 12rem floor is what triggers one, wrapping the trailing items to
+   the next line when the name would get less. overflow-wrap lets an unbreakable string
+   break instead of overflowing. A row with a main cell packs to the end, so wrapped lines
+   sit at the row's right edge (the main cell fills its own line, so nothing else moves). */
+.ds-list__main { flex: 1 1 0; min-width: min(12rem, 100%); overflow-wrap: anywhere; }
+.ds-list__row:has(> .ds-list__main) { justify-content: flex-end; }
 .ds-list__row + .ds-list__row { border-top: 1px solid var(--ds-border); }
 
 /* Settings: sections in one bordered surface. Each section is an aside (title and
@@ -222,12 +237,15 @@ a { color: inherit; }
 
 
 /* badge.css */
+/* Success and danger text is the tone mixed 60/40 into the page text colour, as .ds-message does: the raw tone
+   is 4.2:1 (success, light) and 2.6 to 3.5:1 (dark) on its own tint, and mixing toward the text colour pulls it
+   to whichever end the theme needs. */
 .ds-badge { display: inline-flex; align-items: center; gap: var(--ds-space-1); padding: 2px var(--ds-space-2);
   font-size: var(--ds-text-xs); font-weight: 500; border-radius: var(--ds-radius-pill);
   background: var(--ds-hover); color: var(--ds-text); }
 .ds-badge--accent { background: var(--ds-accent-tint); color: var(--ds-accent-press); }
-.ds-badge--success { background: color-mix(in srgb, var(--ds-success-fg) 15%, transparent); color: var(--ds-success-fg); }
-.ds-badge--danger { background: color-mix(in srgb, var(--ds-danger) 15%, transparent); color: var(--ds-danger); }
+.ds-badge--success { background: color-mix(in srgb, var(--ds-success-fg) 15%, transparent); color: color-mix(in srgb, var(--ds-success-fg) 60%, var(--ds-text)); }
+.ds-badge--danger { background: color-mix(in srgb, var(--ds-danger) 15%, transparent); color: color-mix(in srgb, var(--ds-danger) 60%, var(--ds-text)); }
 
 
 /* button.css */
@@ -322,7 +340,8 @@ a { color: inherit; }
 .ds-field { display: grid; gap: var(--ds-space-2); }
 .ds-label { font-size: var(--ds-text-sm); font-weight: 500; }
 .ds-help { font-size: var(--ds-text-sm); color: var(--ds-text-muted); }
-.ds-field[data-invalid] .ds-help { color: var(--ds-danger); }
+/* The raw danger tone is 3.2 to 4.3:1 as text; mixed 60/40 into the text colour it clears 4.5:1 in both themes. */
+.ds-field[data-invalid] .ds-help { color: color-mix(in srgb, var(--ds-danger) 60%, var(--ds-text)); }
 .ds-input, .ds-textarea, .ds-select {
   width: 100%; padding: var(--ds-space-3) var(--ds-space-4); background: var(--ds-surface);
   color: var(--ds-text); border: 1px solid var(--ds-border); border-radius: var(--ds-radius-md);
@@ -444,6 +463,7 @@ dialog.ds-modal::backdrop { background: var(--ds-scrim); }
 .ds-modal > * + * { margin-top: var(--ds-space-4); }
 .ds-menu { position: relative; display: inline-block; }
 .ds-menu__list { position: absolute; top: calc(100% + var(--ds-space-1)); left: 0; min-width: 180px; background: var(--ds-surface); border: 1px solid var(--ds-border); border-radius: var(--ds-radius-lg); box-shadow: var(--ds-shadow-pop); padding: var(--ds-space-2); display: none; z-index: 20; }
+.ds-menu--end .ds-menu__list { left: auto; right: 0; } /* for a menu at a row's end: open leftward so the list stays on screen */
 .ds-menu.is-open .ds-menu__list { display: block; }
 .ds-menu__item { display: block; width: 100%; text-align: left; padding: var(--ds-space-3) var(--ds-space-4); border: 0; background: transparent; border-radius: var(--ds-radius-sm); cursor: pointer; color: var(--ds-text); }
 .ds-menu__item:hover { background: var(--ds-hover); }

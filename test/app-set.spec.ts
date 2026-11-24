@@ -230,6 +230,28 @@ describe("app set: shell and side nav", () => {
     expect(flat(".ds-sidenav__item:hover")["color"]).toBe("var(--ds-text)");
   });
 
+  // GRE-620: an item can be an <a> or a <button>. The rule resets what a button brings
+  // (background, border, font, alignment, width, cursor, appearance) so both look alike.
+  it("resets the button defaults so a link and a button item render the same", () => {
+    const d = flat(".ds-sidenav__item");
+    expect(d["background"]).toBe("transparent");
+    expect(d["border"]).toBe("0");
+    expect(d["font"]).toBe("inherit");
+    expect(d["text-align"]).toBe("left");
+    expect(d["width"]).toBe("100%");
+    expect(d["cursor"]).toBe("pointer");
+    expect(d["appearance"]).toBe("none");
+  });
+
+  // `font: inherit` is a shorthand that would wipe the size and weight if it came after them.
+  it("declares the font reset before the item's own font-size and font-weight", () => {
+    const body = flatRules.find((r) => r.selectors.includes(".ds-sidenav__item"))!.body;
+    const order = body.split(";").map((x) => x.split(":")[0].trim());
+    expect(order.indexOf("font")).toBeGreaterThanOrEqual(0);
+    expect(order.indexOf("font")).toBeLessThan(order.indexOf("font-size"));
+    expect(order.indexOf("font")).toBeLessThan(order.indexOf("font-weight"));
+  });
+
   it("marks the current page with the hover fill and full-strength text", () => {
     const d = flat('.ds-sidenav__item[aria-current="page"]');
     expect(d["background"]).toBe("var(--ds-hover)");
@@ -294,8 +316,24 @@ describe("app set: page header and list", () => {
 
   it("gives a row a flexible main cell so trailing actions sit at the end", () => {
     const d = flat(".ds-list__main");
-    expect(d["flex"]).toBe("1 1 auto");
-    expect(d["min-width"]).toBe("0");
+    // GRE-619: a zero basis, so a long name shrinks to share the line instead of
+    // claiming its full text width and pushing the trailing action onto a second line.
+    expect(d["flex"]).toBe("1 1 0");
+    // A floor that is also the wrap trigger: below 12rem of spare width the trailing items
+    // wrap to the next line instead of squeezing the name. The 100% cap keeps it inside a
+    // container narrower than 12rem.
+    expect(d["min-width"]).toBe("min(12rem, 100%)");
+    expect(d["overflow-wrap"]).toBe("anywhere");
+  });
+
+  // The floor lets a crowded row wrap, and a wrapped item would start at the line's start.
+  // The main cell grows to fill its own line, so end-packing the row moves nothing on that
+  // line and right-aligns every wrapped line. An auto margin on the first trailing item
+  // only aligned the first wrapped line, so it is not used. Rows with no main cell keep
+  // their start alignment.
+  it("packs a row's wrapped items to the inline end, only when the row has a main cell", () => {
+    expect(flat(".ds-list__row:has(> .ds-list__main)")).toEqual({ "justify-content": "flex-end" });
+    expect(exists(".ds-list__main + *")).toBe(false);
   });
 
   it("separates adjacent rows with a top border", () => {
@@ -373,5 +411,21 @@ describe("app set: margins belong to the stack", () => {
       .filter((r) => !(r.selectors.length === 1 && STACK_MARGIN_RULES.includes(r.selectors[0])))
       .flatMap((r) => Object.keys(decls(r.body)).filter((p) => /^margin/.test(p)).map((p) => `${r.selectors.join(", ")} sets ${p}`));
     expect(offenders).toEqual([]);
+  });
+});
+
+// GRE-617: a menu at a row's end opens leftward, so the list stays inside the viewport.
+describe("app set: end-aligned menu", () => {
+  it("anchors the list to the menu's right edge", () => {
+    const d = flat(".ds-menu--end .ds-menu__list");
+    expect(d["left"]).toBe("auto");
+    expect(d["right"]).toBe("0");
+  });
+
+  // The base rule has specificity (0,1,0), so the modifier rule must be longer and later.
+  it("follows the base list rule in the stylesheet", () => {
+    const at = (sel: string) => flatRules.findIndex((r) => r.selectors.includes(sel));
+    expect(at(".ds-menu__list")).toBeGreaterThanOrEqual(0);
+    expect(at(".ds-menu__list")).toBeLessThan(at(".ds-menu--end .ds-menu__list"));
   });
 });

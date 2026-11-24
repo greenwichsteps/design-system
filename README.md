@@ -2,6 +2,14 @@
 
 A shared, themeable, CSS-first design system for the Greenwich Steps family of products: install with `pnpm install`, build the published CSS/JS output with `pnpm build`, run the test suite with `pnpm test`, and consume it in another project as a git dependency pinned to a tag (e.g. `"@greenwichsteps/design-system": "github:greenwichsteps/design-system#v0.1.0"`), which resolves via its `prepare` script so `dist/` is built automatically on install.
 
+## v0.9.2: contrast and app-set fixes
+
+- Danger and success badges and the invalid field hint now clear 4.5:1 in light and dark, on their own tint over the page, a card and a raised surface. Their text is the tone mixed 60/40 into `--ds-text`, as `.ds-message` already does. Before, dark badges measured 2.6 to 3.2:1 and the dark hint 3.2 to 3.9:1.
+- `.ds-sidenav__item` renders the same as an `<a>` or a `<button>`: the rule resets background, border, font, alignment, width, cursor and appearance.
+- `.ds-menu--end` opens the list leftward from the menu's right edge, for a menu at the end of a row, so the list stays inside a narrow viewport.
+- `.ds-list__main` is `flex: 1 1 0` with a 12rem floor, so a long name shares the row with the trailing action instead of wrapping the action onto its own line, and a crowded row wraps its trailing items to the next line, aligned to the row's end (a row with a main cell packs to the end), rather than squeezing the name. Unbreakable strings break instead of overflowing.
+- Token change: the dark `--ds-ink-muted` goes from `#8A8891` to `#8D8B94`, so muted text on `--ds-surface-raised` clears 4.5:1 (4.37 to 4.54:1). It affects every use of `--ds-text-muted` under `[data-theme="dark"]`: `.ds-lede`, `.ds-note`, `.ds-help`, `.ds-hero__lede`, table headers, tabs, footer text and links, `.ds-stat__label`, `.ds-empty` and `.ds-sidenav__item`. Muted text on the dark page and surface becomes slightly lighter (5.31 to 5.53:1 and 4.81 to 5.01:1). Light is unchanged.
+
 ## v0.9.1: nested stacks keep their own gap
 
 A plain `.ds-stack` nested inside `.ds-stack--loose` (or `--tight`) used to inherit the outer gap, because the margin read a custom property and custom properties inherit, so its children sat 32px (or 8px) apart instead of 16px. The margin rules are now keyed on the parent's class (`.ds-stack > * + *`, `.ds-stack--tight > * + *`, `.ds-stack--loose > * + *`) and read no variable, so a stack's gap comes only from its own class and the gap above a nested stack comes from its parent. `--ds-stack-gap` is still set on each stack for consumers that read it, but no rule uses it for margins. 

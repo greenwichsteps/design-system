@@ -61,6 +61,14 @@ describe("gallery coverage", () => {
     for (const cls of ["ds-app", "ds-app__sidebar", "ds-app__sidebar-foot", "ds-sidenav__item", "ds-pagehead", "ds-list__row", "ds-list__main", "ds-settings__section", "ds-message--danger", "ds-message--success", "ds-stack"])
       expect(hasClassToken(html, cls), cls).toBe(true);
     expect(html).toMatch(/<a[^>]*class="[^"]*\bds-sidenav__item\b[^"]*"[^>]*aria-current="page"|<a[^>]*aria-current="page"[^>]*class="[^"]*\bds-sidenav__item\b/);
+    // GRE-620: one item of each element, so the two can be compared by eye.
+    expect(html).toMatch(/<button[^>]*class="[^"]*\bds-sidenav__item\b/);
+    // GRE-617: a menu at the row end, using the end-aligned modifier.
+    expect(html).toMatch(/<div[^>]*class="[^"]*\bds-menu\b[^"]*"/);
+    expect(hasClassToken(html, "ds-menu--end")).toBe(true);
+    // GRE-619: a row whose name is long enough to wrap on a phone, with an action after it.
+    const mains = [...html.matchAll(/<span[^>]*class="[^"]*\bds-list__main\b[^"]*"[^>]*>([^<]*)<\/span>/g)].map((m) => m[1]);
+    expect(mains.some((t) => t.length > 80 && /long name/i.test(t))).toBe(true);
     const field = html.match(/<div[^>]*class="[^"]*\bds-field\b[^"]*"[^>]*data-invalid[^>]*>[\s\S]*?<\/div>\s*<\/div>|<div[^>]*data-invalid[^>]*class="[^"]*\bds-field\b[^"]*"[^>]*>[\s\S]*?<\/div>/);
     expect(field).not.toBeNull();
     const describedby = field![0].match(/aria-describedby="([^"]+)"/);
