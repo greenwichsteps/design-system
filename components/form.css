@@ -1,7 +1,8 @@
 .ds-field { display: grid; gap: var(--ds-space-2); }
 .ds-label { font-size: var(--ds-text-sm); font-weight: 500; }
 .ds-help { font-size: var(--ds-text-sm); color: var(--ds-text-muted); }
-.ds-field[data-invalid] .ds-help { color: var(--ds-danger); }
+/* The raw danger tone is 3.2 to 4.3:1 as text; mixed 60/40 into the text colour it clears 4.5:1 in both themes. */
+.ds-field[data-invalid] .ds-help { color: color-mix(in srgb, var(--ds-danger) 60%, var(--ds-text)); }
 .ds-input, .ds-textarea, .ds-select {
   width: 100%; padding: var(--ds-space-3) var(--ds-space-4); background: var(--ds-surface);
   color: var(--ds-text); border: 1px solid var(--ds-border); border-radius: var(--ds-radius-md);

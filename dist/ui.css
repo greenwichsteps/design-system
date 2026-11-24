@@ -222,12 +222,15 @@ a { color: inherit; }
 
 
 /* badge.css */
+/* Success and danger text is the tone mixed 60/40 into the page text colour, as .ds-message does: the raw tone
+   is 4.2:1 (success, light) and 2.6 to 3.5:1 (dark) on its own tint, and mixing toward the text colour pulls it
+   to whichever end the theme needs. */
 .ds-badge { display: inline-flex; align-items: center; gap: var(--ds-space-1); padding: 2px var(--ds-space-2);
   font-size: var(--ds-text-xs); font-weight: 500; border-radius: var(--ds-radius-pill);
   background: var(--ds-hover); color: var(--ds-text); }
 .ds-badge--accent { background: var(--ds-accent-tint); color: var(--ds-accent-press); }
-.ds-badge--success { background: color-mix(in srgb, var(--ds-success-fg) 15%, transparent); color: var(--ds-success-fg); }
-.ds-badge--danger { background: color-mix(in srgb, var(--ds-danger) 15%, transparent); color: var(--ds-danger); }
+.ds-badge--success { background: color-mix(in srgb, var(--ds-success-fg) 15%, transparent); color: color-mix(in srgb, var(--ds-success-fg) 60%, var(--ds-text)); }
+.ds-badge--danger { background: color-mix(in srgb, var(--ds-danger) 15%, transparent); color: color-mix(in srgb, var(--ds-danger) 60%, var(--ds-text)); }
 
 
 /* button.css */
@@ -322,7 +325,8 @@ a { color: inherit; }
 .ds-field { display: grid; gap: var(--ds-space-2); }
 .ds-label { font-size: var(--ds-text-sm); font-weight: 500; }
 .ds-help { font-size: var(--ds-text-sm); color: var(--ds-text-muted); }
-.ds-field[data-invalid] .ds-help { color: var(--ds-danger); }
+/* The raw danger tone is 3.2 to 4.3:1 as text; mixed 60/40 into the text colour it clears 4.5:1 in both themes. */
+.ds-field[data-invalid] .ds-help { color: color-mix(in srgb, var(--ds-danger) 60%, var(--ds-text)); }
 .ds-input, .ds-textarea, .ds-select {
   width: 100%; padding: var(--ds-space-3) var(--ds-space-4); background: var(--ds-surface);
   color: var(--ds-text); border: 1px solid var(--ds-border); border-radius: var(--ds-radius-md);

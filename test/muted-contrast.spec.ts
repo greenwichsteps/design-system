@@ -59,3 +59,54 @@ describe("muted text contrast", () => {
     expect(resolve(dark, "--ds-text-muted")).toBe("#8A8891");
   });
 });
+
+// GRE-616. Tone text (the danger/success badges and the invalid hint) is computed from
+// the DECLARED value in dist/ui.css, not a copy of it: the colour expression is read
+// off the whole-selector rule, evaluated against the resolved theme tokens, and
+// composited over each surface the element can sit on. A badge background is the tone
+// at an alpha, so it is flattened onto the surface before the ratio is taken.
+const rgb = (hex: string) => { const n = parseInt(hex.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+const hexOf = (c: number[]) => "#" + c.map((v) => Math.round(v).toString(16).padStart(2, "0")).join("");
+
+function declared(sel: string, prop: string): string {
+  const css = readFileSync(join(root, "dist/ui.css"), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+  const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].filter((r) => r[1].split(",").map((s) => s.trim()).includes(sel));
+  const values = rules.map((r) => r[2].match(new RegExp(`(?:^|;)\\s*${prop}\\s*:\\s*([^;]+)`))?.[1].trim()).filter(Boolean);
+  if (!values.length) throw new Error(`no ${prop} declared on ${sel}`);
+  return values[values.length - 1]!;
+}
+
+// Evaluates var(--x), or color-mix(in srgb, A N%, B) where B may be `transparent`
+// (then the result is A at alpha N, returned with the alpha so it can be flattened).
+function evalColour(t: Tokens, expr: string): { c: number[]; a: number } {
+  const v = expr.match(/^var\((--[\w-]+)\)$/);
+  if (v) return { c: rgb(resolve(t, v[1])), a: 1 };
+  const m = expr.match(/^color-mix\(in srgb,\s*(var\(--[\w-]+\))\s+(\d+)%,\s*(var\(--[\w-]+\)|transparent)\)$/);
+  if (!m) throw new Error(`cannot evaluate: ${expr}`);
+  const p = Number(m[2]) / 100;
+  const a = evalColour(t, m[1]).c;
+  if (m[3] === "transparent") return { c: a, a: p };
+  const b = evalColour(t, m[3]).c;
+  return { c: a.map((x, i) => x * p + b[i] * (1 - p)), a: 1 };
+}
+const over = (f: { c: number[]; a: number }, surface: number[]) => f.c.map((x, i) => x * f.a + surface[i] * (1 - f.a));
+
+describe("tone text contrast (danger and success)", () => {
+  const surfaces = ["--ds-bg", "--ds-surface", "--ds-surface-raised"];
+  for (const [theme, t] of [["light", light], ["dark", dark]] as const) {
+    for (const surface of surfaces) {
+      const s = rgb(resolve(t, surface));
+      for (const sel of [".ds-badge--success", ".ds-badge--danger"]) {
+        it(`${sel} text clears AA on its own tint over ${theme} ${surface}`, () => {
+          const bg = over(evalColour(t, declared(sel, "background")), s);
+          const fg = evalColour(t, declared(sel, "color")).c;
+          expect(ratio(hexOf(fg), hexOf(bg)), `${hexOf(fg)} on ${hexOf(bg)}`).toBeGreaterThanOrEqual(4.5);
+        });
+      }
+      it(`the invalid hint clears AA on ${theme} ${surface}`, () => {
+        const fg = evalColour(t, declared(".ds-field[data-invalid] .ds-help", "color")).c;
+        expect(ratio(hexOf(fg), hexOf(s)), `${hexOf(fg)} on ${hexOf(s)}`).toBeGreaterThanOrEqual(4.5);
+      });
+    }
+  }
+});
