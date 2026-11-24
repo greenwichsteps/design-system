@@ -2,6 +2,10 @@
 
 A shared, themeable, CSS-first design system for the Greenwich Steps family of products: install with `pnpm install`, build the published CSS/JS output with `pnpm build`, run the test suite with `pnpm test`, and consume it in another project as a git dependency pinned to a tag (e.g. `"@greenwichsteps/design-system": "github:greenwichsteps/design-system#v0.1.0"`), which resolves via its `prepare` script so `dist/` is built automatically on install.
 
+## v0.9.3: sidenav items in the phone row
+
+Under 720px `.ds-sidenav__item` sizes to its content (`width: auto`), so items sit several to a line instead of one per line; the column above 720px is unchanged.
+
 ## v0.9.2: contrast and app-set fixes
 
 - Danger and success badges and the invalid field hint now clear 4.5:1 in light and dark, on their own tint over the page, a card and a raised surface. Their text is the tone mixed 60/40 into `--ds-text`, as `.ds-message` already does. Before, dark badges measured 2.6 to 3.2:1 and the dark hint 3.2 to 3.9:1.
