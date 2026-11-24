@@ -397,3 +397,19 @@ describe("app set: margins belong to the stack", () => {
     expect(offenders).toEqual([]);
   });
 });
+
+// GRE-617: a menu at a row's end opens leftward, so the list stays inside the viewport.
+describe("app set: end-aligned menu", () => {
+  it("anchors the list to the menu's right edge", () => {
+    const d = flat(".ds-menu--end .ds-menu__list");
+    expect(d["left"]).toBe("auto");
+    expect(d["right"]).toBe("0");
+  });
+
+  // The base rule has specificity (0,1,0), so the modifier rule must be longer and later.
+  it("follows the base list rule in the stylesheet", () => {
+    const at = (sel: string) => flatRules.findIndex((r) => r.selectors.includes(sel));
+    expect(at(".ds-menu__list")).toBeGreaterThanOrEqual(0);
+    expect(at(".ds-menu__list")).toBeLessThan(at(".ds-menu--end .ds-menu__list"));
+  });
+});
