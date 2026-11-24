@@ -9,7 +9,7 @@ import { describe, expect, it } from "vitest";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const css = readFileSync(join(root, "dist/ui.css"), "utf8");
 
-type Rule = { selectors: string[]; body: string };
+type Rule = { raw: string; selectors: string[]; body: string };
 
 function stripComments(s: string): string {
   return s.replace(/\/\*[\s\S]*?\*\//g, "");
@@ -17,6 +17,7 @@ function stripComments(s: string): string {
 
 function parseRules(s: string): Rule[] {
   return [...s.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map((m) => ({
+    raw: m[1].trim(),
     selectors: m[1].split(",").map((x) => x.trim()),
     body: m[2],
   }));
@@ -96,10 +97,15 @@ describe("app set: stack and radius scope", () => {
     expect(hits).toEqual([]);
   });
 
-  it("tightens the radii inside .ds-app only", () => {
-    const d = flat(".ds-app");
-    expect(d["--ds-radius-md"]).toBe("8px");
-    expect(d["--ds-radius-lg"]).toBe("12px");
+  it("tightens the radii inside .ds-app and .ds-app-scope only", () => {
+    const sel = ":where(.ds-app, .ds-app-scope)";
+    const hits = flatRules.filter((r) => r.raw === sel);
+    expect(hits).toHaveLength(1);
+    expect(decls(hits[0].body)).toEqual({ "--ds-radius-md": "8px", "--ds-radius-lg": "12px" });
+    // No other rule may set the radius tokens, in any block.
+    const others = [...flatRules, ...mediaRules, ...wideRules].filter(
+      (r) => r.raw !== sel && /--ds-radius-(md|lg)\s*:/.test(r.body));
+    expect(others).toEqual([]);
   });
 
   it("sorts app.css before badge.css in the published stylesheet", () => {

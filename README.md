@@ -21,7 +21,9 @@ own `ds-*` class, so marketing pages are untouched.
 
 Inside `.ds-app` the radii are re-scoped: `--ds-radius-md` is 8px and
 `--ds-radius-lg` is 12px, so every component there inherits tighter corners with no
-extra class. Outside `.ds-app` the tokens are unchanged.
+extra class. Outside `.ds-app` the tokens are unchanged, unless an ancestor carries
+`.ds-app-scope`: put it on a sign-in card or any screen outside the grid shell to opt
+in to the same radii.
 
 `.ds-shell` is unchanged and is not the app shell. Use `.ds-app` for application
 screens.

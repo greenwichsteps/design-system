@@ -30,8 +30,10 @@ a { color: inherit; }
 .ds-stack--loose { --ds-stack-gap: var(--ds-space-6); }
 
 /* Application screens use tighter corners than the marketing site. The tokens are
-   overridden here so every component inside inherits them with no extra class. */
-.ds-app {
+   overridden here so every component inside inherits them with no extra class. The
+   scope is its own class too, so a card outside the grid shell (a sign-in screen) can
+   opt in with .ds-app-scope. :where() keeps the specificity at zero. */
+:where(.ds-app, .ds-app-scope) {
   --ds-radius-md: 8px;
   --ds-radius-lg: 12px;
 }
