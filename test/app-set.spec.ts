@@ -92,6 +92,17 @@ describe("app set: stack and radius scope", () => {
     expect(flat(".ds-stack--loose")).toEqual({ "--ds-stack-gap": "var(--ds-space-6)" });
   });
 
+  // Custom properties inherit, so without this reset a plain stack nested in a
+  // loose one would gap at the loose value. Source order is what lets the
+  // modifiers (same specificity) win over the reset.
+  it("every stack resets its own gap to space-4, before the modifiers", () => {
+    expect(flat(".ds-stack")).toEqual({ "--ds-stack-gap": "var(--ds-space-4)" });
+    const at = (sel: string) => flatRules.findIndex((r) => r.selectors.includes(sel));
+    expect(at(".ds-stack")).toBeGreaterThanOrEqual(0);
+    expect(at(".ds-stack")).toBeLessThan(at(".ds-stack--tight"));
+    expect(at(".ds-stack")).toBeLessThan(at(".ds-stack--loose"));
+  });
+
   it("never sets display on a stack rule", () => {
     const hits = flatRules.filter((r) => r.selectors.some((s) => /\.ds-stack\b/.test(s)) && "display" in decls(r.body));
     expect(hits).toEqual([]);
