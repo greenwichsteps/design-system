@@ -17,6 +17,202 @@ a { color: inherit; }
 :focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
 
 
+/* app.css */
+/* The app set (GRE-615): patterns for application screens such as a dashboard.
+   Spec: the GRE-615 dashboard redesign spec. Everything here
+   is scoped to .ds-app or carries its own ds-* class, so marketing pages and the
+   existing .ds-shell are untouched. Tested in test/app-set.spec.ts. */
+
+/* Vertical rhythm for direct children. Sets no display, so it composes with any
+   container. The gap is a variable so the modifiers change one value. */
+.ds-stack > * + * { margin-block-start: var(--ds-stack-gap, var(--ds-space-4)); }
+.ds-stack--tight { --ds-stack-gap: var(--ds-space-2); }
+.ds-stack--loose { --ds-stack-gap: var(--ds-space-6); }
+
+/* Application screens use tighter corners than the marketing site. The tokens are
+   overridden here so every component inside inherits them with no extra class. The
+   scope is its own class too, so a card outside the grid shell (a sign-in screen) can
+   opt in with .ds-app-scope. :where() keeps the specificity at zero. */
+:where(.ds-app, .ds-app-scope) {
+  --ds-radius-md: 8px;
+  --ds-radius-lg: 12px;
+}
+
+/* The shell: a fixed sidebar column and a main column that may shrink below its
+   content width (min-width: 0 on the main). Below 720px it becomes one column and
+   the sidebar stays visible above the page, so navigation never disappears. */
+.ds-app {
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+  min-height: 100vh;
+}
+.ds-app__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-5);
+  padding: var(--ds-space-4) var(--ds-space-3);
+  background: var(--ds-surface);
+  border-right: 1px solid var(--ds-border);
+}
+.ds-app__main {
+  min-width: 0;
+  padding: var(--ds-space-6) var(--ds-space-6) var(--ds-space-10);
+}
+
+.ds-sidenav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-1);
+  list-style: none;
+  padding: 0;
+}
+.ds-sidenav__item {
+  display: block;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  border-radius: var(--ds-radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ds-text-muted);
+  text-decoration: none;
+}
+.ds-sidenav__item:hover {
+  background: var(--ds-hover);
+  color: var(--ds-text); /* muted text is 4.06:1 on the dark hover tint */
+}
+.ds-sidenav__item[aria-current="page"] {
+  background: var(--ds-hover);
+  color: var(--ds-text);
+}
+
+/* The foot holds what belongs at the bottom of the sidebar (a plan box, the account). */
+.ds-app__sidebar-foot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-3);
+}
+
+/* Above 720px the sidebar stays in view while the page scrolls and scrolls itself if it
+   is taller than the viewport. The nav grows to fill it, which pushes the foot to the
+   bottom without a margin. */
+@media (min-width: 721px) {
+  .ds-app__sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .ds-app__sidebar .ds-sidenav { flex: 1 1 auto; }
+}
+
+@media (max-width: 720px) {
+  .ds-app {
+    grid-template-columns: minmax(0, 1fr);
+    /* min-height: 100vh would otherwise share spare height with the sidebar row. */
+    grid-template-rows: auto 1fr;
+  }
+  .ds-app__sidebar {
+    border-right: 0;
+    border-bottom: 1px solid var(--ds-border);
+  }
+  .ds-sidenav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+/* Page header: title and lede on the left, actions on the right, wrapping on a
+   narrow screen. The title is the sans face; an app page is not a marketing hero. */
+.ds-pagehead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--ds-space-4);
+}
+.ds-pagehead__title {
+  font-family: var(--ds-font-sans);
+  font-size: 1.5rem;
+  font-weight: 700; /* the sans family ships 400/500/700, so 600 would only round up */
+  line-height: 1.2;
+}
+/* App page ledes read at 16px under the 24px title. The marketing lede stays 20px. */
+.ds-pagehead .ds-lede { font-size: var(--ds-text-base); }
+.ds-pagehead__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+}
+
+/* List: rows in one bordered surface, divided by a hairline. */
+.ds-list {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-lg);
+  list-style: none;
+  padding: 0;
+}
+.ds-list__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-4);
+  padding: var(--ds-space-4) var(--ds-space-5);
+}
+/* The main cell takes the spare width, so a trailing action (a menu button) sits at
+   the row end with no consumer margins. min-width: 0 lets long text shrink and wrap. */
+.ds-list__main { flex: 1 1 auto; min-width: 0; }
+.ds-list__row + .ds-list__row { border-top: 1px solid var(--ds-border); }
+
+/* Settings: sections in one bordered surface. Each section is an aside (title and
+   help) beside a body. The body grows far faster than the aside, and both wrap, so
+   a narrow screen stacks them with no media query. */
+.ds-settings {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-lg);
+}
+.ds-settings__section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-5) var(--ds-space-8);
+  padding: var(--ds-space-6);
+}
+.ds-settings__section + .ds-settings__section { border-top: 1px solid var(--ds-border); }
+.ds-settings__aside {
+  flex: 1 1 220px;
+  max-width: 320px;
+}
+.ds-settings__body {
+  flex: 999 1 360px;
+  min-width: 0;
+}
+
+/* Message: an inline notice in a block. Not a badge, so the corners follow the
+   app radius and are never a pill. The tint is the tone mixed into the surface,
+   which keeps it theme-aware with no new colour. The text is the tone mixed 60/40 into
+   the page text colour: the raw tone is 4.3:1 on its tint in light and 3.1 to 3.3:1 in
+   dark, so the text colour pulls it toward whichever end the theme needs. */
+.ds-message {
+  display: block;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-hover);
+  color: var(--ds-text);
+  font-size: var(--ds-text-sm);
+}
+.ds-message--danger {
+  border-color: color-mix(in srgb, var(--ds-danger) 40%, var(--ds-surface));
+  background: color-mix(in srgb, var(--ds-danger) 8%, var(--ds-surface));
+  color: color-mix(in srgb, var(--ds-danger) 60%, var(--ds-text));
+}
+.ds-message--success {
+  border-color: color-mix(in srgb, var(--ds-success-fg) 40%, var(--ds-surface));
+  background: color-mix(in srgb, var(--ds-success-fg) 8%, var(--ds-surface));
+  color: color-mix(in srgb, var(--ds-success-fg) 60%, var(--ds-text));
+}
+
+
 /* badge.css */
 .ds-badge { display: inline-flex; align-items: center; gap: var(--ds-space-1); padding: 2px var(--ds-space-2);
   font-size: var(--ds-text-xs); font-weight: 500; border-radius: var(--ds-radius-pill);

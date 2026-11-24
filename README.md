@@ -2,6 +2,43 @@
 
 A shared, themeable, CSS-first design system for the Greenwich Steps family of products: install with `pnpm install`, build the published CSS/JS output with `pnpm build`, run the test suite with `pnpm test`, and consume it in another project as a git dependency pinned to a tag (e.g. `"@greenwichsteps/design-system": "github:greenwichsteps/design-system#v0.1.0"`), which resolves via its `prepare` script so `dist/` is built automatically on install.
 
+## v0.9.0: app set
+
+Patterns for application screens such as a dashboard, all in `components/app.css`.
+Nothing outside `.ds-app` changes: every rule is scoped to `.ds-app` or carries its
+own `ds-*` class, so marketing pages are untouched.
+
+| Class | What it is for |
+| --- | --- |
+| `.ds-stack` (`--tight`, `--loose`) | Vertical rhythm between direct children. Sets no display, so it composes with any container. |
+| `.ds-app` | The app shell: a sidebar column and a main column. Below 720px it becomes one column with the sidebar above the page. |
+| `.ds-app__sidebar`, `.ds-app__main` | The two columns. The main may shrink below its content width. |
+| `.ds-sidenav`, `.ds-sidenav__item` | Side navigation. Mark the current page with `aria-current="page"`. |
+| `.ds-pagehead`, `__title`, `__actions` | Page header: title and lede left, actions right, wrapping when narrow. The title is the sans face. |
+| `.ds-app__sidebar-foot` | The bottom of the sidebar (a plan box, the account). Above 720px the sidebar is pinned to the viewport and the foot sits at its bottom; below 720px it follows the nav. |
+| `.ds-list`, `.ds-list__row`, `.ds-list__main` | Rows in one bordered surface, divided by a hairline. Wrap a row's text in `.ds-list__main` and it takes the spare width, so a trailing action (a menu button) sits at the end with no margins. |
+| `.ds-settings`, `__section`, `__aside`, `__body` | Settings sections: title and help beside the fields, stacking on a narrow screen with no media query. |
+| `.ds-message` (`--danger`, `--success`) | An inline notice in a block. Three tones: neutral (no modifier), danger and success. Not a badge, so never a pill. |
+| `.ds-app-scope` | Opts a screen outside the grid shell into the app radii, e.g. a sign-in card. |
+
+Inside `.ds-app` the radii are re-scoped: `--ds-radius-md` is 8px and
+`--ds-radius-lg` is 12px, so every component there inherits tighter corners with no
+extra class. Outside `.ds-app` the tokens are unchanged, unless an ancestor carries
+`.ds-app-scope`: put it on a sign-in card or any screen outside the grid shell to opt
+in to the same radii.
+
+`.ds-list` sets `list-style: none`, so a numbered steps list written as `<ol class="ds-list">`
+shows no numbers: write the numbers in the markup.
+
+`.ds-shell` is unchanged and is not the app shell. Use `.ds-app` for application
+screens.
+
+`.ds-lede` keeps its own small top margin, so a lede placed directly in a
+`.ds-stack` sits closer to the heading above it than other stack children do. This
+is deliberate: a lede belongs to its heading.
+
+The release only adds, so upgrading changes no existing page.
+
 ## v0.8.0: text roles, `.ds-lede` and `.ds-note`
 
 Two new classes, so every kind of supporting sentence has a class named for
