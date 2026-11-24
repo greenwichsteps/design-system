@@ -74,10 +74,20 @@ a { color: inherit; }
   list-style: none;
   padding: 0;
 }
+/* An item is an <a> or a <button>. The reset below (background through appearance) strips
+   what a button brings, so the two render the same. `font: inherit` comes first because
+   the shorthand would otherwise wipe the size and weight set after it. */
 .ds-sidenav__item {
   display: block;
+  width: 100%;
   padding: var(--ds-space-2) var(--ds-space-3);
+  border: 0;
   border-radius: var(--ds-radius-sm);
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  appearance: none;
   font-size: 14px;
   font-weight: 500;
   color: var(--ds-text-muted);

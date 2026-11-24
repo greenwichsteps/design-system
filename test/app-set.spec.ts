@@ -230,6 +230,28 @@ describe("app set: shell and side nav", () => {
     expect(flat(".ds-sidenav__item:hover")["color"]).toBe("var(--ds-text)");
   });
 
+  // GRE-620: an item can be an <a> or a <button>. The rule resets what a button brings
+  // (background, border, font, alignment, width, cursor, appearance) so both look alike.
+  it("resets the button defaults so a link and a button item render the same", () => {
+    const d = flat(".ds-sidenav__item");
+    expect(d["background"]).toBe("transparent");
+    expect(d["border"]).toBe("0");
+    expect(d["font"]).toBe("inherit");
+    expect(d["text-align"]).toBe("left");
+    expect(d["width"]).toBe("100%");
+    expect(d["cursor"]).toBe("pointer");
+    expect(d["appearance"]).toBe("none");
+  });
+
+  // `font: inherit` is a shorthand that would wipe the size and weight if it came after them.
+  it("declares the font reset before the item's own font-size and font-weight", () => {
+    const body = flatRules.find((r) => r.selectors.includes(".ds-sidenav__item"))!.body;
+    const order = body.split(";").map((x) => x.split(":")[0].trim());
+    expect(order.indexOf("font")).toBeGreaterThanOrEqual(0);
+    expect(order.indexOf("font")).toBeLessThan(order.indexOf("font-size"));
+    expect(order.indexOf("font")).toBeLessThan(order.indexOf("font-weight"));
+  });
+
   it("marks the current page with the hover fill and full-strength text", () => {
     const d = flat('.ds-sidenav__item[aria-current="page"]');
     expect(d["background"]).toBe("var(--ds-hover)");

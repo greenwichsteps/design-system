@@ -61,6 +61,8 @@ describe("gallery coverage", () => {
     for (const cls of ["ds-app", "ds-app__sidebar", "ds-app__sidebar-foot", "ds-sidenav__item", "ds-pagehead", "ds-list__row", "ds-list__main", "ds-settings__section", "ds-message--danger", "ds-message--success", "ds-stack"])
       expect(hasClassToken(html, cls), cls).toBe(true);
     expect(html).toMatch(/<a[^>]*class="[^"]*\bds-sidenav__item\b[^"]*"[^>]*aria-current="page"|<a[^>]*aria-current="page"[^>]*class="[^"]*\bds-sidenav__item\b/);
+    // GRE-620: one item of each element, so the two can be compared by eye.
+    expect(html).toMatch(/<button[^>]*class="[^"]*\bds-sidenav__item\b/);
     const field = html.match(/<div[^>]*class="[^"]*\bds-field\b[^"]*"[^>]*data-invalid[^>]*>[\s\S]*?<\/div>\s*<\/div>|<div[^>]*data-invalid[^>]*class="[^"]*\bds-field\b[^"]*"[^>]*>[\s\S]*?<\/div>/);
     expect(field).not.toBeNull();
     const describedby = field![0].match(/aria-describedby="([^"]+)"/);
