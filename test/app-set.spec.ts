@@ -170,3 +170,62 @@ describe("app set: shell and side nav", () => {
     expect(d["color"]).toBe("var(--ds-text)");
   });
 });
+
+describe("app set: page header and list", () => {
+  it("lays the page header out as a wrapping flex row", () => {
+    const d = flat(".ds-pagehead");
+    expect(d["display"]).toBe("flex");
+    expect(d["flex-wrap"]).toBe("wrap");
+    expect(d["align-items"]).toBe("flex-end");
+    expect(d["justify-content"]).toBe("space-between");
+    expect(d["gap"]).toBe("var(--ds-space-4)");
+  });
+
+  it("sets the title in the sans face, not the display face", () => {
+    const d = flat(".ds-pagehead__title");
+    expect(d["font-family"]).toBe("var(--ds-font-sans)");
+    expect(d["font-size"]).toBe("1.5rem");
+    // The brief said 600, but the sans family ships 400/500/700 and font-weight.spec.ts
+    // refuses a weight with no face. 600 would render as the 700 face anyway.
+    expect(d["font-weight"]).toBe("700");
+    expect(d["line-height"]).toBe("1.2");
+    expect(d["font-family"]).not.toMatch(/display/);
+  });
+
+  it("shrinks a lede to 16px inside a page header with one dedicated rule", () => {
+    const hits = flatRules.filter((r) => r.selectors.includes(".ds-pagehead .ds-lede"));
+    expect(hits).toHaveLength(1);
+    expect(hits[0].selectors).toEqual([".ds-pagehead .ds-lede"]);
+    expect(decls(hits[0].body)["font-size"]).toBe("var(--ds-text-base)");
+    // The marketing lede is left alone.
+    expect(flat(".ds-lede")["font-size"]).toBe("var(--ds-text-lg)");
+  });
+
+  it("lays header actions out as a flex row", () => {
+    const d = flat(".ds-pagehead__actions");
+    expect(d["display"]).toBe("flex");
+    expect(d["gap"]).toBe("var(--ds-space-2)");
+  });
+
+  it("draws the list as a bordered rounded surface", () => {
+    const d = flat(".ds-list");
+    expect(d["background"]).toBe("var(--ds-surface)");
+    expect(d["border"]).toBe("1px solid var(--ds-border)");
+    expect(d["border-radius"]).toBe("var(--ds-radius-lg)");
+    expect(d["list-style"]).toBe("none");
+    expect(d["padding"]).toBe("0");
+  });
+
+  it("lays list rows out as wrapping flex rows", () => {
+    const d = flat(".ds-list__row");
+    expect(d["display"]).toBe("flex");
+    expect(d["flex-wrap"]).toBe("wrap");
+    expect(d["align-items"]).toBe("center");
+    expect(d["gap"]).toBe("var(--ds-space-4)");
+    expect(d["padding"]).toBe("var(--ds-space-4) var(--ds-space-5)");
+  });
+
+  it("separates adjacent rows with a top border", () => {
+    expect(flat(".ds-list__row + .ds-list__row")["border-top"]).toBe("1px solid var(--ds-border)");
+  });
+});
