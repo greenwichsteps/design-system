@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 const root = join(__dirname, "..");
@@ -59,6 +59,33 @@ describe("muted text contrast", () => {
     expect(resolve(light, "--ds-text-muted")).toBe("#6E6C66");
     expect(resolve(dark, "--ds-text-muted")).toBe("#8D8B94");
   });
+});
+
+// GRE-603. A brand theme is the third layer: its base block applies in both themes,
+// and a block scoped under [data-theme="dark"] applies in dark only. No brand sets a
+// muted or surface token today, so this passes trivially; it exists so the day one
+// does, the pairing is measured instead of assumed.
+const brandBlocks = (p: string) =>
+  [...readFileSync(join(root, p), "utf8").replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+    .map((m) => ({ dark: /data-theme=["']?dark\b/.test(m[1]), tokens: new Map([...m[2].matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)].map((d) => [d[1], d[2].trim()])) }));
+const brands = readdirSync(join(root, "themes")).filter((f) => f.endsWith(".css") && f !== "dark.css");
+
+describe("muted text contrast under each brand theme", () => {
+  it("finds the brand themes", () => {
+    expect(brands).toEqual(expect.arrayContaining(["burnside.css", "farnsworth.css"]));
+  });
+
+  it.each(brands.flatMap((b) => ["light", "dark"].flatMap((theme) =>
+    ["--ds-bg", "--ds-surface", "--ds-surface-raised"].map((surface) => [b, theme, surface]))))(
+    "%s: muted text clears AA on %s %s", (brand, theme, surface) => {
+      const blocks = brandBlocks(`themes/${brand}`);
+      const t: Tokens = new Map(theme === "light" ? light : dark);
+      for (const b of blocks) if (!b.dark) for (const [k, v] of b.tokens) t.set(k, v);
+      if (theme === "dark") for (const b of blocks) if (b.dark) for (const [k, v] of b.tokens) t.set(k, v);
+      const fg = resolve(t, "--ds-text-muted");
+      const bg = resolve(t, surface);
+      expect(ratio(fg, bg), `${fg} on ${bg}`).toBeGreaterThanOrEqual(4.5);
+    });
 });
 
 // GRE-616. Tone text (the danger/success badges and the invalid hint) is computed from

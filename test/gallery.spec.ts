@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { JSDOM } from "jsdom";
 
 const root = join(__dirname, "..");
 // True when `cls` is a whole token of some class attribute in `html`. Tokens are split on
@@ -52,7 +53,9 @@ describe("gallery coverage", () => {
     for (const cls of ["ds-lede", "ds-note", "ds-help"])
       expect(hasClassToken(html, cls), cls).toBe(true);
     expect(html).toMatch(/<p>[^<]+<\/p>/); // a plain, unclassed paragraph
-    expect(hasClassToken(html, "ds-field")).toBe(true); // the hint sits in a real field
+    // GRE-603: the hint sits INSIDE a real field, not merely beside one.
+    const doc = new JSDOM(html).window.document;
+    expect(doc.querySelector(".ds-field .ds-help")).not.toBeNull();
   });
 
   // GRE-615. The app set is only legible as a whole screen, so one section composes it.
@@ -69,10 +72,13 @@ describe("gallery coverage", () => {
     // GRE-619: a row whose name is long enough to wrap on a phone, with an action after it.
     const mains = [...html.matchAll(/<span[^>]*class="[^"]*\bds-list__main\b[^"]*"[^>]*>([^<]*)<\/span>/g)].map((m) => m[1]);
     expect(mains.some((t) => t.length > 80 && /long name/i.test(t))).toBe(true);
-    const field = html.match(/<div[^>]*class="[^"]*\bds-field\b[^"]*"[^>]*data-invalid[^>]*>[\s\S]*?<\/div>\s*<\/div>|<div[^>]*data-invalid[^>]*class="[^"]*\bds-field\b[^"]*"[^>]*>[\s\S]*?<\/div>/);
-    expect(field).not.toBeNull();
-    const describedby = field![0].match(/aria-describedby="([^"]+)"/);
-    expect(describedby).not.toBeNull();
-    expect(field![0]).toMatch(new RegExp(`id="${describedby![1]}"[^>]*class="[^"]*\\bds-help\\b|class="[^"]*\\bds-help\\b[^"]*"[^>]*id="${describedby![1]}"`));
+    // GRE-603: read as a DOM, so the class match is a whole token (`ds-help-foo` fails)
+    // and the hint must be inside the invalid field whose input it describes.
+    const doc = new JSDOM(html).window.document;
+    const input = doc.querySelector(".ds-field[data-invalid] [aria-describedby]");
+    expect(input).not.toBeNull();
+    const hint = doc.getElementById(input!.getAttribute("aria-describedby")!);
+    expect(hint?.classList.contains("ds-help")).toBe(true);
+    expect(hint!.closest(".ds-field")).toBe(input!.closest(".ds-field"));
   });
 });
