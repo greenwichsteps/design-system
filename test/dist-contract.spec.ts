@@ -116,30 +116,61 @@ function rules(css: string): Array<{ selectors: string[]; body: string }> {
   return [...css.replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/([^{}]+)\{([^{}]*)\}/g)]
     .map((m) => ({ selectors: m[1].split(",").map((s) => s.trim()), body: m[2] }));
 }
+// GRE-603. A rule body as a property map, so a check compares whole declarations:
+// `line-height: 1.4` no longer passes `1.45`, nor `color` inside `background-color`.
+function props(body: string): Record<string, string> {
+  return Object.fromEntries(
+    body.split(";").map((d) => d.trim()).filter(Boolean).map((d) => {
+      const i = d.indexOf(":");
+      return [d.slice(0, i).trim(), d.slice(i + 1).trim()];
+    }),
+  );
+}
 
 describe("text roles in the published stylesheet", () => {
   it("ships .ds-lede with the spec's declarations", () => {
     const r = rules(read("dist/ui.css")).filter((x) => x.selectors.includes(".ds-lede"));
     expect(r).toHaveLength(1);
     expect(r[0].selectors).toEqual([".ds-lede"]);
-    for (const d of ["font-size: var(--ds-text-lg)", "color: var(--ds-text-muted)", "line-height: 1.4", "margin-top: var(--ds-space-3)"])
-      expect(r[0].body).toContain(d);
-    // The context decides width and alignment, not the lede.
-    expect(r[0].body).not.toMatch(/max-width|text-align|margin:\s|auto/);
+    // Exactly these, and nothing else: the context decides width and alignment, not
+    // the lede, so a width, max-width, text-align or margin shorthand fails here.
+    expect(props(r[0].body)).toEqual({
+      "font-size": "var(--ds-text-lg)",
+      color: "var(--ds-text-muted)",
+      "line-height": "1.4",
+      "margin-top": "var(--ds-space-3)",
+    });
   });
 
   it("ships .ds-note with the spec's declarations", () => {
     const r = rules(read("dist/ui.css")).filter((x) => x.selectors.includes(".ds-note"));
     expect(r).toHaveLength(1);
     expect(r[0].selectors).toEqual([".ds-note"]);
-    expect(r[0].body).toContain("font-size: var(--ds-text-sm)");
-    expect(r[0].body).toContain("color: var(--ds-text-muted)");
+    expect(props(r[0].body)).toEqual({ "font-size": "var(--ds-text-sm)", color: "var(--ds-text-muted)" });
   });
 
   // What separates a note from .ds-help: a hint turns red with its invalid field,
-  // a note never does. A negative assertion, so it was mutated once to prove it fails.
-  it("never colours a note as an error", () => {
-    const hits = rules(read("dist/ui.css")).filter((x) => x.selectors.some((s) => /\bds-note\b/.test(s)) && /--ds-danger/.test(x.body));
+  // a note never does. Three ways a note could turn red, one check each. They read the
+  // stylesheet, so they cannot see a consumer's own CSS; only a browser check of a note
+  // inside an invalid field would close that.
+  it("names no danger or error token in any rule that selects .ds-note", () => {
+    const hits = rules(read("dist/ui.css"))
+      .filter((x) => x.selectors.some((s) => /\.ds-note(?![\w-])/.test(s)) && /--ds-(danger|error)\b/.test(x.body));
+    expect(hits).toEqual([]);
+  });
+
+  // `.ds-field[data-invalid] p { color: ... }` outranks .ds-note and would colour every
+  // note in an invalid field. Only the hint may take a colour from the invalid state.
+  it("colours only .ds-help from an invalid field", () => {
+    const hits = rules(read("dist/ui.css"))
+      .filter((x) => x.selectors.some((s) => s.includes("[data-invalid]")) && "color" in props(x.body))
+      .filter((x) => !x.selectors.every((s) => /\.ds-help$/.test(s)));
+    expect(hits).toEqual([]);
+  });
+
+  // Redefining the token would turn a note red without naming it at all.
+  it("never redefines --ds-text-muted in the component stylesheet", () => {
+    const hits = rules(read("dist/ui.css")).filter((x) => "--ds-text-muted" in props(x.body));
     expect(hits).toEqual([]);
   });
 
