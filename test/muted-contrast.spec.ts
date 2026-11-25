@@ -67,7 +67,7 @@ describe("muted text contrast", () => {
 // does, the pairing is measured instead of assumed.
 const brandBlocks = (p: string) =>
   [...readFileSync(join(root, p), "utf8").replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/([^{}]+)\{([^{}]*)\}/g)]
-    .map((m) => ({ dark: m[1].includes('[data-theme="dark"]'), tokens: new Map([...m[2].matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)].map((d) => [d[1], d[2].trim()])) }));
+    .map((m) => ({ dark: /data-theme=["']?dark\b/.test(m[1]), tokens: new Map([...m[2].matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)].map((d) => [d[1], d[2].trim()])) }));
 const brands = readdirSync(join(root, "themes")).filter((f) => f.endsWith(".css") && f !== "dark.css");
 
 describe("muted text contrast under each brand theme", () => {

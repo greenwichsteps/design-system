@@ -109,8 +109,8 @@ describe("published artifacts", () => {
 
 // GRE-597: the text-role classes. Selectors are matched as whole entries in a rule's
 // selector list, with comments stripped, so `.ds-lede-x` or a comment that names
-// `.ds-lede` cannot satisfy them. Only flat rules are read; ui.css has @media blocks,
-// and the regex skips their opening line rather than mistaking it for a selector.
+// `.ds-lede` cannot satisfy them. A rule inside @media is read as if unconditional (the
+// regex skips the at-rule's opening line), which errs toward flagging it.
 const read = (p: string) => readFileSync(join(root, p), "utf8");
 function rules(css: string): Array<{ selectors: string[]; body: string }> {
   return [...css.replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/([^{}]+)\{([^{}]*)\}/g)]
@@ -160,10 +160,11 @@ describe("text roles in the published stylesheet", () => {
   });
 
   // `.ds-field[data-invalid] p { color: ... }` outranks .ds-note and would colour every
-  // note in an invalid field. Only the hint may take a colour from the invalid state.
+  // note in an invalid field. Only the hint may take a colour from the invalid state,
+  // however it is spelled: [data-invalid], [aria-invalid], .is-invalid or :invalid.
   it("colours only .ds-help from an invalid field", () => {
     const hits = rules(read("dist/ui.css"))
-      .filter((x) => x.selectors.some((s) => s.includes("[data-invalid]")) && "color" in props(x.body))
+      .filter((x) => x.selectors.some((s) => /invalid/i.test(s)) && "color" in props(x.body))
       .filter((x) => !x.selectors.every((s) => /\.ds-help$/.test(s)));
     expect(hits).toEqual([]);
   });
