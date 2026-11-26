@@ -460,6 +460,9 @@ describe("code block with a Copy button", () => {
     expect(d["min-width"]).toBe("0");
     // A <pre> does not wrap; it scrolls inside its own column instead of spilling under the button.
     expect(d["overflow-x"]).toBe("auto");
+    // v0.9.5: a long unbroken token (a URL in a snippet) breaks instead of making the column a
+    // scrollable region, which axe flags as unreachable by keyboard. Only a <pre> still scrolls.
+    expect(d["overflow-wrap"]).toBe("anywhere");
   });
 });
 
