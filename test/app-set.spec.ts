@@ -466,3 +466,23 @@ describe("code block with a Copy button", () => {
   });
 });
 
+
+// GRE-642. Three browser defaults the kit never reset, found in Burnside's hosted dashboard.
+describe("app set: browser defaults the kit resets (GRE-642)", () => {
+  it("a menu list drops its list markers and margin", () => {
+    expect(flat(".ds-menu__list")).toMatchObject({ "list-style": "none", margin: "0" });
+  });
+
+  it("a fieldset field has no border, padding or margin, and may shrink", () => {
+    expect(flat("fieldset.ds-field")).toMatchObject({ border: "0", padding: "0", margin: "0", "min-inline-size": "0" });
+  });
+
+  // A rendered legend is not a grid item, so the field's gap never reaches it: its own margin does.
+  it("a fieldset's legend is laid out like a label, with the field's gap below it", () => {
+    expect(flat("fieldset.ds-field > legend")).toMatchObject({ padding: "0", "margin-block-end": "var(--ds-space-2)" });
+  });
+
+  it("below 720px the sidebar foot is a wrapping row, as the nav is", () => {
+    expect(narrow(".ds-app__sidebar-foot")).toMatchObject({ "flex-direction": "row", "flex-wrap": "wrap" });
+  });
+});

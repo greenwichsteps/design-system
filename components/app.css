@@ -122,6 +122,13 @@
   .ds-sidenav__item {
     width: auto;
   }
+  /* GRE-642. The foot as a column put four lines above every page; as a row it wraps to one or two. */
+  .ds-app__sidebar-foot {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: var(--ds-space-4);
+  }
 }
 
 /* Page header: title and lede on the left, actions on the right, wrapping on a

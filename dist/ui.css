@@ -145,6 +145,13 @@ a { color: inherit; }
   .ds-sidenav__item {
     width: auto;
   }
+  /* GRE-642. The foot as a column put four lines above every page; as a row it wraps to one or two. */
+  .ds-app__sidebar-foot {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: var(--ds-space-4);
+  }
 }
 
 /* Page header: title and lede on the left, actions on the right, wrapping on a
@@ -384,6 +391,12 @@ a { color: inherit; }
 .ds-toggle input:checked + span { background: var(--ds-accent); }
 .ds-toggle input:checked + span::after { transform: translateX(18px); }
 
+/* GRE-642. A radio or checkbox group is a <fieldset class="ds-field">: without this it keeps the
+   browser's square border and padding, with the legend cut into the top edge. A rendered legend is
+   not a grid item, so the field's gap never reaches it; its own margin gives the same space. */
+fieldset.ds-field { border: 0; padding: 0; margin: 0; min-inline-size: 0; }
+fieldset.ds-field > legend { padding: 0; margin-block-end: var(--ds-space-2); }
+
 
 /* header.css */
 /* Full-bleed sticky chrome. The consumer nests a .ds-container inside this, and
@@ -480,7 +493,7 @@ dialog.ds-modal { border: 0; border-radius: var(--ds-radius-lg); padding: var(--
 dialog.ds-modal::backdrop { background: var(--ds-scrim); }
 .ds-modal > * + * { margin-top: var(--ds-space-4); }
 .ds-menu { position: relative; display: inline-block; }
-.ds-menu__list { position: absolute; top: calc(100% + var(--ds-space-1)); left: 0; min-width: 180px; background: var(--ds-surface); border: 1px solid var(--ds-border); border-radius: var(--ds-radius-lg); box-shadow: var(--ds-shadow-pop); padding: var(--ds-space-2); display: none; z-index: 20; }
+.ds-menu__list { position: absolute; top: calc(100% + var(--ds-space-1)); left: 0; min-width: 180px; background: var(--ds-surface); border: 1px solid var(--ds-border); border-radius: var(--ds-radius-lg); box-shadow: var(--ds-shadow-pop); padding: var(--ds-space-2); display: none; z-index: 20; list-style: none; margin: 0; } /* GRE-642: a <ul> list drops its markers */
 .ds-menu--end .ds-menu__list { left: auto; right: 0; } /* for a menu at a row's end: open leftward so the list stays on screen */
 .ds-menu.is-open .ds-menu__list { display: block; }
 .ds-menu__item { display: block; width: 100%; text-align: left; padding: var(--ds-space-3) var(--ds-space-4); border: 0; background: transparent; border-radius: var(--ds-radius-sm); cursor: pointer; color: var(--ds-text); }
