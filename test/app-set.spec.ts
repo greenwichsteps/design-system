@@ -483,6 +483,8 @@ describe("app set: browser defaults the kit resets (GRE-642)", () => {
   });
 
   it("below 720px the sidebar foot is a wrapping row, as the nav is", () => {
-    expect(narrow(".ds-app__sidebar-foot")).toMatchObject({ "flex-direction": "row", "flex-wrap": "wrap" });
+    expect(narrow(".ds-app__sidebar-foot")).toMatchObject({ "flex-direction": "row", "flex-wrap": "wrap", "align-items": "center", "column-gap": "var(--ds-space-4)" });
+    // Above 720px it stays the column it was.
+    expect(flat(".ds-app__sidebar-foot")).toMatchObject({ "flex-direction": "column" });
   });
 });
