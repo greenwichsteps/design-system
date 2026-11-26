@@ -14,7 +14,10 @@ body {
 img, svg, video { display: block; max-width: 100%; }
 a { color: inherit; }
 :where(button, input, select, textarea) { font: inherit; color: inherit; }
-:focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
+/* GRE-386. An outline, not a box-shadow: forced-colours mode paints an outline (in a system
+   colour) and drops a box-shadow, so the tint ring left High Contrast users with no indicator,
+   and at 14% alpha it measured 1.16:1 to 1.19:1 everywhere else. */
+:focus-visible { outline: 3px solid var(--ds-focus-color); outline-offset: 2px; }
 
 
 /* app.css */
@@ -284,7 +287,7 @@ a { color: inherit; }
 .ds-iconbtn { display: inline-grid; place-items: center; width: 40px; height: 40px; border: 0;
   background: transparent; border-radius: var(--ds-radius-md); color: var(--ds-text); cursor: pointer; }
 .ds-iconbtn:hover { background: var(--ds-hover); }
-.ds-link { color: var(--ds-accent); text-decoration: underline; text-underline-offset: 2px; }
+.ds-link { color: var(--ds-accent-text); text-decoration: underline; text-underline-offset: 2px; }
 
 
 /* card.css */
@@ -482,7 +485,10 @@ dialog.ds-modal::backdrop { background: var(--ds-scrim); }
 .ds-menu.is-open .ds-menu__list { display: block; }
 .ds-menu__item { display: block; width: 100%; text-align: left; padding: var(--ds-space-3) var(--ds-space-4); border: 0; background: transparent; border-radius: var(--ds-radius-sm); cursor: pointer; color: var(--ds-text); }
 .ds-menu__item:hover { background: var(--ds-hover); }
-.ds-tabs__list { display: flex; gap: var(--ds-space-2); border-bottom: 1px solid var(--ds-border); }
+.ds-tabs__list { display: flex; gap: var(--ds-space-2); border-bottom: 1px solid var(--ds-border); overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; }
+/* GRE-419. A narrow bar scrolls inside itself instead of widening the page; a focused tab is
+   scrolled into view within the strip. Each tab keeps its size, or they shrink and wrap their text. */
+.ds-tabs__list > .ds-tab { flex: 0 0 auto; white-space: nowrap; }
 .ds-tab { padding: var(--ds-space-3) var(--ds-space-4); border: 0; background: transparent; cursor: pointer; color: var(--ds-text-muted); border-bottom: 2px solid transparent; }
 .ds-tab[aria-selected="true"] { color: var(--ds-text); border-bottom-color: var(--ds-accent); }
 .ds-tabs [data-ds-panel] { padding-top: var(--ds-space-4); }

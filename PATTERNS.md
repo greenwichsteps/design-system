@@ -16,6 +16,23 @@ in `components/` (mark its row "promoted → components/<file>").
 | nav-toggle | burnside-www, farnsworth-www | 2026-08-02 | Hide the nav toggle above the breakpoint that reveals the links, and stop it shrinking under the tap-target minimum | promoted → `components/layout.css` (`[data-ds-nav-toggle]`). Selector is deliberately bare and unscoped, specificity (0,1,0), the minimum a consumer needs to beat to override it; scoping it later (e.g. to `.ds-nav [data-ds-nav-toggle]`) would raise specificity and is a breaking change. |
 | app set | burnside-hosted, burnside-admin | 2026-11-24 | Patterns for application screens: stack rhythm, sidebar shell and nav, page header, list, settings sections, inline message | `components/app.css` (`.ds-app`, `.ds-stack`). Added by design for GRE-615, not by promotion. |
 
+## Accent contract (GRE-227)
+
+A brand's accent is **two values, one per theme**, wherever it meets text. Clearing 4.5:1 on
+`--ds-paper` needs relative luminance at or below 0.158; clearing it on `--ds-bg` needs at or
+above 0.205. The ranges do not overlap, so no single colour can do both: the split is forced,
+not a preference.
+
+- `--ds-accent` is the brand colour, for fills, borders, tints and the wordmark. It may serve one
+  theme only.
+- `--ds-accent-text` is what text in the accent uses (`.ds-link`). It defaults to `--ds-accent`; a
+  brand whose accent fails one theme overrides it for that theme (Burnside: `#B81866` on light,
+  its pink on dark). Farnsworth instead swaps `--ds-accent` itself in its dark block.
+- `--ds-focus-color` draws the focus outline and needs 3:1 on every surface; it defaults to
+  `--ds-accent-solid`.
+- `test/accent-contrast.spec.ts` measures every one of these pairs, for every brand, in both
+  themes. A new brand is covered by adding its name there.
+
 ## Identity rules
 
 **No lockup.** `icon` and `wordmark` are separate masters per brand, never

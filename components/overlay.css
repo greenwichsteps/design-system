@@ -7,7 +7,10 @@ dialog.ds-modal::backdrop { background: var(--ds-scrim); }
 .ds-menu.is-open .ds-menu__list { display: block; }
 .ds-menu__item { display: block; width: 100%; text-align: left; padding: var(--ds-space-3) var(--ds-space-4); border: 0; background: transparent; border-radius: var(--ds-radius-sm); cursor: pointer; color: var(--ds-text); }
 .ds-menu__item:hover { background: var(--ds-hover); }
-.ds-tabs__list { display: flex; gap: var(--ds-space-2); border-bottom: 1px solid var(--ds-border); }
+.ds-tabs__list { display: flex; gap: var(--ds-space-2); border-bottom: 1px solid var(--ds-border); overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; }
+/* GRE-419. A narrow bar scrolls inside itself instead of widening the page; a focused tab is
+   scrolled into view within the strip. Each tab keeps its size, or they shrink and wrap their text. */
+.ds-tabs__list > .ds-tab { flex: 0 0 auto; white-space: nowrap; }
 .ds-tab { padding: var(--ds-space-3) var(--ds-space-4); border: 0; background: transparent; cursor: pointer; color: var(--ds-text-muted); border-bottom: 2px solid transparent; }
 .ds-tab[aria-selected="true"] { color: var(--ds-text); border-bottom-color: var(--ds-accent); }
 .ds-tabs [data-ds-panel] { padding-top: var(--ds-space-4); }

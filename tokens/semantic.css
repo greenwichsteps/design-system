@@ -22,7 +22,13 @@
   --ds-accent-solid: var(--ds-accent);
   --ds-accent-solid-press: var(--ds-accent-press);
   --ds-on-accent-solid: var(--ds-on-accent);
-  --ds-focus-ring: 0 0 0 3px var(--ds-accent-tint);
+  --ds-focus-ring: 0 0 0 3px var(--ds-accent-tint); /* kept for consumers; the kit no longer draws focus with it (GRE-386) */
+  /* GRE-386. Link text needs 4.5:1 where borders, fills and tints need 3:1, so it gets its own
+     token rather than a darker --ds-accent for everything. A brand overrides it per theme where
+     its accent cannot do both (see PATTERNS.md, Accent contract). */
+  --ds-accent-text: var(--ds-accent);
+  /* GRE-386. The focus outline: a solid colour, 3:1 on every surface. */
+  --ds-focus-color: var(--ds-accent-solid);
   --ds-logo: none;
   /* code block: theme-aware so it doesn't go dark-on-dark under [data-theme="dark"] */
   --ds-code-bg: var(--ds-ink);
