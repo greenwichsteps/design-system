@@ -454,10 +454,12 @@ describe("code block with a Copy button", () => {
     expect(d["order"]).toBe("1");
     expect(d["flex"]).toBe("none");
   });
-  it("lets the code take the rest and wrap within it", () => {
+  it("lets the code take the rest, scrolling within it when it cannot wrap", () => {
     const d = flat(".ds-code:has(> .ds-code__copy) > :not(.ds-code__copy)");
     expect(d["flex"]).toBe("1 1 auto");
     expect(d["min-width"]).toBe("0");
+    // A <pre> does not wrap; it scrolls inside its own column instead of spilling under the button.
+    expect(d["overflow-x"]).toBe("auto");
   });
 });
 

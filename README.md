@@ -6,7 +6,7 @@ A shared, themeable, CSS-first design system for the Greenwich Steps family of p
 
 - Above 720px `.ds-app__sidebar` has the same top padding as `.ds-app__main` (`--ds-space-6`), so the brand's top meets the page title's. The phone band keeps 16px.
 - `.ds-pagehead` aligns to the top, so an action's top meets the title's rather than the lede's bottom.
-- A `.ds-code` block with a `.ds-code__copy` button becomes a row: the code wraps in the remaining width and the button keeps its own column, so it never covers a line of code.
+- A `.ds-code` block with a `.ds-code__copy` button becomes a row: the code takes the remaining width (wrapping, or scrolling inside its own column if it is a `<pre>`) and the button keeps its own column, so it never covers a line of code.
 
 ## v0.9.3: sidenav items in the phone row
 
