@@ -2,6 +2,10 @@
 
 A shared, themeable, CSS-first design system for the Greenwich Steps family of products: install with `pnpm install`, build the published CSS/JS output with `pnpm build`, run the test suite with `pnpm test`, and consume it in another project as a git dependency pinned to a tag (e.g. `"@greenwichsteps/design-system": "github:greenwichsteps/design-system#v0.1.0"`), which resolves via its `prepare` script so `dist/` is built automatically on install.
 
+## v0.9.5: long tokens in a code block break
+
+In a `.ds-code` block with a Copy button, the code breaks a long unbroken token (a URL in a snippet) instead of scrolling. A scrolling column is a region axe flags as unreachable by keyboard; v0.9.4 made one wherever such a token met a narrow screen. A `<pre>` still scrolls, since it does not wrap.
+
 ## v0.9.4: app shell alignment and the code block's Copy button
 
 - Above 720px `.ds-app__sidebar` has the same top padding as `.ds-app__main` (`--ds-space-6`), so the brand's top meets the page title's. The phone band keeps 16px.
