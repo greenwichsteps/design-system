@@ -10,6 +10,10 @@
   --ds-accent-solid: var(--ds-accent);
   --ds-accent-solid-press: var(--ds-accent-press);
   --ds-on-accent-solid: var(--ds-on-accent);
+  /* Re-declared, like the three above, so a page that also loads another brand's file (which sets
+     these on :root) does not hand this brand its colours. Its accent already reads in both themes. */
+  --ds-accent-text: var(--ds-accent);
+  --ds-focus-color: var(--ds-accent-solid);
   --ds-logo: url("../identity/farnsworth/wordmark.svg");
   /* One line, 5462x737. Nav and footer differ because the footer has room. */
   --ds-brand-nav-h: 26px;

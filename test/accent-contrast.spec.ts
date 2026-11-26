@@ -81,3 +81,20 @@ describe("accent contrast, every brand and theme", () => {
     expect(resolve(theme("burnside", true), "--ds-accent")).toBe("#FF4D9D");
   });
 });
+
+// v0.10.0 review. A page can load both brand files (the gallery does) and set the brand on an
+// element. Burnside's :root block then sets --ds-accent-text and the rest first; each brand block
+// must re-declare every accent-derived token, or it inherits the other brand's.
+describe("a brand block stands on its own when another brand's file is loaded too", () => {
+  const both = (brand: string, other: string): Tokens => {
+    const t = merge(new Map(), base);
+    for (const b of blocks(`themes/${other}.css`)) if (!b.dark) merge(t, b.tokens);
+    for (const b of blocks(`themes/${brand}.css`)) if (!b.dark) merge(t, b.tokens);
+    return t;
+  };
+  it.each([["farnsworth", "burnside"], ["burnside", "farnsworth"]])("%s over %s keeps its own link text and focus colour", (brand, other) => {
+    const t = both(brand, other), own = theme(brand, false);
+    expect(resolve(t, "--ds-accent-text")).toBe(resolve(own, "--ds-accent-text"));
+    expect(resolve(t, "--ds-focus-color")).toBe(resolve(own, "--ds-focus-color"));
+  });
+});

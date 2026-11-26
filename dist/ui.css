@@ -489,6 +489,8 @@ dialog.ds-modal::backdrop { background: var(--ds-scrim); }
 /* GRE-419. A narrow bar scrolls inside itself instead of widening the page; a focused tab is
    scrolled into view within the strip. Each tab keeps its size, or they shrink and wrap their text. */
 .ds-tabs__list > .ds-tab { flex: 0 0 auto; white-space: nowrap; }
+/* The strip clips overflow on both axes, so a tab's focus outline is drawn inside the tab. */
+.ds-tabs__list > .ds-tab:focus-visible { outline-offset: -3px; }
 .ds-tab { padding: var(--ds-space-3) var(--ds-space-4); border: 0; background: transparent; cursor: pointer; color: var(--ds-text-muted); border-bottom: 2px solid transparent; }
 .ds-tab[aria-selected="true"] { color: var(--ds-text); border-bottom-color: var(--ds-accent); }
 .ds-tabs [data-ds-panel] { padding-top: var(--ds-space-4); }

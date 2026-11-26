@@ -6,7 +6,8 @@ A shared, themeable, CSS-first design system for the Greenwich Steps family of p
 
 - **Focus is an outline.** `:focus-visible` draws `3px solid var(--ds-focus-color)` with a 2px offset, replacing the 14% accent-tint box-shadow, which measured 1.16:1 to 1.19:1 on every surface and disappeared entirely in forced-colours mode. `--ds-focus-color` is new and defaults to `--ds-accent-solid`. `--ds-focus-ring` is still defined but the kit no longer uses it.
 - **Links read at 4.5:1 in both themes.** New `--ds-accent-text`, used by `.ds-link`, defaults to `--ds-accent`. Burnside sets it to `#B81866` on light (its pink measures 2.76:1 on paper) and back to the pink on dark. The brand pink itself is unchanged.
-- **Tab bars scroll on narrow screens.** `.ds-tabs__list` scrolls inside itself instead of widening the page, and each tab keeps its size.
+- **Tab bars scroll on narrow screens.** `.ds-tabs__list` scrolls inside itself instead of widening the page, and each tab keeps its size; a focused tab's outline is drawn inside the tab, since the strip clips.
+- Each brand file declares `--ds-accent-text` and `--ds-focus-color` itself, so a page loading two brand files gives each brand its own.
 - The accent contract (two values per theme where text is involved) is written down in `PATTERNS.md`, and `test/accent-contrast.spec.ts` measures every accent pair for every brand in both themes.
 
 Consumers carrying local overrides for any of these can delete them.

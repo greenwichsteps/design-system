@@ -208,5 +208,7 @@ describe("focus, links and tabs in the published stylesheet", () => {
     expect(d["overflow-x"]).toBe("auto");
     expect(d["overflow-y"]).toBe("hidden");
     expect(only(".ds-tabs__list > .ds-tab")).toEqual({ flex: "0 0 auto", "white-space": "nowrap" });
+    // The strip clips overflow on both axes, so a tab's outline is drawn inside it, not around it.
+    expect(only(".ds-tabs__list > .ds-tab:focus-visible")).toEqual({ "outline-offset": "-3px" });
   });
 });
