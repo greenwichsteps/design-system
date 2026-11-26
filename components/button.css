@@ -26,4 +26,4 @@
 .ds-iconbtn { display: inline-grid; place-items: center; width: 40px; height: 40px; border: 0;
   background: transparent; border-radius: var(--ds-radius-md); color: var(--ds-text); cursor: pointer; }
 .ds-iconbtn:hover { background: var(--ds-hover); }
-.ds-link { color: var(--ds-accent); text-decoration: underline; text-underline-offset: 2px; }
+.ds-link { color: var(--ds-accent-text); text-decoration: underline; text-underline-offset: 2px; }

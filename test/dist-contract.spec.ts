@@ -183,3 +183,32 @@ describe("text roles in the published stylesheet", () => {
     expect(r[0].body.trim()).toBe("color: var(--ds-text-muted); max-width: 46ch; margin: var(--ds-space-4) auto 0;");
   });
 });
+
+// GRE-386, GRE-419. Read as whole rules from the published stylesheet.
+describe("focus, links and tabs in the published stylesheet", () => {
+  const only = (sel: string) => {
+    const r = rules(read("dist/ui.css")).filter((x) => x.selectors.includes(sel));
+    expect(r, `${sel} rules`).toHaveLength(1);
+    return props(r[0]!.body);
+  };
+
+  // An outline, not a box-shadow: forced-colours mode paints an outline in a system colour and
+  // drops a box-shadow entirely, which left a High Contrast user with no focus indicator.
+  it("draws focus as an outline in the focus colour", () => {
+    expect(only(":focus-visible")).toEqual({ outline: "3px solid var(--ds-focus-color)", "outline-offset": "2px" });
+  });
+
+  it("colours links with the text-safe accent", () => {
+    expect(only(".ds-link")["color"]).toBe("var(--ds-accent-text)");
+  });
+
+  // A narrow tab bar scrolls inside itself rather than widening the page; each tab keeps its size.
+  it("makes the tab list a scrolling strip", () => {
+    const d = only(".ds-tabs__list");
+    expect(d["overflow-x"]).toBe("auto");
+    expect(d["overflow-y"]).toBe("hidden");
+    expect(only(".ds-tabs__list > .ds-tab")).toEqual({ flex: "0 0 auto", "white-space": "nowrap" });
+    // The strip clips overflow on both axes, so a tab's outline is drawn inside it, not around it.
+    expect(only(".ds-tabs__list > .ds-tab:focus-visible")).toEqual({ "outline-offset": "-3px" });
+  });
+});

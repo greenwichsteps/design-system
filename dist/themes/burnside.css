@@ -9,10 +9,21 @@
   --ds-accent-solid: #D81E7A;
   --ds-accent-solid-press: #B81866;
   --ds-on-accent-solid: #ffffff;
+  /* GRE-386/GRE-227. Link text on the light field: the pink is 2.76:1 on paper, this is 5.58:1.
+     The brand pink itself is unchanged; only text that must read at 4.5:1 takes this. */
+  --ds-accent-text: #B81866;
+  --ds-focus-color: var(--ds-accent-solid);
   --ds-logo: url("../identity/burnside/wordmark.svg");
   /* Nav draws the short mark (4264x737, same 737 as Farnsworth, so 26px matches
      it exactly). The footer draws the full stacked mark (4251x1870), which needs
      81px to put its glyphs at the same size as Farnsworth's 32px. */
   --ds-brand-nav-h: 26px;
   --ds-brand-foot-h: 81px;
+}
+
+/* GRE-227. In dark the bright pink is the right text colour (6.01:1 on ink). The nested selector
+   covers a burnside-branded element inside a dark page, whose own base block would otherwise win. */
+[data-theme="dark"],
+[data-theme="dark"] [data-theme-brand="burnside"] {
+  --ds-accent-text: var(--ds-accent);
 }
