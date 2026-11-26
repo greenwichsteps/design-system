@@ -2,6 +2,12 @@
 
 A shared, themeable, CSS-first design system for the Greenwich Steps family of products: install with `pnpm install`, build the published CSS/JS output with `pnpm build`, run the test suite with `pnpm test`, and consume it in another project as a git dependency pinned to a tag (e.g. `"@greenwichsteps/design-system": "github:greenwichsteps/design-system#v0.1.0"`), which resolves via its `prepare` script so `dist/` is built automatically on install.
 
+## v0.11.0: menu lists, fieldsets and the phone sidebar foot
+
+- **A menu list has no bullets.** `.ds-menu__list` sets `list-style: none` and `margin: 0`, so a menu written as `<ul>` no longer shows a marker beside each item.
+- **A fieldset field has no browser box.** `fieldset.ds-field` drops the default border, padding and margin, so a radio or checkbox group sits like any other field. Its legend gets the field's gap as a bottom margin, since a rendered legend is not a grid item.
+- **The sidebar foot wraps on phones.** Below 720px `.ds-app__sidebar-foot` is a wrapping row like the nav above it, instead of a column of four lines above every page.
+
 ## v0.10.0: visible focus, readable links, scrolling tabs
 
 - **Focus is an outline.** `:focus-visible` draws `3px solid var(--ds-focus-color)` with a 2px offset, replacing the 14% accent-tint box-shadow, which measured 1.16:1 to 1.19:1 on every surface and disappeared entirely in forced-colours mode. `--ds-focus-color` is new and defaults to `--ds-accent-solid`. `--ds-focus-ring` is still defined but the kit no longer uses it.

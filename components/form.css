@@ -26,3 +26,9 @@
 .ds-toggle span::after { content: ""; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: var(--ds-surface); border-radius: 50%; transition: transform var(--ds-dur) var(--ds-ease); }
 .ds-toggle input:checked + span { background: var(--ds-accent); }
 .ds-toggle input:checked + span::after { transform: translateX(18px); }
+
+/* GRE-642. A radio or checkbox group is a <fieldset class="ds-field">: without this it keeps the
+   browser's square border and padding, with the legend cut into the top edge. A rendered legend is
+   not a grid item, so the field's gap never reaches it; its own margin gives the same space. */
+fieldset.ds-field { border: 0; padding: 0; margin: 0; min-inline-size: 0; }
+fieldset.ds-field > legend { padding: 0; margin-block-end: var(--ds-space-2); }
