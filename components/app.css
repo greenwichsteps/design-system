@@ -97,6 +97,8 @@
     position: sticky;
     top: 0;
     height: 100vh;
+    /* GRE-640: start where the main column does, so the brand's top meets the page title's. */
+    padding-top: var(--ds-space-6);
     overflow-y: auto;
   }
   .ds-app__sidebar .ds-sidenav { flex: 1 1 auto; }
@@ -127,7 +129,8 @@
 .ds-pagehead {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
+  /* GRE-640: top, so an action's top meets the title's, not the lede's bottom. */
+  align-items: flex-start;
   justify-content: space-between;
   gap: var(--ds-space-4);
 }

@@ -172,6 +172,9 @@ describe("app set: shell and side nav", () => {
   // foot to the bottom with no margin (the margin guard below forbids margin-top: auto).
   it("pins the sidebar to the viewport above 720px and lets the nav grow", () => {
     const d = wide(".ds-app__sidebar");
+    // GRE-640: beside the page, the sidebar starts where the main column does, so the brand's top
+    // meets the page title's. On a phone the sidebar is a band above the page and keeps 16px.
+    expect(d["padding-top"]).toBe("var(--ds-space-6)");
     expect(d["position"]).toBe("sticky");
     expect(d["top"]).toBe("0");
     expect(d["height"]).toBe("100vh");
@@ -270,7 +273,8 @@ describe("app set: page header and list", () => {
     const d = flat(".ds-pagehead");
     expect(d["display"]).toBe("flex");
     expect(d["flex-wrap"]).toBe("wrap");
-    expect(d["align-items"]).toBe("flex-end");
+    // GRE-640: top, so an action's top meets the title's rather than the lede's bottom.
+    expect(d["align-items"]).toBe("flex-start");
     expect(d["justify-content"]).toBe("space-between");
     expect(d["gap"]).toBe("var(--ds-space-4)");
   });
@@ -435,3 +439,25 @@ describe("app set: end-aligned menu", () => {
     expect(at(".ds-menu__list")).toBeLessThan(at(".ds-menu--end .ds-menu__list"));
   });
 });
+
+// GRE-640. A code block's Copy button takes its own column, so no line of code runs under it.
+describe("code block with a Copy button", () => {
+  it("lays the block out as a row when it has a Copy button", () => {
+    const d = flat(".ds-code:has(> .ds-code__copy)");
+    expect(d["display"]).toBe("flex");
+    expect(d["align-items"]).toBe("flex-start");
+    expect(d["gap"]).toBe("var(--ds-space-3)");
+  });
+  it("puts the button in flow, last, at its own size", () => {
+    const d = flat(".ds-code:has(> .ds-code__copy) > .ds-code__copy");
+    expect(d["position"]).toBe("static");
+    expect(d["order"]).toBe("1");
+    expect(d["flex"]).toBe("none");
+  });
+  it("lets the code take the rest and wrap within it", () => {
+    const d = flat(".ds-code:has(> .ds-code__copy) > :not(.ds-code__copy)");
+    expect(d["flex"]).toBe("1 1 auto");
+    expect(d["min-width"]).toBe("0");
+  });
+});
+
