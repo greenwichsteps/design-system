@@ -2,6 +2,12 @@
 
 A shared, themeable, CSS-first design system for the Greenwich Steps family of products: install with `pnpm install`, build the published CSS/JS output with `pnpm build`, run the test suite with `pnpm test`, and consume it in another project as a git dependency pinned to a tag (e.g. `"@greenwichsteps/design-system": "github:greenwichsteps/design-system#v0.1.0"`), which resolves via its `prepare` script so `dist/` is built automatically on install.
 
+## v0.9.4: app shell alignment and the code block's Copy button
+
+- Above 720px `.ds-app__sidebar` has the same top padding as `.ds-app__main` (`--ds-space-6`), so the brand's top meets the page title's. The phone band keeps 16px.
+- `.ds-pagehead` aligns to the top, so an action's top meets the title's rather than the lede's bottom.
+- A `.ds-code` block with a `.ds-code__copy` button becomes a row: the code takes the remaining width (wrapping, or scrolling inside its own column if it is a `<pre>`) and the button keeps its own column, so it never covers a line of code.
+
 ## v0.9.3: sidenav items in the phone row
 
 Under 720px `.ds-sidenav__item` sizes to its content (`width: auto`), so items sit several to a line instead of one per line; the column above 720px is unchanged.

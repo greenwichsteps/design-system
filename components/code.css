@@ -3,3 +3,10 @@
 .ds-code pre, .ds-code code { font-family: var(--ds-font-mono); font-size: var(--ds-text-sm); font-weight: 400; }
 .ds-code__copy { position: absolute; top: var(--ds-space-2); right: var(--ds-space-2);
   background: var(--ds-code-fg); color: var(--ds-code-bg); border-color: transparent; }
+/* GRE-640. With a Copy button the block is a row: the code takes the rest of the width (wrapping
+   where its own CSS wraps, scrolling inside its column where it does not, as a <pre> does) and the
+   button sits in its own column, so no line of code runs under it. Absolute positioning (above)
+   stays for a block whose button is the only child. */
+.ds-code:has(> .ds-code__copy) { display: flex; align-items: flex-start; gap: var(--ds-space-3); }
+.ds-code:has(> .ds-code__copy) > .ds-code__copy { position: static; order: 1; flex: none; }
+.ds-code:has(> .ds-code__copy) > :not(.ds-code__copy) { flex: 1 1 auto; min-width: 0; overflow-x: auto; }
